@@ -580,7 +580,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B8CFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path><circle cx="12" cy="12" r="3.4"></circle></svg>
           <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:#8B93A9;font-weight:600;">DESIGN STUDIO</span>
           <span style="color:#3A3A4E;">·</span>
-          <span style="font-size:12.5px;color:#AEB4C6;">drag bottle to rotate · drag art to move</span>
+          <span style="font-size:12.5px;color:#AEB4C6;">drag bottle to rotate · drag art to move · use the handle to rotate art</span>
         </div>
         <div style="position:relative;flex:1;min-height:0;">
           <div style="position:absolute;inset:0;z-index:2;cursor:grab;touch-action:none;" onPointerDown="{{ startRotate }}" onPointerMove="{{ rotateMove }}" onPointerUp="{{ endDrag }}"></div>
@@ -607,6 +607,15 @@
               </div>
             </div>
           </div>
+          <sc-if value="{{ selHandleOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;z-index:4;pointer-events:none;display:flex;align-items:center;justify-content:center;">
+            <div style="position:relative;width:256px;height:420px;">
+              <div style="{{ selHandleStyle }}" title="Drag to rotate" onPointerDown="{{ startObjRotate }}" onPointerMove="{{ objRotateMove }}" onPointerUp="{{ endDrag }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
+              </div>
+            </div>
+          </div>
+          </sc-if>
         </div>
         <div style="position:relative;z-index:5;padding:16px 26px 22px;border-top:1px solid #24242F;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;align-items:center;gap:13px;">
@@ -625,7 +634,12 @@
               </sc-for>
             </div>
             <span style="flex:1;"></span>
-            <button onClick="{{ toggleWrap }}" style="{{ wrapBtnStyle }}">{{ wrapLabel }}</button>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:#6B7285;">WRAP</span>
+            <div style="display:flex;gap:2px;background:#1E1E2A;border-radius:9px;padding:3px;">
+              <sc-for list="{{ wrapModes }}" as="wm" hint-placeholder-count="3">
+                <button onClick="{{ wm.onSelect }}" style="{{ wm.style }}">{{ wm.label }}</button>
+              </sc-for>
+            </div>
           </div>
         </div>
       </div>
@@ -828,7 +842,7 @@ class Component extends DCLogic {
     this.state = {
       screen:'pdp', colorIdx:0, size:'20', method:'engrave', qty:1, galleryIdx:0,
       orderIntent:'single', justAdded:0,
-      objects:[], selectedId:null, viewAngle:0, wrap:false, objSeq:1,
+      objects:[], selectedId:null, viewAngle:0, wrap:'off', objSeq:1,
       studioOpen:false, studioTab:'assistant', draft:'', thinking:false,
       chat:[{role:'ai', text:"Hi! Tell me what you\u2019d like on your tumbler \u2014 a phrase, a vibe, or your logo. Or open the Editor tab to add text, upload a logo, and drag it around the bottle."}],
       cart:[],
@@ -875,7 +889,8 @@ class Component extends DCLogic {
       style:'cursor:pointer;border-radius:9px;padding:8px 12px;font-size:12.5px;font-weight:600;border:1px solid '+(S.qty===n?'#2D5BFF':'#E7E9F0')+';background:'+(S.qty===n?'#EEF3FF':'#fff')+';color:'+(S.qty===n?'#0B2A8A':'#6B7280')+';'}));
 
     const hasDesign=S.objects.length>0;
-    const designSummary=hasDesign?(this.designText(S.objects)+' \u00B7 '+(S.wrap?'Wrapped':'Front')+' \u00B7 '+M.label):'';
+    const wrapText=S.wrap==='repeat'?'Repeat pattern':S.wrap==='single'?'Wrapped':'Front';
+    const designSummary=hasDesign?(this.designText(S.objects)+' \u00B7 '+wrapText+' \u00B7 '+M.label):'';
 
     const previewUnit=this.unitFor(S.size,S.qty);
     const subtotal=previewUnit*S.qty;
@@ -906,9 +921,18 @@ class Component extends DCLogic {
         editorItems.push(Object.assign({isText:true,isLogo:false,text:o.text||'',style:base+'font-family:'+ft.css+';font-weight:'+ft.weight+';font-size:'+size+'px;letter-spacing:'+ft.ls+';text-transform:'+ft.tt+';white-space:nowrap;line-height:1;color:'+tc+';'},h)); }
       else { const f=S.method==='engrave'?'filter:brightness(0) '+(light?'':'invert(1)')+';opacity:'+(op*(light?.5:.55)).toFixed(3)+';mix-blend-mode:'+(light?'multiply':'soft-light')+';':'';
         const realUrl = (window.__dashImages && window.__dashImages[o.url]) || o.url;
-        editorItems.push(Object.assign({isText:false,isLogo:true,style:base+'width:'+size+'px;height:'+size+'px;background-image:url('+realUrl+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f},h)); } });
+        editorItems.push(Object.assign({isText:false,isLogo:true,style:base+'width:'+size+'px;height:'+size+'px;background-image:url("'+realUrl+'");background-size:contain;background-repeat:no-repeat;background-position:center;'+f},h)); } });
     const sel=S.objects.find(o=>o.id===S.selectedId)||null;
     const engraveNow=S.method==='engrave';
+    // rotate handle for the selected object, positioned above it on the preview
+    let selHandleOn=false, selHandleStyle='';
+    if(sel){ const hd=this.adiff(Number(sel.u)||0,S.viewAngle);
+      if(Math.abs(hd)<=86){ selHandleOn=true;
+        const hx=50+(hd/90)*40, hv=sel.v!==undefined?sel.v:50, hsize=sel.size||(sel.type==='text'?26:70);
+        const fullX=16+(hx/100)*68, fullY=34+(hv/100)*20, lift=(hsize/2+22);
+        selHandleStyle='position:absolute;left:'+fullX.toFixed(2)+'%;top:'+fullY.toFixed(2)+'%;transform:translate(-50%,-50%) translateY(-'+lift.toFixed(0)+'px);width:30px;height:30px;border-radius:50%;background:#2D5BFF;border:2px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;cursor:grab;pointer-events:auto;touch-action:none;z-index:8;';
+      }
+    }
     const layerCards=S.objects.map(o=>{ const on=o.id===S.selectedId; const isText=o.type==='text';
       return {
         isText, isLogo:!isText, selected:on,
@@ -1094,8 +1118,12 @@ class Component extends DCLogic {
       studioGrad:'linear-gradient(90deg,'+this.darken(color.hex,.4)+' 0%,'+this.darken(color.hex,.12)+' 20%,'+this.lighten(color.hex,.24)+' 50%,'+this.darken(color.hex,.12)+' 80%,'+this.darken(color.hex,.4)+' 100%)',
       editorItems, viewAngle360:((Math.round(S.viewAngle)%360)+360)%360,
       onRotateSlider:(e)=>this.set('viewAngle',Number(e.target.value)), resetView:()=>this.set('viewAngle',0),
-      studioSwatches, toggleWrap:()=>this.set('wrap',!S.wrap), wrapLabel:S.wrap?'Wrap: on':'Wrap: off',
-      wrapBtnStyle:'border:none;cursor:pointer;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;'+(S.wrap?'background:#2D5BFF;color:#fff;':'background:#1E1E2A;color:#8B93A9;'),
+      studioSwatches,
+      wrapModes:[{k:'off',label:'Off'},{k:'single',label:'Single'},{k:'repeat',label:'Pattern'}].map(w=>({
+        label:w.label, onSelect:()=>this.set('wrap',w.k),
+        style:'border:none;cursor:pointer;border-radius:7px;padding:6px 12px;font-size:11.5px;font-weight:600;'+(S.wrap===w.k?'background:#2D5BFF;color:#fff;':'background:transparent;color:#8B93A9;') })),
+      selHandleOn, selHandleStyle,
+      startObjRotate:(e)=>this.startObjRotate(e), objRotateMove:(e)=>this.objRotateMove(e),
       tabAssistant:()=>this.set('studioTab','assistant'), tabEditor:()=>this.set('studioTab','editor'),
       tabIsAssistant:S.studioTab==='assistant', tabIsEditor:S.studioTab==='editor',
       tabAStyle:tabStyle(S.studioTab==='assistant'), tabEStyle:tabStyle(S.studioTab==='editor'),
@@ -1111,6 +1139,16 @@ class Component extends DCLogic {
 
   startRotate(e){ this._drag={mode:'rotate',x:e.clientX,a0:this.state.viewAngle}; try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} }
   rotateMove(e){ if(!this._drag||this._drag.mode!=='rotate')return; const dx=e.clientX-this._drag.x; this.setState({viewAngle:this._drag.a0-dx*0.6}); }
+  startObjRotate(e){ e.stopPropagation(); const S=this.state; const sel=S.objects.find(o=>o.id===S.selectedId); if(!sel)return;
+    const area=e.currentTarget.parentElement.getBoundingClientRect();
+    const hd=this.adiff(Number(sel.u)||0,S.viewAngle); const hx=50+(hd/90)*40, hv=sel.v!==undefined?sel.v:50;
+    const cx=area.left+(16+(hx/100)*68)/100*area.width, cy=area.top+(34+(hv/100)*20)/100*area.height;
+    const a0=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;
+    this._drag={mode:'objrot',id:sel.id,cx,cy,a0,r0:Number(sel.rot)||0};
+    try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} }
+  objRotateMove(e){ if(!this._drag||this._drag.mode!=='objrot')return;
+    const a=Math.atan2(e.clientY-this._drag.cy,e.clientX-this._drag.cx)*180/Math.PI;
+    this.updateObj(this._drag.id,{rot:Math.round(this._drag.r0+(a-this._drag.a0))}); }
   startMove(o,e){ e.stopPropagation(); const band=e.currentTarget.parentElement.getBoundingClientRect();
     this._drag={mode:'move',id:o.id,x:e.clientX,y:e.clientY,u0:Number(o.u)||0,v0:o.v!==undefined?o.v:50,w:band.width||220,h:band.height||90};
     this.setState({selectedId:o.id}); try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} }
@@ -1128,9 +1166,9 @@ class Component extends DCLogic {
   clearDesign(){ this.setState({objects:[],selectedId:null}); }
   onUpload(e,inStudio){ const f=e.target.files&&e.target.files[0]; if(!f)return; const r=new FileReader();
     r.onload=()=>{ const id=this.state.objSeq;
-      const o={id,type:'logo',url:r.result,u:this.state.viewAngle,v:50,rot:0,size:52};
-      const upd={objects:[...this.state.objects,o],selectedId:id,objSeq:id+1,method:'engrave',studioOpen:true,studioTab:'editor'};
-      if(inStudio){ upd.chat=[...this.state.chat,{role:'user',text:'[Uploaded '+f.name+']'},{role:'ai',text:'Got your logo \u2014 placed and centered. It reads as one color, so I set it to laser engraving. Drag it on the bottle to reposition, add text, or resize it here in the Editor.'}]; }
+      const o={id,type:'logo',url:r.result,u:this.state.viewAngle,v:50,rot:0,size:70};
+      const upd={objects:[...this.state.objects,o],selectedId:id,objSeq:id+1,method:'uv',studioOpen:true,studioTab:'editor'};
+      if(inStudio){ upd.chat=[...this.state.chat,{role:'user',text:'[Uploaded '+f.name+']'},{role:'ai',text:'Got your logo \u2014 placed and centered in full color so it shows clearly. Drag it on the bottle to reposition, use the rotate handle to angle it, or resize it here in the Editor. Switch to laser engraving anytime for a single-color etched look.'}]; }
       this.setState(upd); };
     r.readAsDataURL(f); }
   quickStart(t){ this.setState({draft:t},()=>this.sendChat()); }
