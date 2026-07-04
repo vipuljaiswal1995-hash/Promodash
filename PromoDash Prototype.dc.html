@@ -415,7 +415,7 @@
 
   <!-- ============ CHECKOUT ============ -->
   <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
-  <div style="max-width:1060px;margin:0 auto;padding:34px 40px 72px;">
+  <div style="max-width:1060px;margin:0 auto;padding:34px 40px 116px;">
     <button onClick="{{ goCart }}" style="background:none;border:none;color:#6B7280;font-size:13px;cursor:pointer;padding:0;margin-bottom:18px;">← Back to cart</button>
     <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:32px;letter-spacing:-0.8px;margin:0 0 24px;">Checkout</h1>
     <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:start;">
@@ -467,15 +467,6 @@
               </div>
             </div>
             <sc-if value="{{ errAddress }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#E8484D;margin-top:8px;">Please complete the highlighted fields.</div></sc-if>
-            <div style="margin-top:16px;font-size:13px;font-weight:600;margin-bottom:10px;">Shipping speed</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <sc-for list="{{ speedOptions }}" as="s" hint-placeholder-count="2">
-                <button onClick="{{ s.onSelect }}" style="{{ s.style }}">
-                  <span style="display:flex;align-items:center;gap:11px;"><span style="{{ s.radio }}"></span><span><span style="font-weight:600;font-size:14px;">{{ s.name }}</span><span style="display:block;font-size:12.5px;color:#6B7280;margin-top:2px;">{{ s.eta }}</span></span></span>
-                  <span style="font-weight:600;font-size:14px;color:{{ s.priceColor }};">{{ s.price }}</span>
-                </button>
-              </sc-for>
-            </div>
           </sc-if>
 
           <!-- MANY ADDRESSES -->
@@ -648,36 +639,53 @@
         </div>
       </div>
 
-      <!-- summary -->
-      <div style="position:sticky;top:84px;background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:24px;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:14px;">Order summary</div>
-        <div style="display:flex;flex-direction:column;gap:12px;padding-bottom:14px;border-bottom:1px solid #EEF0F5;">
-          <sc-for list="{{ cartLines }}" as="l" hint-placeholder-count="1">
-            <div style="display:flex;gap:12px;align-items:center;">
-              <div style="display:grid;width:38px;height:52px;flex:none;filter:drop-shadow(0 4px 6px rgba(20,20,43,.16));"><dc-import name="Bottle" colorhex="{{ l.hex }}" method="{{ l.method }}" objects="{{ l.objects }}" viewangle="{{ zero }}" wrap="{{ l.wrap }}" hint-size="100%,100%"></dc-import></div>
-              <div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:600;">{{ l.sizeLabel }} · {{ l.methodLabel }}</div><div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Qty {{ l.qty }} · {{ l.colorName }}</div></div>
-              <div style="font-size:13px;font-weight:600;">{{ l.lineFmt }}</div>
+      <!-- right column: shipping speed (single-address only) + summary -->
+      <div style="position:sticky;top:84px;display:flex;flex-direction:column;gap:20px;">
+        <sc-if value="{{ shipOne }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:20px 22px;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Shipping speed</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <sc-for list="{{ speedOptions }}" as="s" hint-placeholder-count="2">
+                <button onClick="{{ s.onSelect }}" style="{{ s.style }}">
+                  <span style="display:flex;align-items:center;gap:11px;"><span style="{{ s.radio }}"></span><span><span style="font-weight:600;font-size:14px;">{{ s.name }}</span><span style="display:block;font-size:12.5px;color:#6B7280;margin-top:2px;">{{ s.eta }}</span></span></span>
+                  <span style="font-weight:600;font-size:14px;color:{{ s.priceColor }};">{{ s.price }}</span>
+                </button>
+              </sc-for>
             </div>
-          </sc-for>
-        </div>
-        <div style="margin-top:14px;">
-          <div style="display:flex;gap:8px;">
-            <input value="{{ discountCode }}" onChange="{{ onDiscount }}" placeholder="Discount code" style="flex:1;font-size:13px;padding:10px 12px;border:1px solid #D9DEE8;border-radius:9px;">
-            <button onClick="{{ applyDiscount }}" style="background:#14142B;color:#fff;border:none;border-radius:9px;padding:0 16px;font-size:13px;font-weight:600;cursor:pointer;">Apply</button>
           </div>
-          <sc-if value="{{ discountError }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#E8484D;margin-top:6px;">That code isn't valid. Try PROMO10.</div></sc-if>
-          <sc-if value="{{ discountOk }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#1F9D6B;font-weight:600;margin-top:6px;">✓ PROMO10 applied — 10% off</div></sc-if>
+        </sc-if>
+        <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:24px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:14px;">Order summary</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid #EEF0F5;font-size:13.5px;"><span style="color:#6B7280;">Items</span><span style="font-weight:600;color:#14142B;">{{ cartCountLabel }}</span></div>
+          <div style="margin-top:14px;">
+            <div style="display:flex;gap:8px;">
+              <input value="{{ discountCode }}" onChange="{{ onDiscount }}" placeholder="Discount code" style="flex:1;font-size:13px;padding:10px 12px;border:1px solid #D9DEE8;border-radius:9px;">
+              <button onClick="{{ applyDiscount }}" style="background:#14142B;color:#fff;border:none;border-radius:9px;padding:0 16px;font-size:13px;font-weight:600;cursor:pointer;">Apply</button>
+            </div>
+            <sc-if value="{{ discountError }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#E8484D;margin-top:6px;">That code isn't valid. Try PROMO10.</div></sc-if>
+            <sc-if value="{{ discountOk }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#1F9D6B;font-weight:600;margin-top:6px;">✓ PROMO10 applied — 10% off</div></sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;font-size:13.5px;color:#3C4152;">
+            <div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Subtotal ({{ cartCount }})</span><span>{{ sSubtotalFmt }}</span></div>
+            <sc-if value="{{ discountOk }}" hint-placeholder-val="{{ false }}"><div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Discount</span><span style="color:#1F9D6B;">−{{ sDiscountFmt }}</span></div></sc-if>
+            <div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Shipping</span><span>{{ sShipFmt }}</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Tax</span><span>{{ sTaxFmt }}</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:14px;border-top:1px solid #E7E9F0;"><span style="font-size:14px;font-weight:600;">Total</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:23px;color:#1F9D6B;">{{ sTotalFmt }}</span></div>
+          <div style="background:#EEF3FF;border-radius:9px;padding:9px;font-size:12px;font-weight:600;color:#0B2A8A;text-align:center;margin-top:14px;">🖉 Free proof to approve before print</div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;font-size:13.5px;color:#3C4152;">
-          <div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Subtotal ({{ cartCount }})</span><span>{{ sSubtotalFmt }}</span></div>
-          <sc-if value="{{ discountOk }}" hint-placeholder-val="{{ false }}"><div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Discount</span><span style="color:#1F9D6B;">−{{ sDiscountFmt }}</span></div></sc-if>
-          <div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Shipping</span><span>{{ sShipFmt }}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:#6B7280;">Tax</span><span>{{ sTaxFmt }}</span></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:14px;border-top:1px solid #E7E9F0;"><span style="font-size:14px;font-weight:600;">Total</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:23px;color:#1F9D6B;">{{ sTotalFmt }}</span></div>
-        <div style="background:#EEF3FF;border-radius:9px;padding:9px;font-size:12px;font-weight:600;color:#0B2A8A;text-align:center;margin-top:14px;">🖉 Free proof to approve before print</div>
-        <button onClick="{{ placeOrder }}" style="width:100%;margin-top:12px;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;">Place order · {{ sTotalFmt }}</button>
       </div>
+    </div>
+  </div>
+  <!-- STICKY PLACE-ORDER BAR -->
+  <div style="position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid #E7E9F0;box-shadow:0 -6px 22px rgba(20,20,43,.08);padding:13px 40px;">
+    <div style="max-width:1060px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;">
+      <div style="display:flex;align-items:baseline;gap:9px;min-width:0;">
+        <span style="font-size:12.5px;color:#9AA3B2;">Total</span>
+        <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:#14142B;">{{ sTotalFmt }}</span>
+        <span style="font-size:12px;color:#9AA3B2;white-space:nowrap;">· {{ cartCountLabel }}</span>
+      </div>
+      <button onClick="{{ placeOrder }}" style="flex:none;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:14px 40px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(31,157,107,.26);">Place order →</button>
     </div>
   </div>
   </sc-if>
