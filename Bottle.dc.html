@@ -39,7 +39,14 @@ class Component extends DCLogic {
     const wrap = !!this.props.wrap;
     const view = Number(this.props.viewangle)||0;
     const light = this.isLight(color);
-    let objs = Array.isArray(this.props.objects) ? this.props.objects.slice() : [];
+    let objs = [];
+    if(Array.isArray(this.props.objects)) { objs = this.props.objects.slice(); }
+    else if(typeof this.props.objects === 'string' && this.props.objects.startsWith('%5B')) {
+      try { objs = JSON.parse(decodeURIComponent(this.props.objects)); } catch(e) {}
+    } else if(typeof this.props.objects === 'string' && this.props.objects.startsWith('[')) {
+      try { objs = JSON.parse(this.props.objects); } catch(e) {}
+    }
+    if(!Array.isArray(objs)) objs = [];
     if(wrap && objs.length){ const ex=[]; objs.forEach(o=>{ [0,120,240].forEach(off=>ex.push(Object.assign({},o,{u:(Number(o.u)||0)+off}))); }); objs=ex; }
     const items = [];
     objs.forEach(o=>{
@@ -59,7 +66,8 @@ class Component extends DCLogic {
         items.push({ isText:true, isLogo:false, text:o.text||'', style: base+'font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:'+size+'px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;line-height:1;color:'+tcolor+';text-shadow:'+sh+';' });
       } else {
         const f = method==='engrave' ? 'filter:brightness(0) '+(light?'':'invert(1)')+';opacity:'+(op*(light?.5:.55)).toFixed(3)+';mix-blend-mode:'+(light?'multiply':'soft-light')+';' : '';
-        items.push({ isText:false, isLogo:true, style: base+'width:'+size+'px;height:'+size+'px;background-image:url('+o.url+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f });
+        const realUrl = (window.__dashImages && window.__dashImages[o.url]) || (window.parent && window.parent.__dashImages && window.parent.__dashImages[o.url]) || o.url;
+        items.push({ isText:false, isLogo:true, style: base+'width:'+size+'px;height:'+size+'px;background-image:url('+realUrl+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f });
       }
     });
     // shading rotates with the view: the bright reflection band slides across the cylinder

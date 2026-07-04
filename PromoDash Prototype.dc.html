@@ -56,10 +56,6 @@
         <div style="position:relative;background:#FFFFFF;border:1px solid #E7E9F0;border-radius:24px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,43,.05);">
           <!-- BOTTLE view -->
           <sc-if value="{{ galBottle }}" hint-placeholder-val="{{ true }}">
-            <div style="position:absolute;top:18px;left:18px;z-index:4;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.9);backdrop-filter:blur(6px);border:1px solid #EEF0F5;border-radius:999px;padding:6px 13px 6px 10px;box-shadow:0 2px 8px rgba(20,20,43,.06);">
-              <span style="width:13px;height:13px;border-radius:4px;background:{{ selectedHex }};box-shadow:0 0 0 1px rgba(0,0,0,.14);"></span>
-              <span style="font-size:12.5px;font-weight:600;color:#14142B;">{{ decorationChip }}</span>
-            </div>
             <div style="position:absolute;top:22px;right:20px;z-index:4;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1.5px;color:#B4BAC7;">↔ DRAG TO ROTATE</div>
             <div style="position:relative;height:520px;background:radial-gradient(130% 100% at 50% 16%,#FBFCFE 0%,#EDF0F6 60%,#E4E8F0 100%);">
               <div style="position:absolute;inset:0;z-index:2;cursor:grab;touch-action:none;" onPointerDown="{{ startRotate }}" onPointerMove="{{ rotateMove }}" onPointerUp="{{ endDrag }}"></div>
@@ -837,7 +833,8 @@ class Component extends DCLogic {
       if(o.type==='text'){ const tc=S.method==='engrave'?(light?'rgba(24,24,34,.55)':'rgba(255,255,255,.66)'):(o.color||(light?'#14142B':'#FFFFFF'));
         editorItems.push(Object.assign({isText:true,isLogo:false,text:o.text||'',style:base+'font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:'+size+'px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;line-height:1;color:'+tc+';'},h)); }
       else { const f=S.method==='engrave'?'filter:brightness(0) '+(light?'':'invert(1)')+';opacity:'+(op*(light?.5:.55)).toFixed(3)+';mix-blend-mode:'+(light?'multiply':'soft-light')+';':'';
-        editorItems.push(Object.assign({isText:false,isLogo:true,style:base+'width:'+size+'px;height:'+size+'px;background-image:url('+o.url+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f},h)); } });
+        const realUrl = (window.__dashImages && window.__dashImages[o.url]) || o.url;
+        editorItems.push(Object.assign({isText:false,isLogo:true,style:base+'width:'+size+'px;height:'+size+'px;background-image:url('+realUrl+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f},h)); } });
     const sel=S.objects.find(o=>o.id===S.selectedId)||null;
     const layers=S.objects.map(o=>({name:o.type==='text'?(o.text||'Text'):'Logo',icon:o.type==='text'?'T':'▣',
       onSelect:()=>this.set('selectedId',o.id), onDelete:(e)=>{e.stopPropagation();this.deleteObj(o.id);},
@@ -847,7 +844,7 @@ class Component extends DCLogic {
     const totalUnits=this.cartUnits();
     const cartLines=S.cart.map(l=>{ const unit=this.unitFor(l.size,totalUnits); const cObj=this.COLORS[l.colorIdx]; const so=this.SIZES.find(x=>x.id===l.size)||this.SIZES[0];
       return {id:l.id, hex:cObj.hex, colorName:cObj.name, method:l.method, methodLabel:this.METHODS[l.method].label,
-        sizeLabel:so.label, objects:l.objects, wrap:l.wrap, qty:l.qty, designText:this.designText(l.objects),
+        sizeLabel:so.label, objects:encodeURIComponent(JSON.stringify(l.objects)), wrap:l.wrap, qty:l.qty, designText:this.designText(l.objects),
         unitFmt:this.fmt(unit), lineFmt:this.fmt(unit*l.qty),
         inc:()=>this.cartQty(l.id,1), dec:()=>this.cartQty(l.id,-1), remove:()=>this.cartRemove(l.id)}; });
     const cartSubtotal=S.cart.reduce((a,l)=>a+this.unitFor(l.size,totalUnits)*l.qty,0);
@@ -868,7 +865,7 @@ class Component extends DCLogic {
 
     // ---- distribution split-grid: addresses (rows) × designs (columns) ----
     const dist=S.dist||{};
-    const gridDesigns=S.cart.map(l=>({lineId:l.id, name:this.COLORS[l.colorIdx].name+' · '+(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label, hex:this.COLORS[l.colorIdx].hex, method:l.method, objects:l.objects, wrap:l.wrap, qty:l.qty, qtyLabel:'need '+l.qty}));
+    const gridDesigns=S.cart.map(l=>({lineId:l.id, name:this.COLORS[l.colorIdx].name+' · '+(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label, hex:this.COLORS[l.colorIdx].hex, method:l.method, objects:encodeURIComponent(JSON.stringify(l.objects)), wrap:l.wrap, qty:l.qty, qtyLabel:'need '+l.qty}));
     const cellVal=(aid,lid)=>Number(dist[aid+':'+lid])||0;
     const gridRows=S.manyAddr.map(a=>{
       const cells=gridDesigns.map(d=>({qty:cellVal(a.id,d.lineId), onChange:(e)=>this.setDist(a.id,d.lineId,e.target.value)}));
@@ -915,7 +912,7 @@ class Component extends DCLogic {
       isPdp:scr==='pdp', isCart:scr==='cart', isCheckout:scr==='checkout', isConfirm:scr==='confirm',
 
       selectedHex:color.hex, selectedColorName:color.name, method:S.method, methodLabel:M.label, decorationChip:M.label,
-      objects:S.objects, viewAngle:S.viewAngle, wrap:S.wrap, sizeLabel:sizeObj.label,
+      objects:encodeURIComponent(JSON.stringify(S.objects)), viewAngle:S.viewAngle, wrap:S.wrap, sizeLabel:sizeObj.label,
       swatches, methodChips, qtyPresets,
       colorOptions, colorIdxStr:String(S.colorIdx), onColorPick:(e)=>this.set('colorIdx',parseInt(e.target.value,10)||0),
       sizeSelectOptions, size:S.size, onSizePick:(e)=>this.set('size',e.target.value),
@@ -1025,7 +1022,8 @@ class Component extends DCLogic {
   deleteObj(id){ this.setState({objects:this.state.objects.filter(o=>o.id!==id),selectedId:this.state.selectedId===id?null:this.state.selectedId}); }
   clearDesign(){ this.setState({objects:[],selectedId:null}); }
   onUpload(e,inStudio){ const f=e.target.files&&e.target.files[0]; if(!f)return; const r=new FileReader();
-    r.onload=()=>{ const id=this.state.objSeq; const o={id,type:'logo',url:r.result,u:this.state.viewAngle,v:50,rot:0,size:78};
+    r.onload=()=>{ const id=this.state.objSeq; window.__dashImages=window.__dashImages||{}; const imgId='img_'+Date.now()+'_'+id; window.__dashImages[imgId]=r.result;
+      const o={id,type:'logo',url:imgId,u:this.state.viewAngle,v:50,rot:0,size:52};
       const upd={objects:[...this.state.objects,o],selectedId:id,objSeq:id+1,method:'engrave',studioOpen:true,studioTab:'editor'};
       if(inStudio){ upd.chat=[...this.state.chat,{role:'user',text:'[Uploaded '+f.name+']'},{role:'ai',text:'Got your logo \u2014 placed and centered. It reads as one color, so I set it to laser engraving. Drag it on the bottle to reposition, add text, or resize it here in the Editor.'}]; }
       this.setState(upd); };
