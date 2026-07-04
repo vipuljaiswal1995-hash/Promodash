@@ -491,7 +491,20 @@
                 <div style="flex:1;display:flex;">
                   <sc-for list="{{ gridDesigns }}" as="d" hint-placeholder-count="2">
                     <div style="flex:1;min-width:96px;padding:9px 8px;border-left:1px solid #E7E9F0;display:flex;align-items:center;gap:7px;">
-                      <span style="width:22px;height:30px;flex:none;display:grid;filter:drop-shadow(0 2px 3px rgba(20,20,43,.18));"><dc-import name="Bottle" colorhex="{{ d.hex }}" method="{{ d.method }}" objects="{{ d.objects }}" viewangle="{{ zero }}" wrap="{{ d.wrap }}" hint-size="100%,100%"></dc-import></span>
+                      <sc-if value="{{ d.isBottle }}" hint-placeholder-val="{{ true }}">
+                        <span style="width:22px;height:30px;flex:none;display:grid;filter:drop-shadow(0 2px 3px rgba(20,20,43,.18));"><dc-import name="Bottle" colorhex="{{ d.hex }}" method="{{ d.method }}" objects="{{ d.objects }}" viewangle="{{ zero }}" wrap="{{ d.wrap }}" hint-size="100%,100%"></dc-import></span>
+                      </sc-if>
+                      <sc-if value="{{ d.isCompanion }}" hint-placeholder-val="{{ false }}">
+                        <span style="{{ d.mockWrap }}">
+                          <span style="{{ d.mockBody }}"></span>
+                          <span style="{{ d.mockSurface }}">
+                            <sc-if value="{{ d.mockHasLogo }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockOverlay }}"></span></sc-if>
+                            <sc-if value="{{ d.mockHasText }}" hint-placeholder-val="{{ true }}"><span style="{{ d.mockOverlay }}">{{ d.mockOverlayText }}</span></sc-if>
+                          </span>
+                          <span style="{{ d.mockA1 }}"></span>
+                          <span style="{{ d.mockA2 }}"></span>
+                        </span>
+                      </sc-if>
                       <span style="min-width:0;"><span style="display:block;font-size:11.5px;font-weight:600;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.name }}</span><span style="display:block;font-size:10.5px;color:#9AA3B2;">{{ d.qtyLabel }}</span></span>
                     </div>
                   </sc-for>
@@ -931,7 +944,7 @@ class Component extends DCLogic {
     if(prim){ if(prim.type==='logo'){ hasLogo=true; overlay='width:80%;height:80%;background-image:url("'+prim.url+'");background-size:contain;background-repeat:no-repeat;background-position:center;'; }
       else { hasText=true; overlayText=prim.text||''; const ft=this.FONTS.find(f=>f.id===prim.font)||this.FONTS[0];
         overlay='max-width:96%;font-family:'+ft.css+';font-weight:'+ft.weight+';font-size:'+(8*sc).toFixed(1)+'px;letter-spacing:'+ft.ls+';text-transform:'+ft.tt+';color:'+(prim.color||'#14142B')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1;'; } }
-    const W=64*sc, H=76*sc, wrap='position:relative;width:'+W.toFixed(0)+'px;height:'+H.toFixed(0)+'px;flex:none;';
+    const W=64*sc, H=76*sc, wrap='position:relative;display:inline-block;width:'+W.toFixed(0)+'px;height:'+H.toFixed(0)+'px;flex:none;vertical-align:middle;';
     const P=(v)=>(v*sc).toFixed(1)+'px';
     let body,a1,a2,surface;
     if(product==='pen'){
@@ -1092,7 +1105,14 @@ class Component extends DCLogic {
 
     // ---- distribution split-grid: addresses (rows) × designs (columns) ----
     const dist=S.dist||{};
-    const gridDesigns=S.cart.map(l=>({lineId:l.id, name:this.COLORS[l.colorIdx].name+' · '+(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label, hex:this.COLORS[l.colorIdx].hex, method:l.method, objects:l.objects, wrap:l.wrap, qty:l.qty, qtyLabel:'need '+l.qty}));
+    const gridDesigns=S.cart.map(l=>{ const isBottle=!l.product||l.product==='bottle'; const cHex=this.COLORS[l.colorIdx].hex;
+      const comp=isBottle?null:this.COMPANIONS.find(c=>c.k===l.product);
+      const gm=isBottle?null:this.productMock(l.product,cHex,l.objects,0.42);
+      return {lineId:l.id, isBottle, isCompanion:!isBottle,
+        name:this.COLORS[l.colorIdx].name+' · '+(isBottle?(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label:comp.name),
+        hex:cHex, method:l.method, objects:l.objects, wrap:l.wrap, qty:l.qty, qtyLabel:'need '+l.qty,
+        mockWrap:gm&&gm.wrap, mockBody:gm&&gm.body, mockA1:gm&&gm.a1, mockA2:gm&&gm.a2, mockSurface:gm&&gm.surface,
+        mockHasLogo:gm&&gm.hasLogo, mockHasText:gm&&gm.hasText, mockOverlay:gm&&gm.overlay, mockOverlayText:gm&&gm.overlayText}; });
     const cellVal=(aid,lid)=>Number(dist[aid+':'+lid])||0;
     const gridRows=S.manyAddr.map(a=>{
       const cells=gridDesigns.map(d=>({qty:cellVal(a.id,d.lineId), onChange:(e)=>this.setDist(a.id,d.lineId,e.target.value)}));
