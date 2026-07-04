@@ -480,79 +480,150 @@
 
           <!-- MANY ADDRESSES -->
           <sc-if value="{{ shipMany }}" hint-placeholder-val="{{ false }}">
+            <!-- ADDRESS BOOK -->
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-              <span style="font-size:12.5px;color:#6B7280;">Enter how many of each design goes to each address.</span>
+              <span style="font-size:12.5px;font-weight:600;color:#6B7280;">Your addresses</span>
               <span style="{{ reconcileStyle }}">{{ reconcileMsg }}</span>
             </div>
-            <div style="border:1px solid #E7E9F0;border-radius:12px;overflow:hidden;">
-              <!-- header -->
-              <div style="display:flex;align-items:stretch;background:#F7F8FB;border-bottom:1px solid #E7E9F0;">
-                <div style="width:200px;flex:none;padding:11px 13px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1px;color:#9AA3B2;display:flex;align-items:center;">SHIP TO \\ DESIGN</div>
-                <div style="flex:1;display:flex;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <sc-for list="{{ addrBook }}" as="a" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span style="flex:none;width:26px;height:26px;border-radius:8px;background:#EEF3FF;color:#2D5BFF;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ a.tag }}</span>
+                  <input value="{{ a.place }}" onChange="{{ a.onPlace }}" placeholder="Recipient / location" style="flex:1;font-size:12.5px;padding:9px 11px;border:1px solid #D9DEE8;border-radius:9px;background:#fff;">
+                  <button onClick="{{ a.onRemove }}" style="flex:none;background:none;border:none;color:#C7CCDA;font-size:18px;cursor:pointer;padding:0 4px;">×</button>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:14px;margin-top:12px;">
+              <button onClick="{{ addAddress }}" style="background:#EEF3FF;border:1px solid #2D5BFF;color:#0B2A8A;border-radius:10px;padding:9px 15px;font-size:12.5px;font-weight:600;cursor:pointer;">+ Add address</button>
+              <button style="background:none;border:none;color:#2D5BFF;font-size:12.5px;font-weight:600;cursor:pointer;">⬆ Upload address CSV</button>
+            </div>
+
+            <!-- INTENT CHOOSER (ambiguous carts only) -->
+            <sc-if value="{{ needIntent }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:20px;padding-top:18px;border-top:1px solid #EEF0F5;">
+                <div style="font-size:13.5px;font-weight:600;color:#14142B;">How should we split this order?</div>
+                <div style="font-size:12px;color:#9AA3B2;margin:3px 0 12px;">Your items have different quantities — choose how they ship.</div>
+                <div style="display:flex;flex-direction:column;gap:9px;">
+                  <sc-for list="{{ intentCards }}" as="ic" hint-placeholder-count="3">
+                    <button onClick="{{ ic.onSelect }}" style="{{ ic.style }}">
+                      <div style="font-size:13.5px;font-weight:600;color:#14142B;">{{ ic.title }}</div>
+                      <div style="font-size:12px;color:#6B7280;margin-top:2px;">{{ ic.desc }}</div>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- ASSIGN MODE: one address per item -->
+            <sc-if value="{{ modeAssign }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:20px;padding-top:16px;border-top:1px solid #EEF0F5;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                  <span style="font-size:12.5px;font-weight:600;color:#6B7280;">Send each item to an address</span>
+                  <sc-if value="{{ showIntentChange }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resetIntent }}" style="background:none;border:none;color:#2D5BFF;font-size:12px;font-weight:600;cursor:pointer;">Change split</button></sc-if>
+                </div>
+                <div style="border:1px solid #E7E9F0;border-radius:12px;overflow:hidden;">
                   <sc-for list="{{ gridDesigns }}" as="d" hint-placeholder-count="2">
-                    <div style="flex:1;min-width:96px;padding:9px 8px;border-left:1px solid #E7E9F0;display:flex;align-items:center;gap:7px;">
-                      <sc-if value="{{ d.isBottle }}" hint-placeholder-val="{{ true }}">
-                        <span style="width:22px;height:30px;flex:none;display:grid;filter:drop-shadow(0 2px 3px rgba(20,20,43,.18));"><dc-import name="Bottle" colorhex="{{ d.hex }}" method="{{ d.method }}" objects="{{ d.objects }}" viewangle="{{ zero }}" wrap="{{ d.wrap }}" hint-size="100%,100%"></dc-import></span>
-                      </sc-if>
-                      <sc-if value="{{ d.isCompanion }}" hint-placeholder-val="{{ false }}">
-                        <span style="{{ d.mockWrap }}">
-                          <span style="{{ d.mockBody }}"></span>
-                          <span style="{{ d.mockSurface }}">
-                            <sc-if value="{{ d.mockHasLogo }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockOverlay }}"></span></sc-if>
-                            <sc-if value="{{ d.mockHasText }}" hint-placeholder-val="{{ true }}"><span style="{{ d.mockOverlay }}">{{ d.mockOverlayText }}</span></sc-if>
-                          </span>
-                          <span style="{{ d.mockA1 }}"></span>
-                          <span style="{{ d.mockA2 }}"></span>
-                        </span>
-                      </sc-if>
-                      <span style="min-width:0;"><span style="display:block;font-size:11.5px;font-weight:600;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.name }}</span><span style="display:block;font-size:10.5px;color:#9AA3B2;">{{ d.qtyLabel }}</span></span>
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #F2F4F8;">
+                      <sc-if value="{{ d.isBottle }}" hint-placeholder-val="{{ true }}"><span style="width:30px;height:42px;flex:none;display:grid;filter:drop-shadow(0 3px 4px rgba(20,20,43,.16));"><dc-import name="Bottle" colorhex="{{ d.hex }}" method="{{ d.method }}" objects="{{ d.objects }}" viewangle="{{ zero }}" wrap="{{ d.wrap }}" hint-size="100%,100%"></dc-import></span></sc-if>
+                      <sc-if value="{{ d.isCompanion }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockWrap }}"><span style="{{ d.mockBody }}"></span><span style="{{ d.mockSurface }}"><sc-if value="{{ d.mockHasLogo }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockOverlay }}"></span></sc-if><sc-if value="{{ d.mockHasText }}" hint-placeholder-val="{{ true }}"><span style="{{ d.mockOverlay }}">{{ d.mockOverlayText }}</span></sc-if></span><span style="{{ d.mockA1 }}"></span><span style="{{ d.mockA2 }}"></span></span></sc-if>
+                      <div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.name }}</div><div style="font-size:11.5px;color:#9AA3B2;">{{ d.qtyLabel }}</div></div>
+                      <div style="position:relative;flex:none;width:180px;">
+                        <select value="{{ d.assignedVal }}" onChange="{{ d.onAssign }}" style="width:100%;font-size:12.5px;font-weight:600;padding:9px 26px 9px 11px;border:1px solid #D9DEE8;border-radius:9px;background:#fff;appearance:none;cursor:pointer;">
+                          <sc-for list="{{ d.addrOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                        </select>
+                        <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#9AA3B2;pointer-events:none;font-size:9px;">▼</span>
+                      </div>
                     </div>
                   </sc-for>
                 </div>
-                <div style="width:64px;flex:none;padding:11px 8px;border-left:1px solid #E7E9F0;font-size:11px;font-weight:600;color:#3C4152;display:flex;align-items:center;justify-content:flex-end;">Row</div>
-                <div style="width:34px;flex:none;"></div>
               </div>
-              <!-- rows -->
-              <sc-for list="{{ gridRows }}" as="r" hint-placeholder-count="2">
-                <div style="display:flex;align-items:stretch;border-bottom:1px solid #F2F4F8;">
-                  <div style="width:200px;flex:none;padding:8px 10px;display:flex;align-items:center;gap:7px;">
-                    <span style="font-size:14px;flex:none;">📍</span>
-                    <input value="{{ r.place }}" onChange="{{ r.onPlace }}" placeholder="Recipient / location" style="width:100%;font-size:12.5px;padding:8px 9px;border:1px solid #D9DEE8;border-radius:8px;background:#fff;">
+            </sc-if>
+
+            <!-- QUANTITY MODE: split each item's units -->
+            <sc-if value="{{ modeQuantity }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:20px;padding-top:16px;border-top:1px solid #EEF0F5;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                  <span style="font-size:12.5px;font-weight:600;color:#6B7280;">Split each item across addresses</span>
+                  <div style="display:flex;gap:12px;align-items:center;">
+                    <sc-if value="{{ showIntentChange }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resetIntent }}" style="background:none;border:none;color:#2D5BFF;font-size:12px;font-weight:600;cursor:pointer;">Change split</button></sc-if>
+                    <button onClick="{{ autoSplit }}" style="background:#fff;border:1px solid #D9DEE8;color:#14142B;border-radius:9px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;">Split evenly</button>
                   </div>
-                  <div style="flex:1;display:flex;">
-                    <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="2">
-                      <div style="flex:1;min-width:96px;padding:8px;border-left:1px solid #F2F4F8;display:flex;align-items:center;justify-content:center;">
-                        <sc-if value="{{ c.single }}" hint-placeholder-val="{{ false }}">
-                          <div onClick="{{ c.onPick }}" title="Ship this item here" style="{{ c.pickStyle }}"></div>
-                        </sc-if>
-                        <sc-if value="{{ c.multi }}" hint-placeholder-val="{{ true }}">
-                          <input type="number" min="0" value="{{ c.qty }}" onChange="{{ c.onChange }}" style="width:100%;max-width:72px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:8px 4px;border:1px solid #D9DEE8;border-radius:8px;background:#fff;">
-                        </sc-if>
-                      </div>
-                    </sc-for>
-                  </div>
-                  <div style="width:64px;flex:none;padding:8px;border-left:1px solid #F2F4F8;display:flex;align-items:center;justify-content:flex-end;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:#0B2A8A;">{{ r.total }}</div>
-                  <div style="width:34px;flex:none;display:flex;align-items:center;justify-content:center;"><button onClick="{{ r.onRemove }}" style="background:none;border:none;color:#C7CCDA;font-size:17px;cursor:pointer;padding:0;">×</button></div>
                 </div>
-              </sc-for>
-              <!-- footer: per-design allocation -->
-              <div style="display:flex;align-items:stretch;background:#F7F8FB;">
-                <div style="width:200px;flex:none;padding:10px 13px;font-size:11.5px;font-weight:600;color:#3C4152;display:flex;align-items:center;">Allocated / need</div>
-                <div style="flex:1;display:flex;">
-                  <sc-for list="{{ gridColTotals }}" as="c" hint-placeholder-count="2">
-                    <div style="flex:1;min-width:96px;padding:10px 8px;border-left:1px solid #E7E9F0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:{{ c.color }};">{{ c.label }}</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <sc-for list="{{ gridDesigns }}" as="d" hint-placeholder-count="2">
+                    <div style="border:1px solid #E7E9F0;border-radius:12px;padding:12px 14px;">
+                      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                        <sc-if value="{{ d.isBottle }}" hint-placeholder-val="{{ true }}"><span style="width:30px;height:42px;flex:none;display:grid;filter:drop-shadow(0 3px 4px rgba(20,20,43,.16));"><dc-import name="Bottle" colorhex="{{ d.hex }}" method="{{ d.method }}" objects="{{ d.objects }}" viewangle="{{ zero }}" wrap="{{ d.wrap }}" hint-size="100%,100%"></dc-import></span></sc-if>
+                        <sc-if value="{{ d.isCompanion }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockWrap }}"><span style="{{ d.mockBody }}"></span><span style="{{ d.mockSurface }}"><sc-if value="{{ d.mockHasLogo }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockOverlay }}"></span></sc-if><sc-if value="{{ d.mockHasText }}" hint-placeholder-val="{{ true }}"><span style="{{ d.mockOverlay }}">{{ d.mockOverlayText }}</span></sc-if></span><span style="{{ d.mockA1 }}"></span><span style="{{ d.mockA2 }}"></span></span></sc-if>
+                        <div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.name }}</div><div style="font-size:11.5px;color:#9AA3B2;">{{ d.qtyLabel }}</div></div>
+                        <span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:{{ d.allocColor }};">{{ d.allocLabel }}</span>
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:7px;">
+                        <sc-for list="{{ d.allocRows }}" as="ar" hint-placeholder-count="2">
+                          <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="flex:1;min-width:0;font-size:12.5px;color:#3C4152;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ ar.label }}</span>
+                            <input type="number" min="0" value="{{ ar.qty }}" onChange="{{ ar.onChange }}" style="flex:none;width:64px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 4px;border:1px solid #D9DEE8;border-radius:8px;background:#fff;">
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
                   </sc-for>
                 </div>
-                <div style="width:64px;flex:none;padding:10px 8px;border-left:1px solid #E7E9F0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#14142B;">{{ gridGrand }}</div>
-                <div style="width:34px;flex:none;"></div>
               </div>
-            </div>
-            <sc-if value="{{ gridUnbalanced }}" hint-placeholder-val="{{ false }}"><div style="margin-top:10px;background:#FFF8EC;border:1px solid #F0DCA8;border-radius:10px;padding:10px 14px;font-size:12.5px;color:#7A5200;">{{ unbalancedMsg }}</div></sc-if>
-            <div style="display:flex;gap:14px;margin-top:12px;">
-              <button onClick="{{ addAddress }}" style="background:#EEF3FF;border:1px solid #2D5BFF;color:#0B2A8A;border-radius:10px;padding:10px 16px;font-size:12.5px;font-weight:600;cursor:pointer;">+ Add address</button>
-              <button onClick="{{ autoSplit }}" style="background:#fff;border:1px solid #D9DEE8;color:#14142B;border-radius:10px;padding:10px 16px;font-size:12.5px;font-weight:600;cursor:pointer;">Split evenly</button>
-              <button style="background:none;border:none;color:#2D5BFF;font-size:12.5px;font-weight:600;cursor:pointer;">⬆ Upload address CSV</button>
-            </div>
+            </sc-if>
+
+            <!-- CUSTOM MODE: advanced grid (addresses × items) -->
+            <sc-if value="{{ modeCustom }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:20px;padding-top:16px;border-top:1px solid #EEF0F5;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                  <span style="font-size:12.5px;font-weight:600;color:#6B7280;">Manual allocation</span>
+                  <div style="display:flex;gap:12px;align-items:center;">
+                    <sc-if value="{{ showIntentChange }}" hint-placeholder-val="{{ true }}"><button onClick="{{ resetIntent }}" style="background:none;border:none;color:#2D5BFF;font-size:12px;font-weight:600;cursor:pointer;">Change split</button></sc-if>
+                    <button onClick="{{ autoSplit }}" style="background:#fff;border:1px solid #D9DEE8;color:#14142B;border-radius:9px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;">Split evenly</button>
+                  </div>
+                </div>
+                <div style="border:1px solid #E7E9F0;border-radius:12px;overflow-x:auto;">
+                  <div style="display:flex;align-items:stretch;background:#F7F8FB;border-bottom:1px solid #E7E9F0;min-width:max-content;">
+                    <div style="width:150px;flex:none;padding:11px 13px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1px;color:#9AA3B2;display:flex;align-items:center;">ADDR \\ ITEM</div>
+                    <div style="display:flex;">
+                      <sc-for list="{{ gridDesigns }}" as="d" hint-placeholder-count="2">
+                        <div style="width:120px;flex:none;padding:9px 8px;border-left:1px solid #E7E9F0;display:flex;align-items:center;gap:7px;">
+                          <sc-if value="{{ d.isBottle }}" hint-placeholder-val="{{ true }}"><span style="width:20px;height:28px;flex:none;display:grid;filter:drop-shadow(0 2px 3px rgba(20,20,43,.18));"><dc-import name="Bottle" colorhex="{{ d.hex }}" method="{{ d.method }}" objects="{{ d.objects }}" viewangle="{{ zero }}" wrap="{{ d.wrap }}" hint-size="100%,100%"></dc-import></span></sc-if>
+                          <sc-if value="{{ d.isCompanion }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockWrap }}"><span style="{{ d.mockBody }}"></span><span style="{{ d.mockSurface }}"><sc-if value="{{ d.mockHasLogo }}" hint-placeholder-val="{{ false }}"><span style="{{ d.mockOverlay }}"></span></sc-if><sc-if value="{{ d.mockHasText }}" hint-placeholder-val="{{ true }}"><span style="{{ d.mockOverlay }}">{{ d.mockOverlayText }}</span></sc-if></span><span style="{{ d.mockA1 }}"></span><span style="{{ d.mockA2 }}"></span></span></sc-if>
+                          <span style="min-width:0;"><span style="display:block;font-size:11px;font-weight:600;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.name }}</span><span style="display:block;font-size:10px;color:#9AA3B2;">{{ d.qtyLabel }}</span></span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="width:56px;flex:none;padding:11px 8px;border-left:1px solid #E7E9F0;font-size:11px;font-weight:600;color:#3C4152;display:flex;align-items:center;justify-content:flex-end;">Row</div>
+                  </div>
+                  <sc-for list="{{ gridRows }}" as="r" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:stretch;border-bottom:1px solid #F2F4F8;min-width:max-content;">
+                      <div style="width:150px;flex:none;padding:10px 13px;display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#14142B;"><span style="font-size:14px;">📍</span>{{ r.tag }}</div>
+                      <div style="display:flex;">
+                        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="2">
+                          <div style="width:120px;flex:none;padding:8px;border-left:1px solid #F2F4F8;display:flex;align-items:center;justify-content:center;">
+                            <input type="number" min="0" value="{{ c.qty }}" onChange="{{ c.onChange }}" style="width:100%;max-width:68px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:8px 4px;border:1px solid #D9DEE8;border-radius:8px;background:#fff;">
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div style="width:56px;flex:none;padding:8px;border-left:1px solid #F2F4F8;display:flex;align-items:center;justify-content:flex-end;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:#0B2A8A;">{{ r.total }}</div>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;align-items:stretch;background:#F7F8FB;min-width:max-content;">
+                    <div style="width:150px;flex:none;padding:10px 13px;font-size:11.5px;font-weight:600;color:#3C4152;display:flex;align-items:center;">Allocated / need</div>
+                    <div style="display:flex;">
+                      <sc-for list="{{ gridColTotals }}" as="c" hint-placeholder-count="2">
+                        <div style="width:120px;flex:none;padding:10px 8px;border-left:1px solid #E7E9F0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:{{ c.color }};">{{ c.label }}</div>
+                      </sc-for>
+                    </div>
+                    <div style="width:56px;flex:none;padding:10px 8px;border-left:1px solid #E7E9F0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#14142B;">{{ gridGrand }}</div>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ gridUnbalanced }}" hint-placeholder-val="{{ false }}"><div style="margin-top:12px;background:#FFF8EC;border:1px solid #F0DCA8;border-radius:10px;padding:10px 14px;font-size:12.5px;color:#7A5200;">{{ unbalancedMsg }}</div></sc-if>
           </sc-if>
         </div>
 
@@ -921,7 +992,7 @@ class Component extends DCLogic {
       chat:[{role:'ai', text:"Hi! Tell me what you\u2019d like on your tumbler \u2014 a phrase, a vibe, or your logo. Or open the Editor tab to add text, upload a logo, and drag it around the bottle."}],
       cart:[],
       email:'', shipMode:'one', ship:{name:'',line1:'',city:'',state:'',zip:''}, shipSpeed:'standard',
-      manyAddr:[], manySeq:1, dist:{},
+      manyAddr:[], manySeq:1, dist:{}, splitIntent:null,
       payMethod:'card', card:{num:'',exp:'',cvc:''},
       discountCode:'', discountOn:false, discountError:false, errors:{},
       lastOrder:null
@@ -1108,33 +1179,52 @@ class Component extends DCLogic {
       radio:'width:18px;height:18px;border-radius:50%;border:2px solid '+(S.shipSpeed===s.k?'#2D5BFF':'#C7CCDA')+';box-shadow:'+(S.shipSpeed===s.k?'inset 0 0 0 3px #2D5BFF':'none')+';flex:none;',
       style:'display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;border-radius:11px;padding:13px 16px;cursor:pointer;background:'+(S.shipSpeed===s.k?'#EEF3FF':'#fff')+';border:1.5px solid '+(S.shipSpeed===s.k?'#2D5BFF':'#E7E9F0')+';'}));
 
-    // ---- distribution split-grid: addresses (rows) × designs (columns) ----
+    // ---- multi-address allocation (item-centric, with an advanced grid escape hatch) ----
     const dist=S.dist||{};
+    const cellVal=(aid,lid)=>Number(dist[aid+':'+lid])||0;
+    const addrLabel=(a,i)=>a.place||('Address '+(i+1));
+    const addrBook=S.manyAddr.map((a,i)=>({ tag:'#'+(i+1), place:a.place, onPlace:(e)=>this.updMany(a.id,'place',e.target.value), onRemove:()=>this.removeMany(a.id) }));
+    const addrOptions=[{value:'',label:'Choose address…'}].concat(S.manyAddr.map((a,i)=>({value:String(a.id),label:addrLabel(a,i)})));
     const gridDesigns=S.cart.map(l=>{ const isBottle=!l.product||l.product==='bottle'; const cHex=this.COLORS[l.colorIdx].hex;
       const comp=isBottle?null:this.COMPANIONS.find(c=>c.k===l.product);
       const gm=isBottle?null:this.productMock(l.product,cHex,l.objects,0.42);
+      const allocated=S.manyAddr.reduce((s,a)=>s+cellVal(a.id,l.id),0);
+      const assignedA=S.manyAddr.find(a=>cellVal(a.id,l.id)>0);
+      const ok=allocated===l.qty;
       return {lineId:l.id, isBottle, isCompanion:!isBottle,
-        name:this.COLORS[l.colorIdx].name+' · '+(isBottle?(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label:comp.name),
-        hex:cHex, method:l.method, objects:l.objects, wrap:l.wrap, qty:l.qty, qtyLabel:'need '+l.qty,
+        name:this.COLORS[l.colorIdx].name+' · '+(isBottle?(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label+' Tumbler':comp.name),
+        hex:cHex, method:l.method, objects:l.objects, wrap:l.wrap, qty:l.qty, qtyLabel:l.qty+(l.qty>1?' units':' unit'),
         mockWrap:gm&&gm.wrap, mockBody:gm&&gm.body, mockA1:gm&&gm.a1, mockA2:gm&&gm.a2, mockSurface:gm&&gm.surface,
-        mockHasLogo:gm&&gm.hasLogo, mockHasText:gm&&gm.hasText, mockOverlay:gm&&gm.overlay, mockOverlayText:gm&&gm.overlayText}; });
-    const cellVal=(aid,lid)=>Number(dist[aid+':'+lid])||0;
-    const gridRows=S.manyAddr.map(a=>{
-      const cells=gridDesigns.map(d=>{ const val=cellVal(a.id,d.lineId); const single=d.qty===1;
-        return {qty:val, single, multi:!single, selected:val>0,
-          onChange:(e)=>this.setDist(a.id,d.lineId,e.target.value),
-          onPick:()=>this.assignSingle(a.id,d.lineId),
-          pickStyle:'width:22px;height:22px;border-radius:50%;cursor:pointer;flex:none;border:2px solid '+(val>0?'#2D5BFF':'#C7CCDA')+';background:#fff;box-shadow:'+(val>0?'inset 0 0 0 4px #2D5BFF':'none')+';'}; });
+        mockHasLogo:gm&&gm.hasLogo, mockHasText:gm&&gm.hasText, mockOverlay:gm&&gm.overlay, mockOverlayText:gm&&gm.overlayText,
+        assignedVal:assignedA?String(assignedA.id):'', addrOptions, onAssign:(e)=>this.assignLineTo(l.id,e.target.value,l.qty),
+        allocLabel:allocated+'/'+l.qty, allocOk:ok, allocColor:ok?'#1F9D6B':(allocated>l.qty?'#C33':'#C77700'),
+        allocRows:S.manyAddr.map((a,i)=>({label:addrLabel(a,i), qty:cellVal(a.id,l.id), onChange:(e)=>this.setDist(a.id,l.id,e.target.value)}))}; });
+    const gridRows=S.manyAddr.map((a,i)=>{
+      const cells=gridDesigns.map(d=>({qty:cellVal(a.id,d.lineId), onChange:(e)=>this.setDist(a.id,d.lineId,e.target.value)}));
       const total=cells.reduce((s,c)=>s+c.qty,0);
-      return {place:a.place, total, cells, onPlace:(e)=>this.updMany(a.id,'place',e.target.value), onRemove:()=>this.removeMany(a.id)};
+      return {tag:addrLabel(a,i), total, cells};
     });
-    const gridColTotals=gridDesigns.map(d=>{ const got=S.manyAddr.reduce((s,a)=>s+cellVal(a.id,d.lineId),0); const ok=got===d.qty;
-      return {label:got+'/'+d.qty, color:ok?'#1F9D6B':(got>d.qty?'#C33':'#C77700')}; });
-    const gridGrand=gridDesigns.reduce((s,d)=>s+S.manyAddr.reduce((t,a)=>t+cellVal(a.id,d.lineId),0),0);
-    const allBalanced=gridDesigns.length>0 && gridDesigns.every(d=>S.manyAddr.reduce((s,a)=>s+cellVal(a.id,d.lineId),0)===d.qty);
+    const gridColTotals=gridDesigns.map(d=>({label:d.allocRows.reduce((s,r)=>s+r.qty,0)+'/'+d.qty, color:d.allocColor}));
+    const gridGrand=gridDesigns.reduce((s,d)=>s+d.allocRows.reduce((t,r)=>t+r.qty,0),0);
+    const allBalanced=gridDesigns.length>0 && gridDesigns.every(d=>d.allocOk);
     const reconciled=allBalanced;
     const gridUnbalanced=!allBalanced;
-    const unbalancedMsg='Each design must be fully allocated across your addresses before checkout. Use “Split evenly” to auto-fill.';
+    const unbalancedMsg='Each item must be fully assigned to your addresses before checkout.';
+    // shape detection → decide whether to ask the intent question
+    const nLines=S.cart.length, anyMulti=S.cart.some(l=>l.qty>=2);
+    const shapeAmbiguous=nLines>=2 && anyMulti;
+    let splitIntent=S.splitIntent; if(!shapeAmbiguous){ splitIntent=(nLines===1)?'quantity':'assign'; }
+    const needIntent=shapeAmbiguous && !splitIntent;
+    const modeAssign=!needIntent && splitIntent==='assign';
+    const modeQuantity=!needIntent && splitIntent==='quantity';
+    const modeCustom=!needIntent && splitIntent==='custom';
+    const showIntentChange=shapeAmbiguous && !!S.splitIntent;
+    const intentCards=[
+      {k:'assign', title:'Each item to one address', desc:'Every item ships whole to a single recipient.'},
+      {k:'quantity', title:'Split quantities across addresses', desc:'Divide each item’s units across your addresses.'},
+      {k:'custom', title:'Set it up myself', desc:'Full manual control in a grid (advanced).'}
+    ].map(c=>({title:c.title, desc:c.desc, onSelect:()=>this.set('splitIntent',c.k),
+      style:'width:100%;text-align:left;cursor:pointer;border:1.5px solid #E7E9F0;background:#fff;border-radius:12px;padding:13px 15px;'}));
 
     const payTabs=[{k:'card',l:'Card'},{k:'wallet',l:'Wallet'},{k:'po',l:'PO / Invoice'}].map(p=>({label:p.l,onSelect:()=>this.set('payMethod',p.k),
       style:'flex:1;cursor:pointer;border-radius:10px;padding:12px 8px;font-size:13px;font-weight:600;'+(S.payMethod===p.k?'background:#14142B;border:1.5px solid #14142B;color:#fff;':'background:#fff;border:1.5px solid #E7E9F0;color:#3C4152;')}));
@@ -1236,8 +1326,10 @@ class Component extends DCLogic {
       errEmail:!!E.email, errAddress:!!E.address, errCard:!!E.card,
       shipModes, shipOne:S.shipMode==='one', shipMany:S.shipMode==='many',
       gridDesigns, gridRows, gridColTotals, gridGrand, gridUnbalanced, unbalancedMsg,
+      addrBook, intentCards, needIntent, modeAssign, modeQuantity, modeCustom, showIntentChange,
+      resetIntent:()=>this.set('splitIntent',null),
       addAddress:()=>this.addMany(), autoSplit:()=>this.autoSplit(),
-      reconcileMsg:reconciled?('✓ all designs allocated'):('allocate each design'),
+      reconcileMsg:reconciled?('✓ all items assigned'):('assign every item'),
       reconcileStyle:'font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;font-weight:600;color:'+(reconciled?'#1F9D6B':'#C77700')+';',
       shipName:S.ship.name, shipLine1:S.ship.line1, shipCity:S.ship.city, shipState:S.ship.state, shipZip:S.ship.zip,
       onShip:{name:(e)=>this.updShip('name',e.target.value),line1:(e)=>this.updShip('line1',e.target.value),city:(e)=>this.updShip('city',e.target.value),state:(e)=>this.updShip('state',e.target.value),zip:(e)=>this.updShip('zip',e.target.value)},
@@ -1353,11 +1445,14 @@ class Component extends DCLogic {
   updMany(id,k,v){ this.setState({manyAddr:this.state.manyAddr.map(a=>a.id===id?Object.assign({},a,{[k]:v}):a)}); }
   removeMany(id){ const dist=Object.assign({},this.state.dist); Object.keys(dist).forEach(key=>{ if(key.indexOf(id+':')===0) delete dist[key]; }); this.setState({manyAddr:this.state.manyAddr.filter(a=>a.id!==id),dist}); }
   setDist(aid,lid,v){ const n=Math.max(0,parseInt(v||'0',10)||0); const dist=Object.assign({},this.state.dist); dist[aid+':'+lid]=n; this.setState({dist}); }
-  // qty-1 line: assign the single item to exactly one address (clear the rest of that column)
-  assignSingle(aid,lid){ const dist=Object.assign({},this.state.dist); const already=(Number(dist[aid+':'+lid])||0)>0;
+  // Assignment mode: send a whole line (all its units) to one address; clear its other allocations.
+  assignLineTo(lid,aidStr,qty){ const dist=Object.assign({},this.state.dist);
     this.state.manyAddr.forEach(a=>{ delete dist[a.id+':'+lid]; });
-    if(!already) dist[aid+':'+lid]=1; this.setState({dist}); }
-  pickShipMode(k){ if(k==='many'&&this.cartUnits()<=1){ return; } if(k==='many'&&this.state.manyAddr.length===0){ const id=this.state.manySeq; this.setState({shipMode:'many',manyAddr:[{id,place:''},{id:id+1,place:''}],manySeq:id+2}); } else { this.setState({shipMode:k}); } }
+    if(aidStr){ dist[aidStr+':'+lid]=qty; } this.setState({dist}); }
+  pickShipMode(k){ if(k==='many'&&this.cartUnits()<=1){ return; }
+    if(k==='many'&&this.state.manyAddr.length===0){ const id=this.state.manySeq; this.setState({shipMode:'many',splitIntent:null,manyAddr:[{id,place:''},{id:id+1,place:''}],manySeq:id+2}); }
+    else if(k==='many'){ this.setState({shipMode:'many',splitIntent:null}); }
+    else { this.setState({shipMode:k}); } }
   autoSplit(){ const S=this.state; const addrs=S.manyAddr; if(addrs.length===0) return; const dist=Object.assign({},S.dist);
     S.cart.forEach(l=>{ const base=Math.floor(l.qty/addrs.length); let rem=l.qty-base*addrs.length;
       addrs.forEach(a=>{ dist[a.id+':'+l.id]=base+(rem>0?1:0); if(rem>0)rem--; }); });
