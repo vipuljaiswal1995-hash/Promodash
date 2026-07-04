@@ -338,9 +338,22 @@
           <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:8px 24px;">
             <sc-for list="{{ cartLines }}" as="l" hint-placeholder-count="1">
               <div style="display:flex;gap:18px;align-items:center;padding:22px 0;border-bottom:1px solid #F2F4F8;">
-                <div style="display:grid;width:56px;height:78px;flex:none;filter:drop-shadow(0 6px 8px rgba(20,20,43,.16));"><dc-import name="Bottle" colorhex="{{ l.hex }}" method="{{ l.method }}" objects="{{ l.objects }}" viewangle="{{ zero }}" wrap="{{ l.wrap }}" hint-size="100%,100%"></dc-import></div>
+                <sc-if value="{{ l.isBottle }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;width:56px;height:78px;flex:none;filter:drop-shadow(0 6px 8px rgba(20,20,43,.16));"><dc-import name="Bottle" colorhex="{{ l.hex }}" method="{{ l.method }}" objects="{{ l.objects }}" viewangle="{{ zero }}" wrap="{{ l.wrap }}" hint-size="100%,100%"></dc-import></div>
+                </sc-if>
+                <sc-if value="{{ l.isCompanion }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ l.mockWrap }}">
+                    <div style="{{ l.mockBody }}"></div>
+                    <div style="{{ l.mockSurface }}">
+                      <sc-if value="{{ l.mockHasLogo }}" hint-placeholder-val="{{ false }}"><div style="{{ l.mockOverlay }}"></div></sc-if>
+                      <sc-if value="{{ l.mockHasText }}" hint-placeholder-val="{{ true }}"><div style="{{ l.mockOverlay }}">{{ l.mockOverlayText }}</div></sc-if>
+                    </div>
+                    <div style="{{ l.mockA1 }}"></div>
+                    <div style="{{ l.mockA2 }}"></div>
+                  </div>
+                </sc-if>
                 <div style="flex:1;min-width:0;">
-                  <div style="font-size:15px;font-weight:600;">{{ l.sizeLabel }} Insulated Tumbler</div>
+                  <div style="font-size:15px;font-weight:600;">{{ l.title }}</div>
                   <div style="font-size:13px;color:#6B7280;margin-top:4px;">{{ l.colorName }} · {{ l.methodLabel }} · {{ l.designText }}</div>
                   <div style="font-size:12.5px;color:#1F9D6B;font-weight:600;margin-top:6px;">{{ l.unitFmt }}/unit</div>
                 </div>
@@ -356,6 +369,35 @@
           </div>
           <button onClick="{{ goPdp }}" style="margin-top:14px;background:#fff;border:1px dashed #C7CCDA;color:#2D5BFF;border-radius:12px;padding:13px;font-size:13.5px;font-weight:600;cursor:pointer;width:100%;">+ Add another design</button>
           <div style="font-size:12.5px;color:#9AA3B2;margin-top:10px;">Different logos or colors for different teams? Add each as its own line — you can send them to separate addresses at checkout.</div>
+
+          <!-- COMPLETE THE SET: same design on companion products -->
+          <sc-if value="{{ showCompanions }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:24px;background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:20px 22px;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;">Complete the set</div>
+              <div style="font-size:12.5px;color:#6B7280;margin-top:3px;margin-bottom:16px;">Your design on matching items — same artwork, same color.</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                <sc-for list="{{ companions }}" as="cp" hint-placeholder-count="3">
+                  <div style="border:1px solid #EEF0F5;border-radius:14px;padding:12px 10px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;background:#FBFCFE;">
+                    <div style="height:92px;display:flex;align-items:center;justify-content:center;">
+                      <div style="{{ cp.mockWrap }}">
+                        <div style="{{ cp.mockBody }}"></div>
+                        <div style="{{ cp.mockSurface }}">
+                          <sc-if value="{{ cp.mockHasLogo }}" hint-placeholder-val="{{ false }}"><div style="{{ cp.mockOverlay }}"></div></sc-if>
+                          <sc-if value="{{ cp.mockHasText }}" hint-placeholder-val="{{ true }}"><div style="{{ cp.mockOverlay }}">{{ cp.mockOverlayText }}</div></sc-if>
+                        </div>
+                        <div style="{{ cp.mockA1 }}"></div>
+                        <div style="{{ cp.mockA2 }}"></div>
+                      </div>
+                    </div>
+                    <div style="font-size:13px;font-weight:600;color:#14142B;margin-top:8px;">{{ cp.name }}</div>
+                    <button onClick="{{ cp.onAdd }}" style="margin-top:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;background:#EEF3FF;color:#2D5BFF;border:1px solid #D6E0FF;border-radius:10px;padding:8px;font-size:12.5px;font-weight:600;cursor:pointer;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Add · {{ cp.priceFmt }}
+                    </button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
         </div>
         <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:24px;position:sticky;top:84px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:16px;">Summary</div>
@@ -840,6 +882,12 @@ class Component extends DCLogic {
       {name:'White', hex:'#FFFFFF'}, {name:'Black', hex:'#14142B'}, {name:'Blue', hex:'#2D5BFF'},
       {name:'Green', hex:'#1F9D6B'}, {name:'Red', hex:'#E8484D'}, {name:'Gold', hex:'#D9A441'}, {name:'Purple', hex:'#7C3AED'}
     ];
+    // companion products for the "Complete the set" cross-sell in the cart
+    this.COMPANIONS = [
+      {k:'pen',   name:'Metal Pen', price:6},
+      {k:'diary', name:'A5 Diary',  price:14},
+      {k:'bag',   name:'Tote Bag',  price:12}
+    ];
     this.REVIEWS = [
       {name:'Dana R.', initials:'DR', role:'Ops Lead', rating:5, date:'Jun 2026', tint:'#DBE3EA', text:'Ordered 120 for our summit \u2014 the proof came in minutes and the engraving matched the preview exactly. Reordering was one click.'},
       {name:'Marcus T.', initials:'MT', role:'Founder', rating:5, date:'Jun 2026', tint:'#E7DFD3', text:'Bought a single engraved bottle as a gift. Checkout took under a minute and it arrived in two days.'},
@@ -873,6 +921,37 @@ class Component extends DCLogic {
   sizeBase(id){ const s=this.SIZES.find(x=>x.id===id); return s?s.base:24.99; }
   unitFor(sizeId,totalQty){ return Math.round(this.sizeBase(sizeId)*this.volFactor(totalQty)*100)/100; }
   cartUnits(){ return this.state.cart.reduce((a,l)=>a+l.qty,0); }
+  // Stylized CSS mock of a companion product (pen/diary/bag) with the customer's design overlaid.
+  productMock(product, colorHex, objs, scale){
+    const dark=this.darken(colorHex,.30), mid=colorHex, light=this.lighten(colorHex,.22);
+    const sc=scale||1;
+    // design overlay: prefer the logo, else the first text
+    const prim=(objs||[]).find(o=>o.type==='logo')||(objs||[]).find(o=>o.type==='text')||(objs||[])[0]||null;
+    let hasLogo=false, hasText=false, overlay='', overlayText='';
+    if(prim){ if(prim.type==='logo'){ hasLogo=true; overlay='width:80%;height:80%;background-image:url("'+prim.url+'");background-size:contain;background-repeat:no-repeat;background-position:center;'; }
+      else { hasText=true; overlayText=prim.text||''; const ft=this.FONTS.find(f=>f.id===prim.font)||this.FONTS[0];
+        overlay='max-width:96%;font-family:'+ft.css+';font-weight:'+ft.weight+';font-size:'+(8*sc).toFixed(1)+'px;letter-spacing:'+ft.ls+';text-transform:'+ft.tt+';color:'+(prim.color||'#14142B')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1;'; } }
+    const W=64*sc, H=76*sc, wrap='position:relative;width:'+W.toFixed(0)+'px;height:'+H.toFixed(0)+'px;flex:none;';
+    const P=(v)=>(v*sc).toFixed(1)+'px';
+    let body,a1,a2,surface;
+    if(product==='pen'){
+      body='position:absolute;left:50%;top:'+P(6)+';transform:translateX(-50%);width:'+P(14)+';height:'+P(60)+';border-radius:'+P(7)+' '+P(7)+' '+P(2)+' '+P(2)+';background:linear-gradient(90deg,'+dark+','+light+' 45%,'+dark+');box-shadow:0 '+P(4)+' '+P(7)+' rgba(0,0,0,.18);';
+      a1='position:absolute;left:50%;top:'+P(64)+';transform:translateX(-50%);width:0;height:0;border-left:'+P(7)+' solid transparent;border-right:'+P(7)+' solid transparent;border-top:'+P(11)+' solid #A6ABB8;';
+      a2='position:absolute;left:calc(50% + '+P(6)+');top:'+P(13)+';width:'+P(3)+';height:'+P(16)+';border-radius:'+P(2)+';background:'+this.lighten(colorHex,.42)+';';
+      surface='position:absolute;left:50%;top:'+P(28)+';transform:translateX(-50%);width:'+P(12)+';height:'+P(20)+';display:flex;align-items:center;justify-content:center;overflow:hidden;';
+    } else if(product==='diary'){
+      body='position:absolute;left:50%;top:'+P(7)+';transform:translateX(-50%);width:'+P(46)+';height:'+P(62)+';border-radius:'+P(4)+' '+P(7)+' '+P(7)+' '+P(4)+';background:linear-gradient(135deg,'+light+','+mid+');box-shadow:0 '+P(5)+' '+P(8)+' rgba(0,0,0,.16);';
+      a1='position:absolute;left:calc(50% - '+P(23)+');top:'+P(7)+';width:'+P(7)+';height:'+P(62)+';border-radius:'+P(4)+' 0 0 '+P(4)+';background:'+dark+';';
+      a2='position:absolute;left:calc(50% + '+P(14)+');top:'+P(7)+';width:'+P(4)+';height:'+P(62)+';background:rgba(20,20,43,.32);';
+      surface='position:absolute;left:calc(50% - '+P(9)+');top:'+P(28)+';width:'+P(30)+';height:'+P(24)+';display:flex;align-items:center;justify-content:center;overflow:hidden;';
+    } else { // bag
+      body='position:absolute;left:50%;top:'+P(24)+';transform:translateX(-50%);width:'+P(48)+';height:'+P(46)+';border-radius:'+P(4)+' '+P(4)+' '+P(9)+' '+P(9)+';background:linear-gradient(180deg,'+light+','+mid+');box-shadow:0 '+P(5)+' '+P(8)+' rgba(0,0,0,.16);';
+      a1='position:absolute;left:calc(50% - '+P(16)+');top:'+P(9)+';width:'+P(14)+';height:'+P(18)+';border:'+P(2.6)+' solid '+dark+';border-bottom:none;border-radius:'+P(9)+' '+P(9)+' 0 0;background:transparent;';
+      a2='position:absolute;left:calc(50% + '+P(2)+');top:'+P(9)+';width:'+P(14)+';height:'+P(18)+';border:'+P(2.6)+' solid '+dark+';border-bottom:none;border-radius:'+P(9)+' '+P(9)+' 0 0;background:transparent;';
+      surface='position:absolute;left:50%;top:'+P(36)+';transform:translateX(-50%);width:'+P(32)+';height:'+P(22)+';display:flex;align-items:center;justify-content:center;overflow:hidden;';
+    }
+    return {wrap,body,a1,a2,surface,hasLogo,hasText,overlay,overlayText};
+  }
   designText(objs){ const t=objs.find(o=>o.type==='text'); const logo=objs.some(o=>o.type==='logo');
     const parts=[]; if(logo)parts.push('Logo'); if(t&&t.text)parts.push('\u201C'+t.text+'\u201D'); return parts.join(' + ')||'Blank'; }
   set(k,v){ this.setState({[k]:v}); }
@@ -969,13 +1048,31 @@ class Component extends DCLogic {
 
     // ---- cart ----
     const totalUnits=this.cartUnits();
-    const cartLines=S.cart.map(l=>{ const unit=this.unitFor(l.size,totalUnits); const cObj=this.COLORS[l.colorIdx]; const so=this.SIZES.find(x=>x.id===l.size)||this.SIZES[0];
-      return {id:l.id, hex:cObj.hex, colorName:cObj.name, method:l.method, methodLabel:this.METHODS[l.method].label,
+    const lineUnit=(l)=>(l.product&&l.product!=='bottle')?(l.unitPrice||0):this.unitFor(l.size,totalUnits);
+    const cartLines=S.cart.map(l=>{ const unit=lineUnit(l); const cObj=this.COLORS[l.colorIdx]; const so=this.SIZES.find(x=>x.id===l.size)||this.SIZES[0];
+      const isBottle=!l.product||l.product==='bottle';
+      const comp=isBottle?null:this.COMPANIONS.find(c=>c.k===l.product);
+      const mock=isBottle?null:this.productMock(l.product,cObj.hex,l.objects,0.82);
+      return {id:l.id, isBottle, isCompanion:!isBottle, hex:cObj.hex, colorName:cObj.name, method:l.method, methodLabel:this.METHODS[l.method].label,
+        title:isBottle?(so.label+' Insulated Tumbler'):comp.name,
         sizeLabel:so.label, objects:l.objects, wrap:l.wrap, qty:l.qty, designText:this.designText(l.objects),
+        mockWrap:mock&&mock.wrap, mockBody:mock&&mock.body, mockA1:mock&&mock.a1, mockA2:mock&&mock.a2, mockSurface:mock&&mock.surface,
+        mockHasLogo:mock&&mock.hasLogo, mockHasText:mock&&mock.hasText, mockOverlay:mock&&mock.overlay, mockOverlayText:mock&&mock.overlayText,
         unitFmt:this.fmt(unit), lineFmt:this.fmt(unit*l.qty),
         inc:()=>this.cartQty(l.id,1), dec:()=>this.cartQty(l.id,-1), remove:()=>this.cartRemove(l.id)}; });
-    const cartSubtotal=S.cart.reduce((a,l)=>a+this.unitFor(l.size,totalUnits)*l.qty,0);
+    const cartSubtotal=S.cart.reduce((a,l)=>a+lineUnit(l)*l.qty,0);
     const cartUnit=totalUnits>0?this.unitFor(S.cart[0]?S.cart[0].size:'20',totalUnits):0;
+
+    // ---- "Complete the set" companion cross-sell (cart) ----
+    const srcLine=S.cart.find(l=>l.objects&&l.objects.length)||null;
+    const srcColorHex=srcLine?this.COLORS[srcLine.colorIdx].hex:'#22314E';
+    const ownedProducts=S.cart.map(l=>l.product||'bottle');
+    const companions=srcLine?this.COMPANIONS.filter(c=>ownedProducts.indexOf(c.k)<0).map(c=>{
+      const mock=this.productMock(c.k,srcColorHex,srcLine.objects,1.15);
+      return {name:c.name, priceFmt:'+'+this.fmt(c.price), onAdd:()=>this.addCompanion(c.k),
+        mockWrap:mock.wrap, mockBody:mock.body, mockA1:mock.a1, mockA2:mock.a2, mockSurface:mock.surface,
+        mockHasLogo:mock.hasLogo, mockHasText:mock.hasText, mockOverlay:mock.overlay, mockOverlayText:mock.overlayText}; }):[];
+    const showCompanions=companions.length>0;
 
     // ---- checkout pricing ----
     const sDiscount=S.discountOn?cartSubtotal*0.1:0;
@@ -1102,6 +1199,7 @@ class Component extends DCLogic {
 
       // cart
       cartEmpty:S.cart.length===0, cartHasItems:S.cart.length>0, cartLines, cartSubtotalFmt:this.fmt(cartSubtotal),
+      companions, showCompanions,
       cartVolume:totalUnits>=6, cartUnitFmt:this.fmt(cartUnit), goCheckout:()=>this.set('screen','checkout'),
 
       // checkout
@@ -1212,6 +1310,10 @@ class Component extends DCLogic {
     else { this.setState({cart,screen:'cart',justAdded:0}); } }
   cartQty(id,delta){ this.setState({cart:this.state.cart.map(l=>l.id===id?Object.assign({},l,{qty:Math.max(1,l.qty+delta)}):l)}); }
   cartRemove(id){ this.setState({cart:this.state.cart.filter(l=>l.id!==id)}); }
+  addCompanion(k){ const src=this.state.cart.find(l=>(l.objects&&l.objects.length))||this.state.cart[0]; if(!src)return;
+    const comp=this.COMPANIONS.find(c=>c.k===k); if(!comp)return;
+    const line={id:Date.now(),product:k,unitPrice:comp.price,colorIdx:src.colorIdx,size:src.size,method:src.method,qty:1,objects:JSON.parse(JSON.stringify(src.objects||[])),wrap:src.wrap};
+    this.setState({cart:[...this.state.cart,line]}); }
 
   updShip(k,v){ this.setState({ship:Object.assign({},this.state.ship,{[k]:v}),errors:Object.assign({},this.state.errors,{address:false})}); }
   updCard(k,v){ this.setState({card:Object.assign({},this.state.card,{[k]:v}),errors:Object.assign({},this.state.errors,{card:false})}); }
@@ -1239,7 +1341,7 @@ class Component extends DCLogic {
       if(!balanced) errors.route=true;
     }
     if(Object.keys(errors).length){ this.setState({errors}); return; }
-    const sub=S.cart.reduce((a,l)=>a+this.unitFor(l.size,totalUnits)*l.qty,0);
+    const sub=S.cart.reduce((a,l)=>a+((l.product&&l.product!=='bottle')?(l.unitPrice||0):this.unitFor(l.size,totalUnits))*l.qty,0);
     const disc=S.discountOn?sub*0.1:0; const sh=S.shipMode==='many'?S.manyAddr.length*9:(S.shipSpeed==='rush'?12:0);
     const tax=(sub-disc)*0.0845, total=sub-disc+sh+tax;
     const id='PD-'+Math.floor(100000+Math.random()*899999);
