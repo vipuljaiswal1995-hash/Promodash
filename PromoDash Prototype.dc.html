@@ -697,12 +697,12 @@
           <button onClick="{{ closeAddrModal }}" style="width:30px;height:30px;border:none;background:#F2F4F8;border-radius:8px;font-size:17px;color:#6B7280;cursor:pointer;">×</button>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <input value="{{ draftName }}" onChange="{{ onDraft.name }}" placeholder="Recipient name" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
-          <input value="{{ draftLine1 }}" onChange="{{ onDraft.line1 }}" placeholder="Street address" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
-          <input value="{{ draftCity }}" onChange="{{ onDraft.city }}" placeholder="City" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+          <input value="{{ draftName }}" onChange="{{ onAddrDraft.name }}" placeholder="Recipient name" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+          <input value="{{ draftLine1 }}" onChange="{{ onAddrDraft.line1 }}" placeholder="Street address" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+          <input value="{{ draftCity }}" onChange="{{ onAddrDraft.city }}" placeholder="City" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <input value="{{ draftState }}" onChange="{{ onDraft.state }}" placeholder="State" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
-            <input value="{{ draftZip }}" onChange="{{ onDraft.zip }}" placeholder="ZIP" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+            <input value="{{ draftState }}" onChange="{{ onAddrDraft.state }}" placeholder="State" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+            <input value="{{ draftZip }}" onChange="{{ onAddrDraft.zip }}" placeholder="ZIP" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
           </div>
         </div>
         <sc-if value="{{ addrErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#E8484D;margin-top:8px;">Please fill in all fields.</div></sc-if>
@@ -1406,7 +1406,7 @@ class Component extends DCLogic {
       addrModalForm:S.addrModal==='form', addrModalBook:S.addrModal==='book', closeAddrModal:()=>this.closeAddrModal(),
       addrErr:S.addrErr, saveAddrForm:()=>this.saveAddrForm(), openAddrForm:()=>this.openAddrForm(),
       draftName:S.addrDraft.name, draftLine1:S.addrDraft.line1, draftCity:S.addrDraft.city, draftState:S.addrDraft.state, draftZip:S.addrDraft.zip,
-      onDraft:{name:(e)=>this.updDraft('name',e.target.value),line1:(e)=>this.updDraft('line1',e.target.value),city:(e)=>this.updDraft('city',e.target.value),state:(e)=>this.updDraft('state',e.target.value),zip:(e)=>this.updDraft('zip',e.target.value)},
+      onAddrDraft:{name:(e)=>this.updDraft('name',e.target.value),line1:(e)=>this.updDraft('line1',e.target.value),city:(e)=>this.updDraft('city',e.target.value),state:(e)=>this.updDraft('state',e.target.value),zip:(e)=>this.updDraft('zip',e.target.value)},
       savedPick, savedPickEmpty:savedPick.length===0,
       reconcileMsg:reconciled?('✓ all items assigned'):('assign every item'),
       reconcileStyle:'font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;font-weight:600;color:'+(reconciled?'#1F9D6B':'#C77700')+';',
