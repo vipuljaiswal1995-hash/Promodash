@@ -983,8 +983,11 @@ class Component extends DCLogic {
     const sTax=(cartSubtotal-sDiscount)*0.0845;
     const sTotal=cartSubtotal-sDiscount+sShip+sTax;
 
-    const shipModes=[{k:'one',label:'One address',sub:'Everything to a single place'},{k:'many',label:'Multiple addresses',sub:'Split across locations'}].map(m=>({label:m.label,sub:m.sub,onSelect:()=>this.pickShipMode(m.k),
-      style:'flex:1;text-align:left;cursor:pointer;border-radius:12px;padding:13px 16px;border:1.5px solid '+(S.shipMode===m.k?'#2D5BFF':'#E7E9F0')+';background:'+(S.shipMode===m.k?'#EEF3FF':'#fff')+';color:#14142B;'}));
+    const shipModes=[{k:'one',label:'One address',sub:'Everything to a single place'},{k:'many',label:'Multiple addresses',sub:'Split across locations'}].map(m=>{
+      const disabled=m.k==='many'&&totalUnits<=1; const on=S.shipMode===m.k;
+      return {label:m.label, sub:disabled?'Add 2 or more items to split':m.sub, onSelect:disabled?(()=>{}):(()=>this.pickShipMode(m.k)),
+        style:'flex:1;text-align:left;border-radius:12px;padding:13px 16px;border:1.5px solid '+(on&&!disabled?'#2D5BFF':'#E7E9F0')+';'+(disabled?'cursor:not-allowed;background:#F7F8FB;color:#B4BAC7;':'cursor:pointer;background:'+(on?'#EEF3FF':'#fff')+';color:#14142B;')};
+    });
 
     const speedOptions=[{k:'standard',name:'Standard',eta:'Arrives Tue, Jul 8',price:'Free',pc:'#1F9D6B'},{k:'rush',name:'Rush',eta:'Arrives Sat, Jul 5',price:'$12.00',pc:'#14142B'}].map(s=>({name:s.name,eta:s.eta,price:s.price,priceColor:s.pc,onSelect:()=>this.set('shipSpeed',s.k),
       radio:'width:18px;height:18px;border-radius:50%;border:2px solid '+(S.shipSpeed===s.k?'#2D5BFF':'#C7CCDA')+';box-shadow:'+(S.shipSpeed===s.k?'inset 0 0 0 3px #2D5BFF':'none')+';flex:none;',
@@ -1219,7 +1222,7 @@ class Component extends DCLogic {
   updMany(id,k,v){ this.setState({manyAddr:this.state.manyAddr.map(a=>a.id===id?Object.assign({},a,{[k]:v}):a)}); }
   removeMany(id){ const dist=Object.assign({},this.state.dist); Object.keys(dist).forEach(key=>{ if(key.indexOf(id+':')===0) delete dist[key]; }); this.setState({manyAddr:this.state.manyAddr.filter(a=>a.id!==id),dist}); }
   setDist(aid,lid,v){ const n=Math.max(0,parseInt(v||'0',10)||0); const dist=Object.assign({},this.state.dist); dist[aid+':'+lid]=n; this.setState({dist}); }
-  pickShipMode(k){ if(k==='many'&&this.state.manyAddr.length===0){ const id=this.state.manySeq; this.setState({shipMode:'many',manyAddr:[{id,place:''},{id:id+1,place:''}],manySeq:id+2}); } else { this.setState({shipMode:k}); } }
+  pickShipMode(k){ if(k==='many'&&this.cartUnits()<=1){ return; } if(k==='many'&&this.state.manyAddr.length===0){ const id=this.state.manySeq; this.setState({shipMode:'many',manyAddr:[{id,place:''},{id:id+1,place:''}],manySeq:id+2}); } else { this.setState({shipMode:k}); } }
   autoSplit(){ const S=this.state; const addrs=S.manyAddr; if(addrs.length===0) return; const dist=Object.assign({},S.dist);
     S.cart.forEach(l=>{ const base=Math.floor(l.qty/addrs.length); let rem=l.qty-base*addrs.length;
       addrs.forEach(a=>{ dist[a.id+':'+l.id]=base+(rem>0?1:0); if(rem>0)rem--; }); });
