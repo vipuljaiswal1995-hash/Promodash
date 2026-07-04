@@ -20,6 +20,16 @@
   .thread::-webkit-scrollbar,.tools::-webkit-scrollbar,.revrow::-webkit-scrollbar{height:8px;width:8px;}
   .thread::-webkit-scrollbar-thumb,.tools::-webkit-scrollbar-thumb,.revrow::-webkit-scrollbar-thumb{background:#E1E5EE;border-radius:8px;}
   input[type=range]{accent-color:#2D5BFF;}
+  /* polished sliders (Size + Rotate) */
+  input[type=range].rng{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:#E4E7EF;cursor:pointer;transition:background .15s;}
+  input[type=range].rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#2D5BFF;border:3px solid #fff;box-shadow:0 2px 6px rgba(45,91,255,.4);transition:transform .1s;}
+  input[type=range].rng::-webkit-slider-thumb:active{transform:scale(1.15);}
+  input[type=range].rng::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#2D5BFF;border:3px solid #fff;box-shadow:0 2px 6px rgba(45,91,255,.4);}
+  input[type=range].rng:hover{background:#D8DCE8;}
+  input[type=range].rng-dark{background:#2C2C3A;}
+  input[type=range].rng-dark::-webkit-slider-thumb{border-color:#16161F;box-shadow:0 2px 8px rgba(45,91,255,.55);}
+  input[type=range].rng-dark::-moz-range-thumb{border-color:#16161F;}
+  input[type=range].rng-dark:hover{background:#343446;}
   @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
 </style>
 </helmet>
@@ -599,10 +609,13 @@
           </div>
         </div>
         <div style="position:relative;z-index:5;padding:16px 26px 22px;border-top:1px solid #24242F;display:flex;flex-direction:column;gap:14px;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:#6B7285;">ROTATE</span>
-            <input type="range" min="0" max="360" value="{{ viewAngle360 }}" onChange="{{ onRotateSlider }}" style="flex:1;">
-            <button onClick="{{ resetView }}" style="background:#1E1E2A;border:none;color:#AEB4C6;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:600;cursor:pointer;">Front</button>
+          <div style="display:flex;align-items:center;gap:13px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:#6B7285;flex:none;">ROTATE</span>
+            <input type="range" class="rng rng-dark" min="0" max="360" value="{{ viewAngle360 }}" onChange="{{ onRotateSlider }}" style="flex:1;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#AEB4C6;min-width:38px;text-align:right;flex:none;">{{ viewAngle360 }}°</span>
+            <button onClick="{{ resetView }}" title="Reset to front" style="display:flex;align-items:center;gap:5px;background:#1E1E2A;border:1px solid #2C2C3A;color:#AEB4C6;border-radius:9px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;flex:none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"></path><path d="M3 3v5h5"></path></svg>Front
+            </button>
           </div>
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:#6B7285;">COLOR</span>
@@ -689,17 +702,11 @@
                 <sc-if value="{{ selIsText }}" hint-placeholder-val="{{ false }}">
                   <input value="{{ selText }}" onChange="{{ onSelText }}" placeholder="Type your text" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;margin-bottom:14px;">
                 </sc-if>
-                <div style="font-size:12.5px;color:#6B7280;display:flex;justify-content:space-between;margin-bottom:6px;"><span>Size</span><span>{{ selSize }}</span></div>
-                <input type="range" min="{{ selSizeMin }}" max="{{ selSizeMax }}" value="{{ selSizeVal }}" onChange="{{ onSelSize }}" style="width:100%;margin-bottom:16px;">
-                <div style="font-size:12.5px;color:#6B7280;display:flex;justify-content:space-between;margin-bottom:6px;"><span>Rotate</span><span>{{ selRot }}°</span></div>
-                <input type="range" min="-45" max="45" value="{{ selRotVal }}" onChange="{{ onSelRot }}" style="width:100%;margin-bottom:16px;">
-
-                <button onClick="{{ deleteSel }}" style="width:100%;background:#FDF3F3;color:#E8484D;border:1px solid #F3C9CB;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;">Delete this element</button>
+                <div style="font-size:12.5px;color:#6B7280;display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-weight:500;">Size</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#2D5BFF;">{{ selSize }}</span></div>
+                <input type="range" class="rng" min="{{ selSizeMin }}" max="{{ selSizeMax }}" value="{{ selSizeVal }}" onChange="{{ onSelSize }}" style="margin-bottom:16px;">
               </div>
             </sc-if>
-            <sc-if value="{{ hasObjects }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ clearDesign }}" style="width:100%;margin-top:16px;background:none;border:none;color:#9AA3B2;font-size:12.5px;font-weight:600;cursor:pointer;">Clear entire design</button>
-            </sc-if>
+
 
             <!-- DECORATION METHOD PICKER -->
             <div style="margin-top:24px;padding-top:22px;border-top:1px solid #EEF0F5;">
