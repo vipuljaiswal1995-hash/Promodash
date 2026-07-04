@@ -59,8 +59,7 @@ class Component extends DCLogic {
         items.push({ isText:true, isLogo:false, text:o.text||'', style: base+'font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:'+size+'px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;line-height:1;color:'+tcolor+';text-shadow:'+sh+';' });
       } else {
         const f = method==='engrave' ? 'filter:brightness(0) '+(light?'':'invert(1)')+';opacity:'+(op*(light?.5:.55)).toFixed(3)+';mix-blend-mode:'+(light?'multiply':'soft-light')+';' : '';
-        const realUrl = (window.__dashImages && window.__dashImages[o.url]) || (window.parent && window.parent.__dashImages && window.parent.__dashImages[o.url]) || o.url;
-        items.push({ isText:false, isLogo:true, style: base+'width:'+size+'px;height:'+size+'px;background-image:url('+realUrl+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f });
+        items.push({ isText:false, isLogo:true, style: base+'width:'+size+'px;height:'+size+'px;background-image:url('+o.url+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f });
       }
     });
     // shading rotates with the view: the bright reflection band slides across the cylinder

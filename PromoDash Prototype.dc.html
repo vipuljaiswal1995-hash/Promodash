@@ -1022,8 +1022,8 @@ class Component extends DCLogic {
   deleteObj(id){ this.setState({objects:this.state.objects.filter(o=>o.id!==id),selectedId:this.state.selectedId===id?null:this.state.selectedId}); }
   clearDesign(){ this.setState({objects:[],selectedId:null}); }
   onUpload(e,inStudio){ const f=e.target.files&&e.target.files[0]; if(!f)return; const r=new FileReader();
-    r.onload=()=>{ const id=this.state.objSeq; window.__dashImages=window.__dashImages||{}; const imgId='img_'+Date.now()+'_'+id; window.__dashImages[imgId]=r.result;
-      const o={id,type:'logo',url:imgId,u:this.state.viewAngle,v:50,rot:0,size:52};
+    r.onload=()=>{ const id=this.state.objSeq;
+      const o={id,type:'logo',url:r.result,u:this.state.viewAngle,v:50,rot:0,size:52};
       const upd={objects:[...this.state.objects,o],selectedId:id,objSeq:id+1,method:'engrave',studioOpen:true,studioTab:'editor'};
       if(inStudio){ upd.chat=[...this.state.chat,{role:'user',text:'[Uploaded '+f.name+']'},{role:'ai',text:'Got your logo \u2014 placed and centered. It reads as one color, so I set it to laser engraving. Drag it on the bottle to reposition, add text, or resize it here in the Editor.'}]; }
       this.setState(upd); };
