@@ -735,10 +735,18 @@
                           </div>
                           <div style="flex:1;min-width:0;">
                             <div style="font-size:11px;font-weight:600;color:#9AA3B2;letter-spacing:.4px;margin-bottom:6px;">COLOR</div>
-                            <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding-top:3px;">
-                              <sc-for list="{{ o.colors }}" as="c" hint-placeholder-count="7">
+                            <div style="display:flex;gap:7px;align-items:center;padding-top:3px;position:relative;">
+                              <sc-for list="{{ o.colorsInline }}" as="c" hint-placeholder-count="2">
                                 <button onClick="{{ c.onSelect }}" title="{{ c.title }}" style="{{ c.style }}"></button>
                               </sc-for>
+                              <button onClick="{{ o.onColorMore }}" title="More colors" style="height:24px;padding:0 9px;flex:none;border-radius:12px;border:1px solid #D9DEE8;background:#fff;color:#6B7280;font-size:11.5px;font-weight:700;cursor:pointer;">+{{ o.colorMoreCount }}</button>
+                              <sc-if value="{{ o.colorPopupOpen }}" hint-placeholder-val="{{ false }}">
+                                <div style="position:absolute;top:calc(100% + 8px);left:0;z-index:10;background:#fff;border:1px solid #E7E9F0;border-radius:12px;box-shadow:0 12px 30px rgba(20,20,43,.18);padding:12px;display:flex;flex-wrap:wrap;gap:10px;width:184px;">
+                                  <sc-for list="{{ o.colorsAll }}" as="c" hint-placeholder-count="7">
+                                    <button onClick="{{ c.onSelect }}" title="{{ c.title }}" style="{{ c.style }}"></button>
+                                  </sc-for>
+                                </div>
+                              </sc-if>
                             </div>
                           </div>
                         </div>
@@ -842,7 +850,7 @@ class Component extends DCLogic {
     this.state = {
       screen:'pdp', colorIdx:0, size:'20', method:'engrave', qty:1, galleryIdx:0,
       orderIntent:'single', justAdded:0,
-      objects:[], selectedId:null, viewAngle:0, wrap:'off', objSeq:1,
+      objects:[], selectedId:null, viewAngle:0, wrap:'off', objSeq:1, colorPopupId:null,
       studioOpen:false, studioTab:'assistant', draft:'', thinking:false,
       chat:[{role:'ai', text:"Hi! Tell me what you\u2019d like on your tumbler \u2014 a phrase, a vibe, or your logo. Or open the Editor tab to add text, upload a logo, and drag it around the bottle."}],
       cart:[],
@@ -933,6 +941,8 @@ class Component extends DCLogic {
         selHandleStyle='position:absolute;left:'+fullX.toFixed(2)+'%;top:'+fullY.toFixed(2)+'%;transform:translate(-50%,-50%) translateY(-'+lift.toFixed(0)+'px);width:30px;height:30px;border-radius:50%;background:#2D5BFF;border:2px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;cursor:grab;pointer-events:auto;touch-action:none;z-index:8;';
       }
     }
+    const colorSwatch=(o,c,sz)=>({ title:c.name, onSelect:()=>{ this.updateObj(o.id,{color:c.hex}); this.set('colorPopupId',null); },
+      style:'width:'+sz+'px;height:'+sz+'px;flex:none;border-radius:50%;cursor:pointer;border:none;background:'+c.hex+';box-shadow:'+((o.color===c.hex)?'0 0 0 2px #F5F8FF,0 0 0 4px #2D5BFF':'inset 0 0 0 1px rgba(0,0,0,.14)')+';' });
     const layerCards=S.objects.map(o=>{ const on=o.id===S.selectedId; const isText=o.type==='text';
       return {
         isText, isLogo:!isText, selected:on,
@@ -940,14 +950,17 @@ class Component extends DCLogic {
         onText:(e)=>this.updateObj(o.id,{text:e.target.value}),
         onSelect:()=>this.set('selectedId',o.id),
         onDelete:(e)=>{e.stopPropagation();this.deleteObj(o.id);},
-        cardStyle:'border-radius:12px;overflow:hidden;cursor:pointer;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#F5F8FF':'#fff')+';',
+        cardStyle:'border-radius:12px;cursor:pointer;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#F5F8FF':'#fff')+';',
         inputStyle:'flex:1;min-width:0;border:none;background:transparent;font-size:14px;font-weight:600;color:#14142B;padding:12px 4px 12px 13px;',
         logoRowStyle:'flex:1;display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:#14142B;padding:12px 4px 12px 13px;',
         delStyle:'flex:none;width:38px;height:44px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:#C0C6D6;cursor:pointer;',
         fontVal:o.font||'grotesk', onFont:(e)=>this.updateObj(o.id,{font:e.target.value}),
         fontOptions:this.FONTS.map(f=>({value:f.id,label:f.name})),
-        colors:this.TEXT_COLORS.map(c=>({ onSelect:()=>this.updateObj(o.id,{color:c.hex}), title:c.name,
-          style:'width:24px;height:24px;flex:none;border-radius:50%;cursor:pointer;border:none;background:'+c.hex+';box-shadow:'+((o.color===c.hex)?'0 0 0 2px #F5F8FF,0 0 0 4px #2D5BFF':'inset 0 0 0 1px rgba(0,0,0,.12)')+';' })),
+        colorsInline:this.TEXT_COLORS.slice(0,2).map(c=>colorSwatch(o,c,24)),
+        colorsAll:this.TEXT_COLORS.map(c=>colorSwatch(o,c,26)),
+        colorMoreCount:this.TEXT_COLORS.length-2,
+        colorPopupOpen:S.colorPopupId===o.id,
+        onColorMore:(e)=>{ e.stopPropagation(); this.set('colorPopupId', S.colorPopupId===o.id?null:o.id); },
         colorNote:isText&&engraveNow,
         size:o.size||(isText?26:78), sizeVal:o.size||(isText?26:78),
         sizeMin:isText?12:30, sizeMax:isText?52:150,
