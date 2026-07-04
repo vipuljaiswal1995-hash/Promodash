@@ -1324,10 +1324,10 @@ class Component extends DCLogic {
 
   addToCart(mode){ const id=Date.now(); const line={id,colorIdx:this.state.colorIdx,size:this.state.size,method:this.state.method,qty:this.state.qty,objects:JSON.parse(JSON.stringify(this.state.objects)),wrap:this.state.wrap};
     const cart=[...this.state.cart,line];
-    if(mode==='buynow'){ this.setState({cart,screen:'checkout',shipMode:'one',justAdded:0}); }
-    else if(mode==='multiaddr'){ this.setState({cart,screen:'checkout',shipMode:'many',justAdded:0}); }
+    if(mode==='buynow'){ this.setState({cart,screen:'checkout',shipMode:'one',justAdded:0,studioOpen:false}); }
+    else if(mode==='multiaddr'){ this.setState({cart,screen:'checkout',shipMode:'many',justAdded:0,studioOpen:false}); }
     else if(mode==='multidesign'){ this.setState({cart,objects:[],selectedId:null,justAdded:(this.state.justAdded||0)+1}); }
-    else { this.setState({cart,screen:'cart',justAdded:0}); } }
+    else { this.setState({cart,screen:'cart',justAdded:0,studioOpen:false}); } }
   cartQty(id,delta){ this.setState({cart:this.state.cart.map(l=>l.id===id?Object.assign({},l,{qty:Math.max(1,l.qty+delta)}):l)}); }
   cartRemove(id){ this.setState({cart:this.state.cart.filter(l=>l.id!==id)}); }
   addCompanion(k){ const src=this.state.cart.find(l=>(l.objects&&l.objects.length))||this.state.cart[0]; if(!src)return;
