@@ -359,7 +359,18 @@
   }
   function cssToObj(css) {
     const o = {};
-    for (const decl of css.split(";")) {
+    // Split on ';' only at paren depth 0 so values like url(data:image/png;base64,...) stay intact.
+    const decls = [];
+    let depth = 0, cur = "";
+    for (let i = 0; i < css.length; i++) {
+      const ch = css[i];
+      if (ch === "(") depth++;
+      else if (ch === ")") depth = Math.max(0, depth - 1);
+      if (ch === ";" && depth === 0) { decls.push(cur); cur = ""; }
+      else cur += ch;
+    }
+    if (cur.trim()) decls.push(cur);
+    for (const decl of decls) {
       const i = decl.indexOf(":");
       if (i < 0) continue;
       const prop = decl.slice(0, i).trim();
