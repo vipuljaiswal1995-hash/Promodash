@@ -98,7 +98,7 @@
         </div>
 
         <!-- thumbnails -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;width:100%;">
+        <div style="display:grid;grid-template-columns:repeat(4,max-content);justify-content:space-between;row-gap:10px;margin-top:14px;width:100%;">
           <sc-for list="{{ galThumbs }}" as="t" hint-placeholder-count="4">
             <button onClick="{{ t.onClick }}" style="{{ t.style }}">
               <sc-if value="{{ t.isBottle }}" hint-placeholder-val="{{ true }}">
