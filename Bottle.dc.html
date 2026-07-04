@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:100%;height:100%;">
+  <div style="width:44%;height:6.5%;background:{{ lidColor }};border-radius:10px 10px 7px 7px;position:relative;z-index:3;margin-bottom:-1.5%;box-shadow:inset 0 2px 2px rgba(255,255,255,.25),0 3px 5px rgba(0,0,0,.2);"></div>
+  <div style="position:relative;width:82%;flex:1;min-height:0;">
+    <div style="position:absolute;inset:0;background:{{ bodyGrad }};border-radius:22px 22px 60px 60px / 16px 16px 34px 34px;box-shadow:inset 0 -22px 44px rgba(0,0,0,.24),inset 0 8px 16px rgba(255,255,255,.10);"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:6%;background:{{ rimColor }};border-radius:50%;box-shadow:inset 0 3px 5px rgba(0,0,0,.4);"></div>
+    <div style="position:absolute;left:{{ hlLeft }};top:8%;width:12%;bottom:14%;background:linear-gradient(90deg,rgba(255,255,255,.30),rgba(255,255,255,0));border-radius:40%;filter:blur(3px);"></div>
+    <div style="position:absolute;left:16%;right:16%;top:22%;height:48%;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);">
+      <sc-for list="{{ items }}" as="it" hint-placeholder-count="0">
+        <sc-if value="{{ it.isText }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ it.style }}">{{ it.text }}</div>
+        </sc-if>
+        <sc-if value="{{ it.isLogo }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ it.style }}"></div>
+        </sc-if>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:210,&quot;height&quot;:330},&quot;colorhex&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#1A1A2E&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;method&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;engrave&quot;,&quot;uv&quot;,&quot;screen&quot;],&quot;default&quot;:&quot;engrave&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;objects&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;any[]&quot;},&quot;viewangle&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;wrap&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  _hex(hex){ const h=(hex||'#333').replace('#',''); const s=h.length===3?h.split('').map(c=>c+c).join(''):h; const n=parseInt(s,16); return {r:(n>>16)&255,g:(n>>8)&255,b:n&255}; }
+  darken(hex,a){ const c=this._hex(hex); return 'rgb('+Math.round(c.r*(1-a))+','+Math.round(c.g*(1-a))+','+Math.round(c.b*(1-a))+')'; }
+  lighten(hex,a){ const c=this._hex(hex); return 'rgb('+Math.round(c.r+(255-c.r)*a)+','+Math.round(c.g+(255-c.g)*a)+','+Math.round(c.b+(255-c.b)*a)+')'; }
+  isLight(hex){ const c=this._hex(hex); return (0.299*c.r+0.587*c.g+0.114*c.b)>150; }
+  adiff(a,b){ return ((a-b+540)%360)-180; }
+  renderVals(){
+    const color = this.props.colorhex || '#1A1A2E';
+    const method = this.props.method || 'engrave';
+    const wrap = !!this.props.wrap;
+    const view = Number(this.props.viewangle)||0;
+    const light = this.isLight(color);
+    let objs = Array.isArray(this.props.objects) ? this.props.objects.slice() : [];
+    if(wrap && objs.length){ const ex=[]; objs.forEach(o=>{ [0,120,240].forEach(off=>ex.push(Object.assign({},o,{u:(Number(o.u)||0)+off}))); }); objs=ex; }
+    const items = [];
+    objs.forEach(o=>{
+      const u = Number(o.u)||0; const d = this.adiff(u, view);
+      if(Math.abs(d) > 90) return;
+      const rad = d*Math.PI/180;
+      const xPct = 50 + (d/90)*40;
+      const sx = Math.max(0.05, Math.cos(rad));
+      const op = Math.max(0, Math.min(1,(90-Math.abs(d))/16));
+      const v = o.v!==undefined ? o.v : 50;
+      const rot = o.rot||0;
+      const size = o.size || (o.type==='text'?26:78);
+      const base = 'position:absolute;left:'+xPct.toFixed(2)+'%;top:'+v+'%;transform:translate(-50%,-50%) rotate('+rot+'deg) scaleX('+sx.toFixed(3)+');opacity:'+op.toFixed(3)+';';
+      if(o.type==='text'){
+        const tcolor = method==='engrave' ? (light?'rgba(24,24,34,.52)':'rgba(255,255,255,.62)') : (o.color || (light?'#14142B':'#FFFFFF'));
+        const sh = method==='engrave' ? (light?'0 1px 0 rgba(255,255,255,.4)':'0 1px 1px rgba(0,0,0,.4)') : (light?'none':'0 1px 2px rgba(0,0,0,.3)');
+        items.push({ isText:true, isLogo:false, text:o.text||'', style: base+'font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:'+size+'px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;line-height:1;color:'+tcolor+';text-shadow:'+sh+';' });
+      } else {
+        const f = method==='engrave' ? 'filter:brightness(0) '+(light?'':'invert(1)')+';opacity:'+(op*(light?.5:.55)).toFixed(3)+';mix-blend-mode:'+(light?'multiply':'soft-light')+';' : '';
+        items.push({ isText:false, isLogo:true, style: base+'width:'+size+'px;height:'+size+'px;background-image:url('+o.url+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f });
+      }
+    });
+    // shading rotates with the view: the bright reflection band slides across the cylinder
+    const vr = view*Math.PI/180;
+    const hc = Math.max(24, Math.min(76, 50 + Math.sin(vr)*24));   // highlight center %
+    const hcL = Math.max(3, Math.min(hc-14, hc-10));
+    return {
+      items,
+      hlLeft: (Math.max(2, Math.min(84, hc-42))).toFixed(1)+'%',
+      bodyGrad:'linear-gradient(90deg,'
+        +this.darken(color,.42)+' 0%,'
+        +this.darken(color,.16)+' '+(hc*0.42).toFixed(0)+'%,'
+        +this.lighten(color,.26)+' '+hc.toFixed(0)+'%,'
+        +this.darken(color,.16)+' '+(hc+(100-hc)*0.55).toFixed(0)+'%,'
+        +this.darken(color,.42)+' 100%)',
+      lidColor:this.darken(color,.3),
+      rimColor:this.darken(color,.46)
+    };
+  }
+}
+</script>
+</body>
+</html>
