@@ -453,13 +453,14 @@
 
           <!-- ONE ADDRESS -->
           <sc-if value="{{ shipOne }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ useLocation }}" style="display:inline-flex;align-items:center;gap:7px;background:#EEF3FF;border:1px solid #2D5BFF;color:#0B2A8A;border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:600;cursor:pointer;margin-bottom:14px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z"></path><circle cx="12" cy="11" r="2.6"></circle></svg>
-              Use my current location
-            </button>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <input value="{{ shipName }}" onChange="{{ onShip.name }}" placeholder="Full name" style="{{ fName }}">
-              <input value="{{ shipLine1 }}" onChange="{{ onShip.line1 }}" placeholder="Street address" style="{{ fLine1 }}">
+              <div style="position:relative;">
+                <input value="{{ shipLine1 }}" onChange="{{ onShip.line1 }}" placeholder="Street address" style="{{ fLine1 }}">
+                <button onClick="{{ useLocation }}" title="Use my current location" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:0;color:#2D5BFF;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path><circle cx="12" cy="12" r="2.4" fill="currentColor"></circle></svg>
+                </button>
+              </div>
               <input value="{{ shipCity }}" onChange="{{ onShip.city }}" placeholder="City" style="{{ fCity }}">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <input value="{{ shipState }}" onChange="{{ onShip.state }}" placeholder="State" style="{{ fState }}">
@@ -1239,6 +1240,7 @@ class Component extends DCLogic {
 
     const fieldBase='width:100%;font-size:14px;padding:12px 14px;border-radius:10px;';
     const fErr=(bad)=>fieldBase+'border:1px solid '+(bad?'#E8484D':'#D9DEE8')+';';
+    const fErrIcon=(bad)=>'width:100%;font-size:14px;padding:12px 40px 12px 14px;border-radius:10px;border:1px solid '+(bad?'#E8484D':'#D9DEE8')+';';
     const E=S.errors;
 
     // reviews / bars
@@ -1341,7 +1343,7 @@ class Component extends DCLogic {
       reconcileStyle:'font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;font-weight:600;color:'+(reconciled?'#1F9D6B':'#C77700')+';',
       shipName:S.ship.name, shipLine1:S.ship.line1, shipCity:S.ship.city, shipState:S.ship.state, shipZip:S.ship.zip,
       onShip:{name:(e)=>this.updShip('name',e.target.value),line1:(e)=>this.updShip('line1',e.target.value),city:(e)=>this.updShip('city',e.target.value),state:(e)=>this.updShip('state',e.target.value),zip:(e)=>this.updShip('zip',e.target.value)},
-      fName:fErr(E.address&&!S.ship.name), fLine1:fErr(E.address&&!S.ship.line1), fCity:fErr(E.address&&!S.ship.city), fState:fErr(E.address&&!S.ship.state), fZip:fErr(E.address&&!S.ship.zip),
+      fName:fErr(E.address&&!S.ship.name), fLine1:fErrIcon(E.address&&!S.ship.line1), fCity:fErr(E.address&&!S.ship.city), fState:fErr(E.address&&!S.ship.state), fZip:fErr(E.address&&!S.ship.zip),
       speedOptions, useLocation:()=>this.useLocation(),
       payTabs, payCard:S.payMethod==='card', payPo:S.payMethod==='po', payWalletMsg:S.payMethod==='wallet',
       cardNum:S.card.num, cardExp:S.card.exp, cardCvc:S.card.cvc,
