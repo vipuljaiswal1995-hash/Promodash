@@ -844,7 +844,7 @@ class Component extends DCLogic {
     const totalUnits=this.cartUnits();
     const cartLines=S.cart.map(l=>{ const unit=this.unitFor(l.size,totalUnits); const cObj=this.COLORS[l.colorIdx]; const so=this.SIZES.find(x=>x.id===l.size)||this.SIZES[0];
       return {id:l.id, hex:cObj.hex, colorName:cObj.name, method:l.method, methodLabel:this.METHODS[l.method].label,
-        sizeLabel:so.label, objects:encodeURIComponent(JSON.stringify(l.objects)), wrap:l.wrap, qty:l.qty, designText:this.designText(l.objects),
+        sizeLabel:so.label, objects:l.objects, wrap:l.wrap, qty:l.qty, designText:this.designText(l.objects),
         unitFmt:this.fmt(unit), lineFmt:this.fmt(unit*l.qty),
         inc:()=>this.cartQty(l.id,1), dec:()=>this.cartQty(l.id,-1), remove:()=>this.cartRemove(l.id)}; });
     const cartSubtotal=S.cart.reduce((a,l)=>a+this.unitFor(l.size,totalUnits)*l.qty,0);
@@ -865,7 +865,7 @@ class Component extends DCLogic {
 
     // ---- distribution split-grid: addresses (rows) × designs (columns) ----
     const dist=S.dist||{};
-    const gridDesigns=S.cart.map(l=>({lineId:l.id, name:this.COLORS[l.colorIdx].name+' · '+(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label, hex:this.COLORS[l.colorIdx].hex, method:l.method, objects:encodeURIComponent(JSON.stringify(l.objects)), wrap:l.wrap, qty:l.qty, qtyLabel:'need '+l.qty}));
+    const gridDesigns=S.cart.map(l=>({lineId:l.id, name:this.COLORS[l.colorIdx].name+' · '+(this.SIZES.find(x=>x.id===l.size)||this.SIZES[0]).label, hex:this.COLORS[l.colorIdx].hex, method:l.method, objects:l.objects, wrap:l.wrap, qty:l.qty, qtyLabel:'need '+l.qty}));
     const cellVal=(aid,lid)=>Number(dist[aid+':'+lid])||0;
     const gridRows=S.manyAddr.map(a=>{
       const cells=gridDesigns.map(d=>({qty:cellVal(a.id,d.lineId), onChange:(e)=>this.setDist(a.id,d.lineId,e.target.value)}));
@@ -912,7 +912,7 @@ class Component extends DCLogic {
       isPdp:scr==='pdp', isCart:scr==='cart', isCheckout:scr==='checkout', isConfirm:scr==='confirm',
 
       selectedHex:color.hex, selectedColorName:color.name, method:S.method, methodLabel:M.label, decorationChip:M.label,
-      objects:encodeURIComponent(JSON.stringify(S.objects)), viewAngle:S.viewAngle, wrap:S.wrap, sizeLabel:sizeObj.label,
+      objects:S.objects, viewAngle:S.viewAngle, wrap:S.wrap, sizeLabel:sizeObj.label,
       swatches, methodChips, qtyPresets,
       colorOptions, colorIdxStr:String(S.colorIdx), onColorPick:(e)=>this.set('colorIdx',parseInt(e.target.value,10)||0),
       sizeSelectOptions, size:S.size, onSizePick:(e)=>this.set('size',e.target.value),

@@ -39,14 +39,7 @@ class Component extends DCLogic {
     const wrap = !!this.props.wrap;
     const view = Number(this.props.viewangle)||0;
     const light = this.isLight(color);
-    let objs = [];
-    if(Array.isArray(this.props.objects)) { objs = this.props.objects.slice(); }
-    else if(typeof this.props.objects === 'string' && this.props.objects.startsWith('%5B')) {
-      try { objs = JSON.parse(decodeURIComponent(this.props.objects)); } catch(e) {}
-    } else if(typeof this.props.objects === 'string' && this.props.objects.startsWith('[')) {
-      try { objs = JSON.parse(this.props.objects); } catch(e) {}
-    }
-    if(!Array.isArray(objs)) objs = [];
+    let objs = Array.isArray(this.props.objects) ? this.props.objects.slice() : [];
     if(wrap && objs.length){ const ex=[]; objs.forEach(o=>{ [0,120,240].forEach(off=>ex.push(Object.assign({},o,{u:(Number(o.u)||0)+off}))); }); objs=ex; }
     const items = [];
     objs.forEach(o=>{
