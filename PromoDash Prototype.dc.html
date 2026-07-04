@@ -614,14 +614,6 @@
             <span style="flex:1;"></span>
             <button onClick="{{ toggleWrap }}" style="{{ wrapBtnStyle }}">{{ wrapLabel }}</button>
           </div>
-          <div style="display:flex;align-items:center;gap:14px;">
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:#6B7285;">METHOD</span>
-            <div style="display:flex;gap:8px;">
-              <sc-for list="{{ studioMethods }}" as="m" hint-placeholder-count="3">
-                <button onClick="{{ m.onSelect }}" style="{{ m.style }}">{{ m.name }}</button>
-              </sc-for>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -708,11 +700,50 @@
             <sc-if value="{{ hasObjects }}" hint-placeholder-val="{{ false }}">
               <button onClick="{{ clearDesign }}" style="width:100%;margin-top:16px;background:none;border:none;color:#9AA3B2;font-size:12.5px;font-weight:600;cursor:pointer;">Clear entire design</button>
             </sc-if>
+
+            <!-- DECORATION METHOD PICKER -->
+            <div style="margin-top:24px;padding-top:22px;border-top:1px solid #EEF0F5;">
+              <div style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:1px;margin-bottom:12px;">DECORATION METHOD</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <sc-for list="{{ studioMethodCards }}" as="mc" hint-placeholder-count="3">
+                  <button onClick="{{ mc.onSelect }}" style="{{ mc.cardStyle }}">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="{{ mc.dotStyle }}"></div>
+                        <span style="font-size:13.5px;font-weight:700;color:#14142B;">{{ mc.name }}</span>
+                      </div>
+                      <span style="font-size:12px;font-weight:600;color:#2D5BFF;white-space:nowrap;">{{ mc.priceFmt }}/ea</span>
+                    </div>
+                    <div style="margin-top:5px;padding-left:28px;font-size:12px;color:#6B7280;line-height:1.5;text-align:left;">{{ mc.desc }}</div>
+                    <div style="margin-top:5px;padding-left:28px;display:flex;gap:6px;flex-wrap:wrap;">
+                      <sc-for list="{{ mc.tags }}" as="tg" hint-placeholder-count="2">
+                        <span style="{{ tg.style }}">{{ tg.label }}</span>
+                      </sc-for>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
           </div>
         </sc-if>
 
-        <div style="padding:16px 24px;border-top:1px solid #EEF0F5;">
-          <button onClick="{{ closeStudio }}" style="width:100%;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer;">{{ studioDoneLabel }}</button>
+        <!-- ADD TO CART FOOTER -->
+        <div style="padding:14px 20px 16px;border-top:1px solid #EEF0F5;background:#fff;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-size:12px;font-weight:600;color:#6B7280;">Qty</span>
+            <div style="display:flex;align-items:center;gap:0;border:1.5px solid #D9DEE8;border-radius:10px;overflow:hidden;">
+              <button onClick="{{ decQty }}" style="width:34px;height:34px;border:none;background:#F7F8FB;font-size:18px;color:#14142B;cursor:pointer;font-weight:400;">−</button>
+              <span style="min-width:36px;text-align:center;font-size:14px;font-weight:700;color:#14142B;">{{ qty }}</span>
+              <button onClick="{{ incQty }}" style="width:34px;height:34px;border:none;background:#F7F8FB;font-size:18px;color:#14142B;cursor:pointer;font-weight:400;">+</button>
+            </div>
+            <span style="flex:1;"></span>
+            <span style="font-size:12px;color:#9AA3B2;">{{ unitPriceFmt }}/ea</span>
+          </div>
+          <button onClick="{{ addToCart }}" style="width:100%;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(31,157,107,.22);display:flex;align-items:center;justify-content:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0"></path></svg>
+            Add to cart · {{ subtotalFmt }}
+          </button>
         </div>
       </div>
     </div>
@@ -892,6 +923,19 @@ class Component extends DCLogic {
       style:'flex:1;text-align:center;cursor:pointer;border-radius:11px;padding:10px 6px;border:1.5px solid '+(i===activeTier?'#2D5BFF':'#E7E9F0')+';background:'+(i===activeTier?'#EEF3FF':'#fff')+';color:#14142B;'}));
     const studioMethods=Object.keys(this.METHODS).map(k=>{ const m=this.METHODS[k]; const on=k===S.method;
       return {name:m.short,onSelect:()=>this.set('method',k),style:'cursor:pointer;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;'+(on?'background:#2D5BFF;color:#fff;':'background:#1E1E2A;color:#8B93A9;')}; });
+    const METHOD_INFO = {
+      engrave:{desc:'A laser permanently etches your design into the steel surface. Crisp, premium look that will never fade, chip, or wash away — even after years of daily use.',tags:[{label:'Permanent',color:'#1F9D6B'},{label:'1-color',color:'#6B7280'},{label:'Best for metal',color:'#6B7280'}],priceMult:1.0},
+      uv:{desc:'Full-color UV ink is cured directly onto the bottle surface. Bring logos, gradients, and multi-color art to life — bold and vibrant.',tags:[{label:'Full color',color:'#7C3AED'},{label:'Gradients OK',color:'#6B7280'},{label:'+$2/ea',color:'#E8484D'}],priceMult:1.0},
+      screen:{desc:'Traditional screen printing with spot colors. Excellent value when ordering in bulk with a design that uses a few solid colors.',tags:[{label:'Best value',color:'#C77700'},{label:'High volume',color:'#6B7280'},{label:'Solid colors',color:'#6B7280'}],priceMult:1.0}
+    };
+    const baseUnit = this.unitFor(S.size, S.qty);
+    const studioMethodCards=Object.keys(this.METHODS).map(k=>{ const m=this.METHODS[k]; const on=k===S.method; const info=METHOD_INFO[k];
+      const methodPrice = k==='uv' ? baseUnit+2 : baseUnit;
+      return {name:m.name, priceFmt:this.fmt(methodPrice), desc:info.desc,
+        tags:info.tags.map(t=>({label:t.label,style:'font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+(t.color==='#1F9D6B'?'#EDFAF3':t.color==='#7C3AED'?'#F3EFFE':t.color==='#E8484D'?'#FEF2F2':t.color==='#C77700'?'#FFF8E7':'#F2F4F8')+';color:'+t.color+';'})),
+        dotStyle:'width:14px;height:14px;border-radius:4px;flex:none;background:'+(on?'#2D5BFF':'#D9DEE8')+';box-shadow:'+(on?'0 0 0 3px rgba(45,91,255,.18)':'none')+';',
+        cardStyle:'width:100%;text-align:left;cursor:pointer;border-radius:12px;padding:12px 14px;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#FAFBFC')+';',
+        onSelect:()=>this.set('method',k)}; });
 
     const lo=S.lastOrder||{};
     const tabStyle=(on)=>'border:none;background:none;cursor:pointer;font-size:13.5px;font-weight:600;padding:10px 14px;margin-bottom:-1px;border-bottom:2px solid '+(on?'#2D5BFF':'transparent')+';color:'+(on?'#14142B':'#9AA3B2')+';';
@@ -915,7 +959,7 @@ class Component extends DCLogic {
         {v:'BPA-free', k:'FDA compliant'},
         {v:'Dishwasher-safe', k:'Easy care'}
       ],
-      volumeTiers, studioMethods,
+      volumeTiers, studioMethods, studioMethodCards,
       details:[
         {tag:'BUILT TO LAST', title:'Double-wall vacuum steel', body:'18/8 stainless keeps drinks cold 24 hours or hot 12. Leakproof lid, cupholder-friendly base, dishwasher-safe.'},
         {tag:'DECORATION', title:'Whatever your art needs', body:'Laser engraving for a permanent 1-color mark, UV for full-color and gradients, screen print for value at volume. The preview always shows the real method.'},
