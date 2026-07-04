@@ -415,7 +415,7 @@
 
   <!-- ============ CHECKOUT ============ -->
   <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
-  <div style="max-width:1060px;margin:0 auto;padding:34px 40px 116px;">
+  <div style="max-width:1060px;margin:0 auto;padding:34px 40px 72px;">
     <button onClick="{{ goCart }}" style="background:none;border:none;color:#6B7280;font-size:13px;cursor:pointer;padding:0;margin-bottom:18px;">← Back to cart</button>
     <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:32px;letter-spacing:-0.8px;margin:0 0 24px;">Checkout</h1>
     <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:start;">
@@ -554,13 +554,14 @@
                         <div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.name }}</div><div style="font-size:11.5px;color:#9AA3B2;">{{ d.qtyLabel }}</div></div>
                         <span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:{{ d.allocColor }};">{{ d.allocLabel }}</span>
                       </div>
-                      <div style="display:flex;flex-direction:column;gap:7px;">
+                      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                         <sc-for list="{{ d.allocRows }}" as="ar" hint-placeholder-count="2">
-                          <div style="display:flex;align-items:center;gap:10px;">
-                            <span style="flex:1;min-width:0;font-size:12.5px;color:#3C4152;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ ar.label }}</span>
-                            <input type="number" min="0" value="{{ ar.qty }}" onChange="{{ ar.onChange }}" style="flex:none;width:64px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 4px;border:1px solid #D9DEE8;border-radius:8px;background:#fff;">
+                          <div style="display:flex;align-items:center;gap:8px;border:1px solid #E7E9F0;border-radius:9px;padding:6px 8px 6px 11px;background:#FBFCFE;">
+                            <span style="font-size:12px;color:#3C4152;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;">{{ ar.label }}</span>
+                            <input type="number" min="0" value="{{ ar.qty }}" onChange="{{ ar.onChange }}" style="flex:none;width:52px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:6px 4px;border:1px solid #D9DEE8;border-radius:7px;background:#fff;">
                           </div>
                         </sc-for>
+                        <button onClick="{{ addAddress }}" style="display:flex;align-items:center;gap:5px;border:1px dashed #C7CCDA;background:#fff;color:#2D5BFF;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;">+ Address</button>
                       </div>
                     </div>
                   </sc-for>
@@ -677,19 +678,9 @@
           </div>
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:14px;border-top:1px solid #E7E9F0;"><span style="font-size:14px;font-weight:600;">Total</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:23px;color:#1F9D6B;">{{ sTotalFmt }}</span></div>
           <div style="background:#EEF3FF;border-radius:9px;padding:9px;font-size:12px;font-weight:600;color:#0B2A8A;text-align:center;margin-top:14px;">🖉 Free proof to approve before print</div>
+          <button onClick="{{ placeOrder }}" style="width:100%;margin-top:14px;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(31,157,107,.24);">Place order · {{ sTotalFmt }}</button>
         </div>
       </div>
-    </div>
-  </div>
-  <!-- STICKY PLACE-ORDER BAR -->
-  <div style="position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid #E7E9F0;box-shadow:0 -6px 22px rgba(20,20,43,.08);padding:13px 40px;">
-    <div style="max-width:1060px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;">
-      <div style="display:flex;align-items:baseline;gap:9px;min-width:0;">
-        <span style="font-size:12.5px;color:#9AA3B2;">Total</span>
-        <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:#14142B;">{{ sTotalFmt }}</span>
-        <span style="font-size:12px;color:#9AA3B2;white-space:nowrap;">· {{ cartCountLabel }}</span>
-      </div>
-      <button onClick="{{ placeOrder }}" style="flex:none;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:14px 40px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(31,157,107,.26);">Place order →</button>
     </div>
   </div>
 
@@ -1547,7 +1538,7 @@ class Component extends DCLogic {
     this.state.manyAddr.forEach(a=>{ delete dist[a.id+':'+lid]; });
     if(aidStr){ dist[aidStr+':'+lid]=qty; } this.setState({dist}); }
   pickShipMode(k){ if(k==='many'&&this.cartUnits()<=1){ return; }
-    if(k==='many'){ const first=this.state.manyAddr.length===0; this.setState({shipMode:'many',splitIntent:null,addrModal:first?'form':null,addrDraft:{name:'',line1:'',city:'',state:'',zip:''},addrErr:false}); }
+    if(k==='many'){ this.setState({shipMode:'many',splitIntent:null,addrModal:null,addrErr:false}); }
     else { this.setState({shipMode:k}); } }
   autoSplit(){ const S=this.state; const addrs=S.manyAddr; if(addrs.length===0) return; const dist=Object.assign({},S.dist);
     S.cart.forEach(l=>{ const base=Math.floor(l.qty/addrs.length); let rem=l.qty-base*addrs.length;
