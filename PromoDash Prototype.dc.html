@@ -522,7 +522,12 @@
                   <div style="flex:1;display:flex;">
                     <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="2">
                       <div style="flex:1;min-width:96px;padding:8px;border-left:1px solid #F2F4F8;display:flex;align-items:center;justify-content:center;">
-                        <input type="number" min="0" value="{{ c.qty }}" onChange="{{ c.onChange }}" style="width:100%;max-width:72px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:8px 4px;border:1px solid #D9DEE8;border-radius:8px;background:#fff;">
+                        <sc-if value="{{ c.single }}" hint-placeholder-val="{{ false }}">
+                          <div onClick="{{ c.onPick }}" title="Ship this item here" style="{{ c.pickStyle }}"></div>
+                        </sc-if>
+                        <sc-if value="{{ c.multi }}" hint-placeholder-val="{{ true }}">
+                          <input type="number" min="0" value="{{ c.qty }}" onChange="{{ c.onChange }}" style="width:100%;max-width:72px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:8px 4px;border:1px solid #D9DEE8;border-radius:8px;background:#fff;">
+                        </sc-if>
                       </div>
                     </sc-for>
                   </div>
@@ -1115,7 +1120,11 @@ class Component extends DCLogic {
         mockHasLogo:gm&&gm.hasLogo, mockHasText:gm&&gm.hasText, mockOverlay:gm&&gm.overlay, mockOverlayText:gm&&gm.overlayText}; });
     const cellVal=(aid,lid)=>Number(dist[aid+':'+lid])||0;
     const gridRows=S.manyAddr.map(a=>{
-      const cells=gridDesigns.map(d=>({qty:cellVal(a.id,d.lineId), onChange:(e)=>this.setDist(a.id,d.lineId,e.target.value)}));
+      const cells=gridDesigns.map(d=>{ const val=cellVal(a.id,d.lineId); const single=d.qty===1;
+        return {qty:val, single, multi:!single, selected:val>0,
+          onChange:(e)=>this.setDist(a.id,d.lineId,e.target.value),
+          onPick:()=>this.assignSingle(a.id,d.lineId),
+          pickStyle:'width:22px;height:22px;border-radius:50%;cursor:pointer;flex:none;border:2px solid '+(val>0?'#2D5BFF':'#C7CCDA')+';background:#fff;box-shadow:'+(val>0?'inset 0 0 0 4px #2D5BFF':'none')+';'}; });
       const total=cells.reduce((s,c)=>s+c.qty,0);
       return {place:a.place, total, cells, onPlace:(e)=>this.updMany(a.id,'place',e.target.value), onRemove:()=>this.removeMany(a.id)};
     });
@@ -1344,6 +1353,10 @@ class Component extends DCLogic {
   updMany(id,k,v){ this.setState({manyAddr:this.state.manyAddr.map(a=>a.id===id?Object.assign({},a,{[k]:v}):a)}); }
   removeMany(id){ const dist=Object.assign({},this.state.dist); Object.keys(dist).forEach(key=>{ if(key.indexOf(id+':')===0) delete dist[key]; }); this.setState({manyAddr:this.state.manyAddr.filter(a=>a.id!==id),dist}); }
   setDist(aid,lid,v){ const n=Math.max(0,parseInt(v||'0',10)||0); const dist=Object.assign({},this.state.dist); dist[aid+':'+lid]=n; this.setState({dist}); }
+  // qty-1 line: assign the single item to exactly one address (clear the rest of that column)
+  assignSingle(aid,lid){ const dist=Object.assign({},this.state.dist); const already=(Number(dist[aid+':'+lid])||0)>0;
+    this.state.manyAddr.forEach(a=>{ delete dist[a.id+':'+lid]; });
+    if(!already) dist[aid+':'+lid]=1; this.setState({dist}); }
   pickShipMode(k){ if(k==='many'&&this.cartUnits()<=1){ return; } if(k==='many'&&this.state.manyAddr.length===0){ const id=this.state.manySeq; this.setState({shipMode:'many',manyAddr:[{id,place:''},{id:id+1,place:''}],manySeq:id+2}); } else { this.setState({shipMode:k}); } }
   autoSplit(){ const S=this.state; const addrs=S.manyAddr; if(addrs.length===0) return; const dist=Object.assign({},S.dist);
     S.cart.forEach(l=>{ const base=Math.floor(l.qty/addrs.length); let rem=l.qty-base*addrs.length;
