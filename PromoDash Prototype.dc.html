@@ -98,7 +98,7 @@
         </div>
 
         <!-- thumbnails -->
-        <div style="display:grid;grid-template-columns:repeat(4,max-content);justify-content:space-between;row-gap:10px;margin-top:14px;width:100%;">
+        <div style="display:flex;gap:10px;margin-top:14px;">
           <sc-for list="{{ galThumbs }}" as="t" hint-placeholder-count="4">
             <button onClick="{{ t.onClick }}" style="{{ t.style }}">
               <sc-if value="{{ t.isBottle }}" hint-placeholder-val="{{ true }}">
@@ -117,14 +117,14 @@
       <div>
 
         <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:44px;line-height:1.0;letter-spacing:-1.4px;margin:0;">Insulated Tumbler</h1>
-        <div style="display:flex;align-items:center;gap:9px;margin-top:15px;">
+        <div style="display:flex;align-items:center;gap:9px;margin-top:6px;">
           <span style="color:#F4A100;font-size:16px;letter-spacing:2px;">★★★★★</span>
           <span style="font-size:14px;color:#14142B;font-weight:600;">4.8</span>
           <span style="font-size:14px;color:#C7CCDA;">·</span>
           <a href="#reviews" style="font-size:14px;color:#6B7280;text-decoration:underline;text-underline-offset:2px;">2,140 reviews</a>
         </div>
 
-        <div style="display:flex;align-items:flex-end;gap:13px;margin-top:24px;">
+        <div style="display:flex;align-items:flex-end;gap:13px;margin-top:16px;">
           <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:40px;letter-spacing:-1.2px;line-height:0.9;">{{ unitPriceFmt }}</span>
           <span style="font-size:14px;color:#6B7280;padding-bottom:4px;">per unit · qty {{ qty }}</span>
         </div>
@@ -134,7 +134,7 @@
 
 
         <!-- USP CHIPS -->
-        <div style="margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;">
+        <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;">
           <sc-for list="{{ specs }}" as="s" hint-placeholder-count="6">
             <span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;font-weight:500;color:#3C4152;background:#F2F4F8;border:1px solid #E7E9F0;border-radius:999px;padding:6px 12px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1F9D6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ s.v }}
