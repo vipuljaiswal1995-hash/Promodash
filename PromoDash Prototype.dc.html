@@ -477,12 +477,15 @@
               <span style="font-size:12.5px;font-weight:600;color:#6B7280;">Your addresses</span>
               <span style="{{ reconcileStyle }}">{{ reconcileMsg }}</span>
             </div>
+            <sc-if value="{{ addrBookEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12.5px;color:#9AA3B2;background:#F7F8FB;border:1px dashed #D9DEE8;border-radius:11px;padding:16px;text-align:center;">No addresses yet — add one to start shipping to multiple places.</div>
+            </sc-if>
             <div style="display:flex;flex-direction:column;gap:8px;">
               <sc-for list="{{ addrBook }}" as="a" hint-placeholder-count="2">
-                <div style="display:flex;align-items:center;gap:10px;">
+                <div style="display:flex;align-items:center;gap:11px;border:1px solid #E7E9F0;border-radius:11px;padding:11px 13px;">
                   <span style="flex:none;width:26px;height:26px;border-radius:8px;background:#EEF3FF;color:#2D5BFF;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ a.tag }}</span>
-                  <input value="{{ a.place }}" onChange="{{ a.onPlace }}" placeholder="Recipient / location" style="flex:1;font-size:12.5px;padding:9px 11px;border:1px solid #D9DEE8;border-radius:9px;background:#fff;">
-                  <button onClick="{{ a.onRemove }}" style="flex:none;background:none;border:none;color:#C7CCDA;font-size:18px;cursor:pointer;padding:0 4px;">×</button>
+                  <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:#14142B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.name }}</div><div style="font-size:11.5px;color:#9AA3B2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.sub }}</div></div>
+                  <button onClick="{{ a.onRemove }}" title="Remove" style="flex:none;background:none;border:none;color:#C7CCDA;font-size:18px;cursor:pointer;padding:0 4px;">×</button>
                 </div>
               </sc-for>
             </div>
@@ -689,6 +692,57 @@
       <button onClick="{{ placeOrder }}" style="flex:none;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:14px 40px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(31,157,107,.26);">Place order →</button>
     </div>
   </div>
+
+  <!-- ADDRESS FORM MODAL -->
+  <sc-if value="{{ addrModalForm }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:80;background:rgba(12,12,20,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:22px;">
+      <div style="width:440px;max-width:100%;background:#fff;border-radius:18px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.4);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;">Add address</span>
+          <button onClick="{{ closeAddrModal }}" style="width:30px;height:30px;border:none;background:#F2F4F8;border-radius:8px;font-size:17px;color:#6B7280;cursor:pointer;">×</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input value="{{ draftName }}" onChange="{{ onDraft.name }}" placeholder="Recipient name" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+          <input value="{{ draftLine1 }}" onChange="{{ onDraft.line1 }}" placeholder="Street address" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+          <input value="{{ draftCity }}" onChange="{{ onDraft.city }}" placeholder="City" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <input value="{{ draftState }}" onChange="{{ onDraft.state }}" placeholder="State" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+            <input value="{{ draftZip }}" onChange="{{ onDraft.zip }}" placeholder="ZIP" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;">
+          </div>
+        </div>
+        <sc-if value="{{ addrErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#E8484D;margin-top:8px;">Please fill in all fields.</div></sc-if>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button onClick="{{ closeAddrModal }}" style="flex:none;background:#fff;border:1px solid #D9DEE8;color:#14142B;border-radius:11px;padding:12px 18px;font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
+          <button onClick="{{ saveAddrForm }}" style="flex:1;background:#2D5BFF;color:#fff;border:none;border-radius:11px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">Save address</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- SAVED ADDRESS BOOK MODAL -->
+  <sc-if value="{{ addrModalBook }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:80;background:rgba(12,12,20,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:22px;">
+      <div style="width:460px;max-width:100%;max-height:82vh;background:#fff;border-radius:18px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.4);display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;">Your saved addresses</span>
+          <button onClick="{{ closeAddrModal }}" style="width:30px;height:30px;border:none;background:#F2F4F8;border-radius:8px;font-size:17px;color:#6B7280;cursor:pointer;">×</button>
+        </div>
+        <div style="font-size:12.5px;color:#9AA3B2;margin-bottom:14px;">Add a saved recipient, or create a new address.</div>
+        <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+          <sc-if value="{{ savedPickEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12.5px;color:#9AA3B2;background:#F7F8FB;border:1px dashed #D9DEE8;border-radius:11px;padding:16px;text-align:center;">All saved addresses are already added to this order.</div>
+          </sc-if>
+          <sc-for list="{{ savedPick }}" as="sp" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:11px;border:1px solid #E7E9F0;border-radius:11px;padding:11px 13px;">
+              <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:#14142B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ sp.name }}</div><div style="font-size:11.5px;color:#9AA3B2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ sp.sub }}</div></div>
+              <button onClick="{{ sp.onAdd }}" style="flex:none;background:#EEF3FF;border:1px solid #D6E0FF;color:#2D5BFF;border-radius:9px;padding:8px 16px;font-size:12.5px;font-weight:600;cursor:pointer;">Add</button>
+            </div>
+          </sc-for>
+        </div>
+        <button onClick="{{ openAddrForm }}" style="margin-top:14px;width:100%;background:#2D5BFF;color:#fff;border:none;border-radius:11px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">+ Add new address</button>
+      </div>
+    </div>
+  </sc-if>
   </sc-if>
 
   <!-- ============ CONFIRMATION ============ -->
@@ -986,6 +1040,13 @@ class Component extends DCLogic {
       {k:'diary', name:'A5 Diary',  price:14},
       {k:'bag',   name:'Tote Bag',  price:12}
     ];
+    // Seed address book for the "saved addresses" reuse popup
+    this.SAVED_SEED = [
+      {id:1, name:'Priya Sharma', line1:'500 Market St', city:'San Francisco', state:'CA', zip:'94105'},
+      {id:2, name:'Marcus Lee',   line1:'88 Congress Ave', city:'Austin', state:'TX', zip:'78701'},
+      {id:3, name:'Dana Ruiz',    line1:'12 Beacon St', city:'Boston', state:'MA', zip:'02108'},
+      {id:4, name:'Leah Kim',     line1:'40 Pike St', city:'Seattle', state:'WA', zip:'98101'}
+    ];
     this.REVIEWS = [
       {name:'Dana R.', initials:'DR', role:'Ops Lead', rating:5, date:'Jun 2026', tint:'#DBE3EA', text:'Ordered 120 for our summit \u2014 the proof came in minutes and the engraving matched the preview exactly. Reordering was one click.'},
       {name:'Marcus T.', initials:'MT', role:'Founder', rating:5, date:'Jun 2026', tint:'#E7DFD3', text:'Bought a single engraved bottle as a gift. Checkout took under a minute and it arrived in two days.'},
@@ -1001,7 +1062,8 @@ class Component extends DCLogic {
       chat:[{role:'ai', text:"Hi! Tell me what you\u2019d like on your tumbler \u2014 a phrase, a vibe, or your logo. Or open the Editor tab to add text, upload a logo, and drag it around the bottle."}],
       cart:[],
       email:'', shipMode:'one', ship:{name:'',line1:'',city:'',state:'',zip:''}, shipSpeed:'standard',
-      manyAddr:[], manySeq:1, dist:{}, splitIntent:null,
+      manyAddr:[], manySeq:100, dist:{}, splitIntent:null,
+      savedAddr:this.SAVED_SEED.map(a=>Object.assign({},a)), addrModal:null, addrDraft:{name:'',line1:'',city:'',state:'',zip:''}, addrErr:false,
       payMethod:'card', card:{num:'',exp:'',cvc:''},
       discountCode:'', discountOn:false, discountError:false, errors:{},
       lastOrder:null
@@ -1191,9 +1253,16 @@ class Component extends DCLogic {
     // ---- multi-address allocation (item-centric, with an advanced grid escape hatch) ----
     const dist=S.dist||{};
     const cellVal=(aid,lid)=>Number(dist[aid+':'+lid])||0;
-    const addrLabel=(a,i)=>a.place||('Address '+(i+1));
-    const addrBook=S.manyAddr.map((a,i)=>({ tag:'#'+(i+1), place:a.place, onPlace:(e)=>this.updMany(a.id,'place',e.target.value), onRemove:()=>this.removeMany(a.id) }));
+    const addrLabel=(a,i)=>a.name||a.place||('Address '+(i+1));
+    const addrBook=S.manyAddr.map((a,i)=>({ tag:'#'+(i+1), name:addrLabel(a,i),
+      sub:[a.line1,a.city,a.state].filter(Boolean).join(', ')+(a.zip?(' '+a.zip):''),
+      onRemove:()=>this.removeMany(a.id) }));
     const addrOptions=[{value:'',label:'Choose address…'}].concat(S.manyAddr.map((a,i)=>({value:String(a.id),label:addrLabel(a,i)})));
+    // saved-address book popup: entries not already added to this order
+    const usedSaved=S.manyAddr.map(a=>a.savedId).filter(x=>x!=null);
+    const savedPick=S.savedAddr.filter(a=>usedSaved.indexOf(a.id)<0).map(a=>({ name:a.name,
+      sub:[a.line1,a.city,a.state].filter(Boolean).join(', ')+(a.zip?(' '+a.zip):''),
+      onAdd:()=>this.addSavedToOrder(a.id) }));
     const gridDesigns=S.cart.map(l=>{ const isBottle=!l.product||l.product==='bottle'; const cHex=this.COLORS[l.colorIdx].hex;
       const comp=isBottle?null:this.COMPANIONS.find(c=>c.k===l.product);
       const gm=isBottle?null:this.productMock(l.product,cHex,l.objects,0.42);
@@ -1336,9 +1405,14 @@ class Component extends DCLogic {
       errEmail:!!E.email, errAddress:!!E.address, errCard:!!E.card,
       shipModes, shipOne:S.shipMode==='one', shipMany:S.shipMode==='many',
       gridDesigns, gridRows, gridColTotals, gridGrand, gridUnbalanced, unbalancedMsg,
-      addrBook, intentCards, needIntent, modeAssign, modeQuantity, modeCustom, showIntentChange,
+      addrBook, addrBookEmpty:S.manyAddr.length===0, intentCards, needIntent, modeAssign, modeQuantity, modeCustom, showIntentChange,
       resetIntent:()=>this.set('splitIntent',null),
       addAddress:()=>this.addMany(), autoSplit:()=>this.autoSplit(),
+      addrModalForm:S.addrModal==='form', addrModalBook:S.addrModal==='book', closeAddrModal:()=>this.closeAddrModal(),
+      addrErr:S.addrErr, saveAddrForm:()=>this.saveAddrForm(), openAddrForm:()=>this.openAddrForm(),
+      draftName:S.addrDraft.name, draftLine1:S.addrDraft.line1, draftCity:S.addrDraft.city, draftState:S.addrDraft.state, draftZip:S.addrDraft.zip,
+      onDraft:{name:(e)=>this.updDraft('name',e.target.value),line1:(e)=>this.updDraft('line1',e.target.value),city:(e)=>this.updDraft('city',e.target.value),state:(e)=>this.updDraft('state',e.target.value),zip:(e)=>this.updDraft('zip',e.target.value)},
+      savedPick, savedPickEmpty:savedPick.length===0,
       reconcileMsg:reconciled?('✓ all items assigned'):('assign every item'),
       reconcileStyle:'font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;font-weight:600;color:'+(reconciled?'#1F9D6B':'#C77700')+';',
       shipName:S.ship.name, shipLine1:S.ship.line1, shipCity:S.ship.city, shipState:S.ship.state, shipZip:S.ship.zip,
@@ -1451,7 +1525,20 @@ class Component extends DCLogic {
   useLocation(){ this.setState({ship:{name:this.state.ship.name||'',line1:'500 Market St',city:'San Francisco',state:'CA',zip:'94105'},errors:Object.assign({},this.state.errors,{address:false})}); }
   applyDiscount(){ const ok=(this.state.discountCode||'').trim().toUpperCase()==='PROMO10'; this.setState({discountOn:ok,discountError:!ok}); }
 
-  addMany(){ const id=this.state.manySeq; this.setState({manyAddr:[...this.state.manyAddr,{id,place:''}],manySeq:id+1}); }
+  // Address flow: 1st/2nd add -> form; once 2+ in the order -> saved-address book popup.
+  addMany(){ this.openAddrFlow(); }
+  openAddrFlow(){ if(this.state.manyAddr.length<2){ this.openAddrForm(); } else { this.setState({addrModal:'book'}); } }
+  openAddrForm(){ this.setState({addrModal:'form',addrDraft:{name:'',line1:'',city:'',state:'',zip:''},addrErr:false}); }
+  closeAddrModal(){ this.setState({addrModal:null,addrErr:false}); }
+  updDraft(k,v){ this.setState({addrDraft:Object.assign({},this.state.addrDraft,{[k]:v}),addrErr:false}); }
+  saveAddrForm(){ const d=this.state.addrDraft;
+    if(!d.name||!d.line1||!d.city||!d.state||!d.zip){ this.setState({addrErr:true}); return; }
+    const sid=this.state.manySeq, oid=this.state.manySeq+1;
+    const saved=Object.assign({id:sid},d), slot=Object.assign({id:oid,savedId:sid},d);
+    this.setState({savedAddr:[...this.state.savedAddr,saved],manyAddr:[...this.state.manyAddr,slot],manySeq:this.state.manySeq+2,addrModal:null,addrErr:false}); }
+  addSavedToOrder(savedId){ const s=this.state.savedAddr.find(a=>a.id===savedId); if(!s)return;
+    const oid=this.state.manySeq, slot=Object.assign({id:oid,savedId},s);
+    this.setState({manyAddr:[...this.state.manyAddr,slot],manySeq:this.state.manySeq+1}); }
   updMany(id,k,v){ this.setState({manyAddr:this.state.manyAddr.map(a=>a.id===id?Object.assign({},a,{[k]:v}):a)}); }
   removeMany(id){ const dist=Object.assign({},this.state.dist); Object.keys(dist).forEach(key=>{ if(key.indexOf(id+':')===0) delete dist[key]; }); this.setState({manyAddr:this.state.manyAddr.filter(a=>a.id!==id),dist}); }
   setDist(aid,lid,v){ const n=Math.max(0,parseInt(v||'0',10)||0); const dist=Object.assign({},this.state.dist); dist[aid+':'+lid]=n; this.setState({dist}); }
@@ -1460,8 +1547,7 @@ class Component extends DCLogic {
     this.state.manyAddr.forEach(a=>{ delete dist[a.id+':'+lid]; });
     if(aidStr){ dist[aidStr+':'+lid]=qty; } this.setState({dist}); }
   pickShipMode(k){ if(k==='many'&&this.cartUnits()<=1){ return; }
-    if(k==='many'&&this.state.manyAddr.length===0){ const id=this.state.manySeq; this.setState({shipMode:'many',splitIntent:null,manyAddr:[{id,place:''},{id:id+1,place:''}],manySeq:id+2}); }
-    else if(k==='many'){ this.setState({shipMode:'many',splitIntent:null}); }
+    if(k==='many'){ const first=this.state.manyAddr.length===0; this.setState({shipMode:'many',splitIntent:null,addrModal:first?'form':null,addrDraft:{name:'',line1:'',city:'',state:'',zip:''},addrErr:false}); }
     else { this.setState({shipMode:k}); } }
   autoSplit(){ const S=this.state; const addrs=S.manyAddr; if(addrs.length===0) return; const dist=Object.assign({},S.dist);
     S.cart.forEach(l=>{ const base=Math.floor(l.qty/addrs.length); let rem=l.qty-base*addrs.length;
