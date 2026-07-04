@@ -1058,7 +1058,11 @@ class Component extends DCLogic {
     this.updateObj(this._drag.id,{u:this._drag.u0+dx/this._drag.w*180, v:Math.max(15,Math.min(85,this._drag.v0+dy/this._drag.h*100))}); }
   endDrag(e){ this._drag=null; }
 
-  addTextObj(){ const id=this.state.objSeq; this.setState({objects:[...this.state.objects,{id,type:'text',text:'YOUR TEXT',u:this.state.viewAngle,v:50,rot:0,size:26}],selectedId:id,objSeq:id+1,studioOpen:true,studioTab:'editor'}); }
+  addTextObj(){ const objs=this.state.objects;
+    // Don't stack duplicate untouched "YOUR TEXT" placeholders — just focus the existing one.
+    const placeholder=objs.find(o=>{ if(o.type!=='text')return false; const t=(o.text||'').trim(); return t===''||t.toUpperCase()==='YOUR TEXT'; });
+    if(placeholder){ this.setState({selectedId:placeholder.id,studioOpen:true,studioTab:'editor'}); return; }
+    const id=this.state.objSeq; this.setState({objects:[...objs,{id,type:'text',text:'YOUR TEXT',u:this.state.viewAngle,v:50,rot:0,size:26}],selectedId:id,objSeq:id+1,studioOpen:true,studioTab:'editor'}); }
   updateObj(id,patch){ this.setState({objects:this.state.objects.map(o=>o.id===id?Object.assign({},o,patch):o)}); }
   deleteObj(id){ this.setState({objects:this.state.objects.filter(o=>o.id!==id),selectedId:this.state.selectedId===id?null:this.state.selectedId}); }
   clearDesign(){ this.setState({objects:[],selectedId:null}); }
