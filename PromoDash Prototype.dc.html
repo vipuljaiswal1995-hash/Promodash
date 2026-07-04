@@ -10,7 +10,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Playfair+Display:wght@600;700;800&amp;family=Bebas+Neue&amp;family=Pacifico&amp;display=swap" rel="stylesheet">
 <style>
   html,body{margin:0;padding:0;background:#F4F5F8;}
   *{box-sizing:border-box;}
@@ -700,7 +700,25 @@
               <div style="margin-top:20px;padding-top:20px;border-top:1px solid #EEF0F5;">
                 <div style="font-size:12px;font-weight:600;color:#9AA3B2;letter-spacing:1px;margin-bottom:14px;">SELECTED · {{ selName }}</div>
                 <sc-if value="{{ selIsText }}" hint-placeholder-val="{{ false }}">
-                  <input value="{{ selText }}" onChange="{{ onSelText }}" placeholder="Type your text" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;margin-bottom:14px;">
+                  <input value="{{ selText }}" onChange="{{ onSelText }}" placeholder="Type your text" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;margin-bottom:16px;">
+                  <div style="font-size:12.5px;font-weight:500;color:#6B7280;margin-bottom:8px;">Font</div>
+                  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;">
+                    <sc-for list="{{ selFonts }}" as="f" hint-placeholder-count="5">
+                      <button onClick="{{ f.onSelect }}" style="{{ f.style }}">{{ f.label }}</button>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:12.5px;font-weight:500;color:#6B7280;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><span>Text color</span></div>
+                  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:6px;">
+                    <sc-for list="{{ selColors }}" as="c" hint-placeholder-count="7">
+                      <button onClick="{{ c.onSelect }}" title="{{ c.title }}" style="{{ c.style }}"></button>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{ selColorNote }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:11.5px;color:#9AA3B2;margin-bottom:16px;line-height:1.4;">Laser engraving is single-color — pick <b style="font-weight:600;color:#6B7280;">UV full-color</b> below to print in color.</div>
+                  </sc-if>
+                  <sc-if value="{{ selColorNoteOff }}" hint-placeholder-val="{{ true }}">
+                    <div style="margin-bottom:16px;"></div>
+                  </sc-if>
                 </sc-if>
                 <div style="font-size:12.5px;color:#6B7280;display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-weight:500;">Size</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#2D5BFF;">{{ selSize }}</span></div>
                 <input type="range" class="rng" min="{{ selSizeMin }}" max="{{ selSizeMax }}" value="{{ selSizeVal }}" onChange="{{ onSelSize }}" style="margin-bottom:16px;">
@@ -714,19 +732,22 @@
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <sc-for list="{{ studioMethodCards }}" as="mc" hint-placeholder-count="3">
                   <button onClick="{{ mc.onSelect }}" style="{{ mc.cardStyle }}">
-                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
-                      <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                      <div style="display:flex;align-items:center;gap:9px;min-width:0;">
                         <div style="{{ mc.dotStyle }}"></div>
-                        <span style="font-size:13.5px;font-weight:700;color:#14142B;">{{ mc.name }}</span>
+                        <span style="font-size:13.5px;font-weight:700;color:#14142B;white-space:nowrap;">{{ mc.name }}</span>
+                        <span style="font-size:11.5px;color:#9AA3B2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">· {{ mc.shortTag }}</span>
                       </div>
-                      <span style="font-size:12px;font-weight:600;color:#2D5BFF;white-space:nowrap;">{{ mc.priceFmt }}/ea</span>
+                      <span style="font-size:12px;font-weight:600;color:#2D5BFF;white-space:nowrap;flex:none;">{{ mc.priceFmt }}/ea</span>
                     </div>
-                    <div style="margin-top:5px;padding-left:28px;font-size:12px;color:#6B7280;line-height:1.5;text-align:left;">{{ mc.desc }}</div>
-                    <div style="margin-top:5px;padding-left:28px;display:flex;gap:6px;flex-wrap:wrap;">
-                      <sc-for list="{{ mc.tags }}" as="tg" hint-placeholder-count="2">
-                        <span style="{{ tg.style }}">{{ tg.label }}</span>
-                      </sc-for>
-                    </div>
+                    <sc-if value="{{ mc.expanded }}" hint-placeholder-val="{{ true }}">
+                      <div style="margin-top:8px;padding-left:21px;font-size:12px;color:#6B7280;line-height:1.5;text-align:left;">{{ mc.desc }}</div>
+                      <div style="margin-top:8px;padding-left:21px;display:flex;gap:6px;flex-wrap:wrap;">
+                        <sc-for list="{{ mc.tags }}" as="tg" hint-placeholder-count="2">
+                          <span style="{{ tg.style }}">{{ tg.label }}</span>
+                        </sc-for>
+                      </div>
+                    </sc-if>
                   </button>
                 </sc-for>
               </div>
@@ -775,6 +796,17 @@ class Component extends DCLogic {
       uv:{name:'UV full-color', short:'Full-color', label:'UV full-color', tag:'many colors · bright', reason:'colors stay bright and vivid, gradients and all.'},
       screen:{name:'Screen print', short:'Screen', label:'Screen printed', tag:'high volume · value', reason:'best value at high volume with a few solid colors.'}
     };
+    this.FONTS = [
+      {id:'grotesk',   name:'Modern',  css:"'Space Grotesk',sans-serif",  weight:700, tt:'uppercase', ls:'0.5px'},
+      {id:'plex',      name:'Clean',   css:"'IBM Plex Sans',sans-serif",  weight:600, tt:'none',      ls:'0'},
+      {id:'serif',     name:'Elegant', css:"'Playfair Display',serif",    weight:700, tt:'none',      ls:'0'},
+      {id:'condensed', name:'Bold',    css:"'Bebas Neue',sans-serif",     weight:400, tt:'uppercase', ls:'1.5px'},
+      {id:'script',    name:'Script',  css:"'Pacifico',cursive",          weight:400, tt:'none',      ls:'0'}
+    ];
+    this.TEXT_COLORS = [
+      {name:'White', hex:'#FFFFFF'}, {name:'Black', hex:'#14142B'}, {name:'Blue', hex:'#2D5BFF'},
+      {name:'Green', hex:'#1F9D6B'}, {name:'Red', hex:'#E8484D'}, {name:'Gold', hex:'#D9A441'}, {name:'Purple', hex:'#7C3AED'}
+    ];
     this.REVIEWS = [
       {name:'Dana R.', initials:'DR', role:'Ops Lead', rating:5, date:'Jun 2026', tint:'#DBE3EA', text:'Ordered 120 for our summit \u2014 the proof came in minutes and the engraving matched the preview exactly. Reordering was one click.'},
       {name:'Marcus T.', initials:'MT', role:'Founder', rating:5, date:'Jun 2026', tint:'#E7DFD3', text:'Bought a single engraved bottle as a gift. Checkout took under a minute and it arrived in two days.'},
@@ -859,7 +891,8 @@ class Component extends DCLogic {
       const base='position:absolute;left:'+xPct.toFixed(2)+'%;top:'+v+'%;transform:translate(-50%,-50%) rotate('+rot+'deg) scaleX('+sx.toFixed(3)+');opacity:'+op.toFixed(3)+';pointer-events:auto;cursor:grab;touch-action:none;'+(selq?'outline:2px dashed #5B8CFF;outline-offset:6px;':'');
       const h={onDown:(e)=>this.startMove(o,e),onMove:(e)=>this.onObjMove(e),onUp:(e)=>this.endDrag(e)};
       if(o.type==='text'){ const tc=S.method==='engrave'?(light?'rgba(24,24,34,.55)':'rgba(255,255,255,.66)'):(o.color||(light?'#14142B':'#FFFFFF'));
-        editorItems.push(Object.assign({isText:true,isLogo:false,text:o.text||'',style:base+'font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:'+size+'px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;line-height:1;color:'+tc+';'},h)); }
+        const ft=this.FONTS.find(f=>f.id===o.font)||this.FONTS[0];
+        editorItems.push(Object.assign({isText:true,isLogo:false,text:o.text||'',style:base+'font-family:'+ft.css+';font-weight:'+ft.weight+';font-size:'+size+'px;letter-spacing:'+ft.ls+';text-transform:'+ft.tt+';white-space:nowrap;line-height:1;color:'+tc+';'},h)); }
       else { const f=S.method==='engrave'?'filter:brightness(0) '+(light?'':'invert(1)')+';opacity:'+(op*(light?.5:.55)).toFixed(3)+';mix-blend-mode:'+(light?'multiply':'soft-light')+';':'';
         const realUrl = (window.__dashImages && window.__dashImages[o.url]) || o.url;
         editorItems.push(Object.assign({isText:false,isLogo:true,style:base+'width:'+size+'px;height:'+size+'px;background-image:url('+realUrl+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f},h)); } });
@@ -938,10 +971,10 @@ class Component extends DCLogic {
     const baseUnit = this.unitFor(S.size, S.qty);
     const studioMethodCards=Object.keys(this.METHODS).map(k=>{ const m=this.METHODS[k]; const on=k===S.method; const info=METHOD_INFO[k];
       const methodPrice = k==='uv' ? baseUnit+2 : baseUnit;
-      return {name:m.name, priceFmt:this.fmt(methodPrice), desc:info.desc,
+      return {name:m.name, priceFmt:this.fmt(methodPrice), desc:info.desc, shortTag:m.tag, expanded:on, collapsed:!on,
         tags:info.tags.map(t=>({label:t.label,style:'font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+(t.color==='#1F9D6B'?'#EDFAF3':t.color==='#7C3AED'?'#F3EFFE':t.color==='#E8484D'?'#FEF2F2':t.color==='#C77700'?'#FFF8E7':'#F2F4F8')+';color:'+t.color+';'})),
-        dotStyle:'width:14px;height:14px;border-radius:4px;flex:none;background:'+(on?'#2D5BFF':'#D9DEE8')+';box-shadow:'+(on?'0 0 0 3px rgba(45,91,255,.18)':'none')+';',
-        cardStyle:'width:100%;text-align:left;cursor:pointer;border-radius:12px;padding:12px 14px;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#FAFBFC')+';',
+        dotStyle:'width:12px;height:12px;border-radius:4px;flex:none;background:'+(on?'#2D5BFF':'#D9DEE8')+';box-shadow:'+(on?'0 0 0 3px rgba(45,91,255,.18)':'none')+';',
+        cardStyle:'width:100%;text-align:left;cursor:pointer;border-radius:12px;padding:'+(on?'12px 14px':'11px 14px')+';border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#FAFBFC')+';',
         onSelect:()=>this.set('method',k)}; });
 
     const lo=S.lastOrder||{};
@@ -1038,7 +1071,12 @@ class Component extends DCLogic {
       onUploadStudio:(e)=>this.onUpload(e,true), addTextObj:()=>this.addTextObj(),
       noObjects:S.objects.length===0, hasObjects:S.objects.length>0, layers,
       hasSelection:!!sel, selName:sel?(sel.type==='text'?'Text':'Logo'):'', selIsText:sel&&sel.type==='text',
-      selText:sel?(sel.text||''):'', onSelText:(e)=>this.updateObj(S.selectedId,{text:e.target.value.toUpperCase()}),
+      selText:sel?(sel.text||''):'', onSelText:(e)=>this.updateObj(S.selectedId,{text:e.target.value}),
+      selFonts:this.FONTS.map(f=>({ label:f.name, onSelect:()=>this.updateObj(S.selectedId,{font:f.id}),
+        style:'flex:none;cursor:pointer;border-radius:9px;padding:8px 12px;font-size:13px;line-height:1;white-space:nowrap;font-family:'+f.css+';font-weight:'+f.weight+';border:1.5px solid '+((sel&&(sel.font||'grotesk')===f.id)?'#2D5BFF':'#E7E9F0')+';background:'+((sel&&(sel.font||'grotesk')===f.id)?'#EEF3FF':'#fff')+';color:#14142B;' })),
+      selColors:this.TEXT_COLORS.map(c=>({ onSelect:()=>this.updateObj(S.selectedId,{color:c.hex}), title:c.name,
+        style:'width:26px;height:26px;flex:none;border-radius:50%;cursor:pointer;background:'+c.hex+';box-shadow:'+((sel&&sel.color===c.hex)?'0 0 0 2px #fff,0 0 0 4px #2D5BFF':'inset 0 0 0 1px rgba(0,0,0,.12)')+';' })),
+      selColorNote:S.method==='engrave', selColorNoteOff:S.method!=='engrave',
       selSize:sel?(sel.size||(sel.type==='text'?26:78)):0, selSizeVal:sel?(sel.size||(sel.type==='text'?26:78)):26,
       selSizeMin:sel&&sel.type==='text'?12:30, selSizeMax:sel&&sel.type==='text'?52:150,
       onSelSize:(e)=>this.updateObj(S.selectedId,{size:Number(e.target.value)}),
