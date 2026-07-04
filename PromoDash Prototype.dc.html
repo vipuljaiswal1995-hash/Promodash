@@ -650,7 +650,6 @@
 
       <!-- right column: shipping speed (single-address only) + summary -->
       <div style="position:sticky;top:84px;display:flex;flex-direction:column;gap:20px;">
-        <sc-if value="{{ shipOne }}" hint-placeholder-val="{{ true }}">
           <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:20px 22px;">
             <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Shipping speed</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
@@ -662,7 +661,6 @@
               </sc-for>
             </div>
           </div>
-        </sc-if>
         <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:24px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:14px;">Order summary</div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid #EEF0F5;font-size:13.5px;"><span style="color:#6B7280;">Items</span><span style="font-weight:600;color:#14142B;">{{ cartCountLabel }}</span></div>
@@ -1231,7 +1229,7 @@ class Component extends DCLogic {
 
     // ---- checkout pricing ----
     const sDiscount=S.discountOn?cartSubtotal*0.1:0;
-    const sShip = S.shipMode==='many' ? S.manyAddr.length*9 : (S.shipSpeed==='rush'?12:0);
+    const sShip = S.shipMode==='many' ? (S.manyAddr.length*9 + (S.shipSpeed==='rush'?12:0)) : (S.shipSpeed==='rush'?12:0);
     const sTax=(cartSubtotal-sDiscount)*0.0845;
     const sTotal=cartSubtotal-sDiscount+sShip+sTax;
 
@@ -1561,7 +1559,7 @@ class Component extends DCLogic {
     }
     if(Object.keys(errors).length){ this.setState({errors}); return; }
     const sub=S.cart.reduce((a,l)=>a+((l.product&&l.product!=='bottle')?(l.unitPrice||0):this.unitFor(l.size,totalUnits))*l.qty,0);
-    const disc=S.discountOn?sub*0.1:0; const sh=S.shipMode==='many'?S.manyAddr.length*9:(S.shipSpeed==='rush'?12:0);
+    const disc=S.discountOn?sub*0.1:0; const sh=S.shipMode==='many'?(S.manyAddr.length*9+(S.shipSpeed==='rush'?12:0)):(S.shipSpeed==='rush'?12:0);
     const tax=(sub-disc)*0.0845, total=sub-disc+sh+tax;
     const id='PD-'+Math.floor(100000+Math.random()*899999);
     const shipTo=S.shipMode==='many'?(S.manyAddr.length+' addresses'):(S.ship.city?(S.ship.city+', '+S.ship.state):'1 address');
