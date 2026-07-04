@@ -675,81 +675,92 @@
 
         <sc-if value="{{ tabIsEditor }}" hint-placeholder-val="{{ false }}">
           <div class="tools" style="flex:1;min-height:0;overflow-y:auto;padding:20px 24px;">
-            <div style="display:flex;gap:10px;margin-bottom:20px;">
-              <button onClick="{{ addTextObj }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#14142B;border:1.5px solid #D9DEE8;border-radius:11px;padding:12px;font-size:13.5px;font-weight:600;cursor:pointer;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14142B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>Add text
-              </button>
-              <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#14142B;border:1.5px solid #D9DEE8;border-radius:11px;padding:12px;font-size:13.5px;font-weight:600;cursor:pointer;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14142B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M8 9l4-4 4 4"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg>Upload image/logo
-                <input type="file" accept="image/*" onChange="{{ onUploadStudio }}" style="display:none;">
-              </label>
-            </div>
-            <div style="font-size:12px;font-weight:600;color:#9AA3B2;letter-spacing:1px;margin-bottom:10px;">LAYERS</div>
-            <sc-if value="{{ noObjects }}" hint-placeholder-val="{{ true }}">
-              <div style="font-size:13px;color:#9AA3B2;background:#F7F8FB;border:1px dashed #D9DEE8;border-radius:11px;padding:18px;text-align:center;">Nothing on the bottle yet. Add text, upload a logo, or ask the AI assistant.</div>
-            </sc-if>
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              <sc-for list="{{ layers }}" as="o" hint-placeholder-count="2">
-                <button onClick="{{ o.onSelect }}" style="{{ o.rowStyle }}">
-                  <span style="display:flex;align-items:center;gap:10px;min-width:0;"><span style="color:#9AA3B2;flex:none;">{{ o.icon }}</span><span style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ o.name }}</span></span>
-                  <span onClick="{{ o.onDelete }}" style="flex:none;color:#C7CCDA;font-size:17px;cursor:pointer;padding:0 4px;">×</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:1px;">YOUR DESIGN</span>
+              <div style="display:flex;gap:8px;">
+                <button onClick="{{ addTextObj }}" style="display:flex;align-items:center;gap:6px;background:#EEF3FF;color:#2D5BFF;border:1px solid #D6E0FF;border-radius:9px;padding:7px 11px;font-size:12.5px;font-weight:600;cursor:pointer;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Add text
                 </button>
+                <label title="Upload image or logo" style="display:flex;align-items:center;gap:6px;background:#fff;color:#14142B;border:1px solid #D9DEE8;border-radius:9px;padding:7px 11px;font-size:12.5px;font-weight:600;cursor:pointer;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14142B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M8 9l4-4 4 4"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg>Logo
+                  <input type="file" accept="image/*" onChange="{{ onUploadStudio }}" style="display:none;">
+                </label>
+              </div>
+            </div>
+            <sc-if value="{{ noObjects }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:13px;color:#9AA3B2;background:#F7F8FB;border:1px dashed #D9DEE8;border-radius:11px;padding:20px;text-align:center;">Nothing on the bottle yet. Add text, upload a logo, or ask the AI assistant.</div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <sc-for list="{{ layerCards }}" as="o" hint-placeholder-count="2">
+                <div onClick="{{ o.onSelect }}" style="{{ o.cardStyle }}">
+                  <div style="display:flex;align-items:center;">
+                    <sc-if value="{{ o.isText }}" hint-placeholder-val="{{ true }}">
+                      <input value="{{ o.text }}" onChange="{{ o.onText }}" placeholder="Type your text" style="{{ o.inputStyle }}">
+                    </sc-if>
+                    <sc-if value="{{ o.isLogo }}" hint-placeholder-val="{{ false }}">
+                      <span style="{{ o.logoRowStyle }}"><span style="color:#9AA3B2;flex:none;">▣</span>Logo / image</span>
+                    </sc-if>
+                    <button onClick="{{ o.onDelete }}" title="Delete" style="{{ o.delStyle }}">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"></path></svg>
+                    </button>
+                  </div>
+                  <sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:2px 13px 13px;">
+                      <sc-if value="{{ o.isText }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;gap:14px;margin-bottom:14px;">
+                          <div style="flex:1;min-width:0;">
+                            <div style="font-size:11px;font-weight:600;color:#9AA3B2;letter-spacing:.4px;margin-bottom:6px;">FONT</div>
+                            <div style="position:relative;">
+                              <select value="{{ o.fontVal }}" onChange="{{ o.onFont }}" style="width:100%;font-size:13px;font-weight:600;padding:9px 26px 9px 11px;border:1px solid #D9DEE8;border-radius:9px;background:#fff;appearance:none;cursor:pointer;">
+                                <sc-for list="{{ o.fontOptions }}" as="fo" hint-placeholder-count="5">
+                                  <option value="{{ fo.value }}">{{ fo.label }}</option>
+                                </sc-for>
+                              </select>
+                              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#9AA3B2;pointer-events:none;font-size:9px;">▼</span>
+                            </div>
+                          </div>
+                          <div style="flex:1;min-width:0;">
+                            <div style="font-size:11px;font-weight:600;color:#9AA3B2;letter-spacing:.4px;margin-bottom:6px;">COLOR</div>
+                            <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding-top:3px;">
+                              <sc-for list="{{ o.colors }}" as="c" hint-placeholder-count="7">
+                                <button onClick="{{ c.onSelect }}" title="{{ c.title }}" style="{{ c.style }}"></button>
+                              </sc-for>
+                            </div>
+                          </div>
+                        </div>
+                        <sc-if value="{{ o.colorNote }}" hint-placeholder-val="{{ false }}">
+                          <div style="font-size:11px;color:#9AA3B2;margin:-4px 0 12px;line-height:1.4;">Engraving is single-color — choose <b style="font-weight:600;color:#6B7280;">Full-color</b> below to print this color.</div>
+                        </sc-if>
+                      </sc-if>
+                      <div style="font-size:12px;color:#6B7280;display:flex;justify-content:space-between;margin-bottom:7px;"><span style="font-weight:500;">Size</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#2D5BFF;">{{ o.size }}</span></div>
+                      <input type="range" class="rng" min="{{ o.sizeMin }}" max="{{ o.sizeMax }}" value="{{ o.sizeVal }}" onChange="{{ o.onSize }}" style="">
+                    </div>
+                  </sc-if>
+                </div>
               </sc-for>
             </div>
-            <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
-              <div style="margin-top:20px;padding-top:20px;border-top:1px solid #EEF0F5;">
-                <div style="font-size:12px;font-weight:600;color:#9AA3B2;letter-spacing:1px;margin-bottom:14px;">SELECTED · {{ selName }}</div>
-                <sc-if value="{{ selIsText }}" hint-placeholder-val="{{ false }}">
-                  <input value="{{ selText }}" onChange="{{ onSelText }}" placeholder="Type your text" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;margin-bottom:16px;">
-                  <div style="font-size:12.5px;font-weight:500;color:#6B7280;margin-bottom:8px;">Font</div>
-                  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;">
-                    <sc-for list="{{ selFonts }}" as="f" hint-placeholder-count="5">
-                      <button onClick="{{ f.onSelect }}" style="{{ f.style }}">{{ f.label }}</button>
-                    </sc-for>
-                  </div>
-                  <div style="font-size:12.5px;font-weight:500;color:#6B7280;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><span>Text color</span></div>
-                  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:6px;">
-                    <sc-for list="{{ selColors }}" as="c" hint-placeholder-count="7">
-                      <button onClick="{{ c.onSelect }}" title="{{ c.title }}" style="{{ c.style }}"></button>
-                    </sc-for>
-                  </div>
-                  <sc-if value="{{ selColorNote }}" hint-placeholder-val="{{ false }}">
-                    <div style="font-size:11.5px;color:#9AA3B2;margin-bottom:16px;line-height:1.4;">Laser engraving is single-color — pick <b style="font-weight:600;color:#6B7280;">UV full-color</b> below to print in color.</div>
-                  </sc-if>
-                  <sc-if value="{{ selColorNoteOff }}" hint-placeholder-val="{{ true }}">
-                    <div style="margin-bottom:16px;"></div>
-                  </sc-if>
-                </sc-if>
-                <div style="font-size:12.5px;color:#6B7280;display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-weight:500;">Size</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#2D5BFF;">{{ selSize }}</span></div>
-                <input type="range" class="rng" min="{{ selSizeMin }}" max="{{ selSizeMax }}" value="{{ selSizeVal }}" onChange="{{ onSelSize }}" style="margin-bottom:16px;">
-              </div>
-            </sc-if>
 
 
             <!-- DECORATION METHOD PICKER -->
             <div style="margin-top:24px;padding-top:22px;border-top:1px solid #EEF0F5;">
               <div style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:1px;margin-bottom:12px;">DECORATION METHOD</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
                 <sc-for list="{{ studioMethodCards }}" as="mc" hint-placeholder-count="3">
-                  <button onClick="{{ mc.onSelect }}" style="{{ mc.cardStyle }}">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                      <div style="display:flex;align-items:center;gap:9px;min-width:0;">
-                        <div style="{{ mc.dotStyle }}"></div>
-                        <span style="font-size:13.5px;font-weight:700;color:#14142B;white-space:nowrap;">{{ mc.name }}</span>
-                        <span style="font-size:11.5px;color:#9AA3B2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">· {{ mc.shortTag }}</span>
-                      </div>
-                      <span style="font-size:12px;font-weight:600;color:#2D5BFF;white-space:nowrap;flex:none;">{{ mc.priceFmt }}/ea</span>
-                    </div>
-                    <sc-if value="{{ mc.expanded }}" hint-placeholder-val="{{ true }}">
-                      <div style="margin-top:8px;padding-left:21px;font-size:12px;color:#6B7280;line-height:1.5;text-align:left;">{{ mc.desc }}</div>
-                      <div style="margin-top:8px;padding-left:21px;display:flex;gap:6px;flex-wrap:wrap;">
-                        <sc-for list="{{ mc.tags }}" as="tg" hint-placeholder-count="2">
-                          <span style="{{ tg.style }}">{{ tg.label }}</span>
-                        </sc-for>
-                      </div>
-                    </sc-if>
+                  <button onClick="{{ mc.onSelect }}" style="{{ mc.boxStyle }}">
+                    <div style="{{ mc.boxDotStyle }}"></div>
+                    <span style="font-size:12.5px;font-weight:700;color:#14142B;line-height:1.1;">{{ mc.shortName }}</span>
+                    <span style="font-size:11px;font-weight:600;color:#2D5BFF;">{{ mc.priceFmt }}/ea</span>
                   </button>
                 </sc-for>
+              </div>
+              <div style="margin-top:12px;background:#F7F8FB;border:1px solid #EEF0F5;border-radius:11px;padding:13px 15px;">
+                <div style="font-size:13px;font-weight:700;color:#14142B;margin-bottom:5px;">{{ selMethodName }}</div>
+                <div style="font-size:12px;color:#6B7280;line-height:1.5;">{{ selMethodDesc }}</div>
+                <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+                  <sc-for list="{{ selMethodTags }}" as="tg" hint-placeholder-count="2">
+                    <span style="{{ tg.style }}">{{ tg.label }}</span>
+                  </sc-for>
+                </div>
               </div>
             </div>
 
@@ -897,9 +908,27 @@ class Component extends DCLogic {
         const realUrl = (window.__dashImages && window.__dashImages[o.url]) || o.url;
         editorItems.push(Object.assign({isText:false,isLogo:true,style:base+'width:'+size+'px;height:'+size+'px;background-image:url('+realUrl+');background-size:contain;background-repeat:no-repeat;background-position:center;'+f},h)); } });
     const sel=S.objects.find(o=>o.id===S.selectedId)||null;
-    const layers=S.objects.map(o=>({name:o.type==='text'?(o.text||'Text'):'Logo',icon:o.type==='text'?'T':'▣',
-      onSelect:()=>this.set('selectedId',o.id), onDelete:(e)=>{e.stopPropagation();this.deleteObj(o.id);},
-      rowStyle:'display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border-radius:10px;padding:11px 13px;cursor:pointer;border:1px solid '+(o.id===S.selectedId?'#2D5BFF':'#E7E9F0')+';background:'+(o.id===S.selectedId?'#EEF3FF':'#fff')+';'}));
+    const engraveNow=S.method==='engrave';
+    const layerCards=S.objects.map(o=>{ const on=o.id===S.selectedId; const isText=o.type==='text';
+      return {
+        isText, isLogo:!isText, selected:on,
+        text:o.text||'',
+        onText:(e)=>this.updateObj(o.id,{text:e.target.value}),
+        onSelect:()=>this.set('selectedId',o.id),
+        onDelete:(e)=>{e.stopPropagation();this.deleteObj(o.id);},
+        cardStyle:'border-radius:12px;overflow:hidden;cursor:pointer;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#F5F8FF':'#fff')+';',
+        inputStyle:'flex:1;min-width:0;border:none;background:transparent;font-size:14px;font-weight:600;color:#14142B;padding:12px 4px 12px 13px;',
+        logoRowStyle:'flex:1;display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:#14142B;padding:12px 4px 12px 13px;',
+        delStyle:'flex:none;width:38px;height:44px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:#C0C6D6;cursor:pointer;',
+        fontVal:o.font||'grotesk', onFont:(e)=>this.updateObj(o.id,{font:e.target.value}),
+        fontOptions:this.FONTS.map(f=>({value:f.id,label:f.name})),
+        colors:this.TEXT_COLORS.map(c=>({ onSelect:()=>this.updateObj(o.id,{color:c.hex}), title:c.name,
+          style:'width:24px;height:24px;flex:none;border-radius:50%;cursor:pointer;border:none;background:'+c.hex+';box-shadow:'+((o.color===c.hex)?'0 0 0 2px #F5F8FF,0 0 0 4px #2D5BFF':'inset 0 0 0 1px rgba(0,0,0,.12)')+';' })),
+        colorNote:isText&&engraveNow,
+        size:o.size||(isText?26:78), sizeVal:o.size||(isText?26:78),
+        sizeMin:isText?12:30, sizeMax:isText?52:150,
+        onSize:(e)=>this.updateObj(o.id,{size:Number(e.target.value)})
+      }; });
 
     // ---- cart ----
     const totalUnits=this.cartUnits();
@@ -969,13 +998,17 @@ class Component extends DCLogic {
       screen:{desc:'Traditional screen printing with spot colors. Excellent value when ordering in bulk with a design that uses a few solid colors.',tags:[{label:'Best value',color:'#C77700'},{label:'High volume',color:'#6B7280'},{label:'Solid colors',color:'#6B7280'}],priceMult:1.0}
     };
     const baseUnit = this.unitFor(S.size, S.qty);
-    const studioMethodCards=Object.keys(this.METHODS).map(k=>{ const m=this.METHODS[k]; const on=k===S.method; const info=METHOD_INFO[k];
+    const tagStyleFor=(color)=>'font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+(color==='#1F9D6B'?'#EDFAF3':color==='#7C3AED'?'#F3EFFE':color==='#E8484D'?'#FEF2F2':color==='#C77700'?'#FFF8E7':'#F2F4F8')+';color:'+color+';';
+    const studioMethodCards=Object.keys(this.METHODS).map(k=>{ const m=this.METHODS[k]; const on=k===S.method;
       const methodPrice = k==='uv' ? baseUnit+2 : baseUnit;
-      return {name:m.name, priceFmt:this.fmt(methodPrice), desc:info.desc, shortTag:m.tag, expanded:on, collapsed:!on,
-        tags:info.tags.map(t=>({label:t.label,style:'font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+(t.color==='#1F9D6B'?'#EDFAF3':t.color==='#7C3AED'?'#F3EFFE':t.color==='#E8484D'?'#FEF2F2':t.color==='#C77700'?'#FFF8E7':'#F2F4F8')+';color:'+t.color+';'})),
-        dotStyle:'width:12px;height:12px;border-radius:4px;flex:none;background:'+(on?'#2D5BFF':'#D9DEE8')+';box-shadow:'+(on?'0 0 0 3px rgba(45,91,255,.18)':'none')+';',
-        cardStyle:'width:100%;text-align:left;cursor:pointer;border-radius:12px;padding:'+(on?'12px 14px':'11px 14px')+';border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#FAFBFC')+';',
+      return {shortName:m.short, priceFmt:this.fmt(methodPrice),
+        boxDotStyle:'width:20px;height:20px;border-radius:6px;background:'+(on?'#2D5BFF':'#D9DEE8')+';box-shadow:'+(on?'0 0 0 3px rgba(45,91,255,.18)':'none')+';',
+        boxStyle:'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;cursor:pointer;border-radius:12px;padding:14px 6px;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#FAFBFC')+';',
         onSelect:()=>this.set('method',k)}; });
+    const selInfo=METHOD_INFO[S.method]||METHOD_INFO.engrave;
+    const selMethodName=(this.METHODS[S.method]||this.METHODS.engrave).name;
+    const selMethodDesc=selInfo.desc;
+    const selMethodTags=selInfo.tags.map(t=>({label:t.label,style:tagStyleFor(t.color)}));
 
     const lo=S.lastOrder||{};
     const tabStyle=(on)=>'border:none;background:none;cursor:pointer;font-size:13.5px;font-weight:600;padding:10px 14px;margin-bottom:-1px;border-bottom:2px solid '+(on?'#2D5BFF':'transparent')+';color:'+(on?'#14142B':'#9AA3B2')+';';
@@ -1069,19 +1102,8 @@ class Component extends DCLogic {
       chat, thinking:S.thinking, starters, draft:S.draft, onDraft:(e)=>this.set('draft',e.target.value),
       onDraftKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.sendChat(); } }, sendChat:()=>this.sendChat(),
       onUploadStudio:(e)=>this.onUpload(e,true), addTextObj:()=>this.addTextObj(),
-      noObjects:S.objects.length===0, hasObjects:S.objects.length>0, layers,
-      hasSelection:!!sel, selName:sel?(sel.type==='text'?'Text':'Logo'):'', selIsText:sel&&sel.type==='text',
-      selText:sel?(sel.text||''):'', onSelText:(e)=>this.updateObj(S.selectedId,{text:e.target.value}),
-      selFonts:this.FONTS.map(f=>({ label:f.name, onSelect:()=>this.updateObj(S.selectedId,{font:f.id}),
-        style:'flex:none;cursor:pointer;border-radius:9px;padding:8px 12px;font-size:13px;line-height:1;white-space:nowrap;font-family:'+f.css+';font-weight:'+f.weight+';border:1.5px solid '+((sel&&(sel.font||'grotesk')===f.id)?'#2D5BFF':'#E7E9F0')+';background:'+((sel&&(sel.font||'grotesk')===f.id)?'#EEF3FF':'#fff')+';color:#14142B;' })),
-      selColors:this.TEXT_COLORS.map(c=>({ onSelect:()=>this.updateObj(S.selectedId,{color:c.hex}), title:c.name,
-        style:'width:26px;height:26px;flex:none;border-radius:50%;cursor:pointer;background:'+c.hex+';box-shadow:'+((sel&&sel.color===c.hex)?'0 0 0 2px #fff,0 0 0 4px #2D5BFF':'inset 0 0 0 1px rgba(0,0,0,.12)')+';' })),
-      selColorNote:S.method==='engrave', selColorNoteOff:S.method!=='engrave',
-      selSize:sel?(sel.size||(sel.type==='text'?26:78)):0, selSizeVal:sel?(sel.size||(sel.type==='text'?26:78)):26,
-      selSizeMin:sel&&sel.type==='text'?12:30, selSizeMax:sel&&sel.type==='text'?52:150,
-      onSelSize:(e)=>this.updateObj(S.selectedId,{size:Number(e.target.value)}),
-      selRot:sel?(sel.rot||0):0, selRotVal:sel?(sel.rot||0):0, onSelRot:(e)=>this.updateObj(S.selectedId,{rot:Number(e.target.value)}),
-      deleteSel:()=>this.deleteObj(S.selectedId),
+      noObjects:S.objects.length===0, hasObjects:S.objects.length>0, layerCards,
+      selMethodName, selMethodDesc, selMethodTags,
       studioDoneLabel:hasDesign?'Use this design':'Done'
     };
   }
