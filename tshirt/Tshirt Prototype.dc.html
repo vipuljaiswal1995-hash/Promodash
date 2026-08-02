@@ -87,63 +87,27 @@
   </sc-if>
 
   <!-- ==================================================================== -->
-  <!-- PRODUCT LISTING                                                       -->
-  <!-- ==================================================================== -->
-  <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
-  <div style="max-width:1100px;margin:0 auto;padding:32px 40px 72px;">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9AA3B2;letter-spacing:0.3px;margin-bottom:22px;"><span onClick="{{ goHome }}" style="cursor:pointer;">Home</span> <span style="margin:0 6px;">/</span> <span style="color:#14142B;">T-shirts</span></div>
-    <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:34px;letter-spacing:-1px;margin:0 0 6px;">Pick a shirt</h1>
-    <p style="font-size:15px;color:#6B7280;margin:0 0 28px;">Choose the blank — you'll design and size it on the next screen.</p>
-    <div class="g2" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-      <sc-for list="{{ blankCards }}" as="b" hint-placeholder-count="2">
-        <button onClick="{{ b.onSelect }}" style="text-align:left;background:#fff;border:1px solid #E7E9F0;border-radius:20px;padding:0;cursor:pointer;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,43,.05);">
-          <div style="height:230px;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 100% at 50% 16%,#FCFCFE,#EEF0F5);padding:18px;"><img src="{{ b.photo }}" alt="{{ b.name }}" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
-          <div style="padding:18px 22px 22px;display:flex;align-items:flex-end;justify-content:space-between;">
-            <div>
-              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;letter-spacing:-0.4px;">{{ b.name }}</div>
-              <div style="font-size:13px;color:#6B7280;margin-top:3px;">{{ b.fabric }} · ships in 3 days</div>
-            </div>
-            <div style="text-align:right;flex:none;"><div style="font-size:11px;color:#9AA3B2;">from</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;">{{ b.from }}</div></div>
-          </div>
-        </button>
-      </sc-for>
-    </div>
-  </div>
-  </sc-if>
-
-  <!-- ==================================================================== -->
   <!-- PDP                                                                   -->
   <!-- ==================================================================== -->
   <sc-if value="{{ isPdp }}" hint-placeholder-val="{{ false }}">
   <div style="max-width:1200px;margin:0 auto;padding:32px 40px 72px;">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9AA3B2;letter-spacing:0.3px;margin-bottom:26px;"><span onClick="{{ goHome }}" style="cursor:pointer;">Home</span> <span style="margin:0 6px;">/</span> <span onClick="{{ goList }}" style="cursor:pointer;">T-shirts</span> <span style="margin:0 6px;">/</span> <span style="color:#14142B;">{{ blankName }}</span></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9AA3B2;letter-spacing:0.3px;margin-bottom:26px;"><span onClick="{{ goHome }}" style="cursor:pointer;">Home</span> <span style="margin:0 6px;">/</span> <span>T-shirts</span> <span style="margin:0 6px;">/</span> <span style="color:#14142B;">{{ blankName }}</span></div>
 
     <div class="rgrid" style="display:grid;grid-template-columns:1.08fr 1fr;gap:56px;align-items:start;">
 
-      <!-- LEFT gallery -->
+      <!-- LEFT gallery (real photo · recoloured · your design composited) -->
       <div style="position:sticky;top:88px;">
-        <div style="position:relative;background:#FFFFFF;border:1px solid #E7E9F0;border-radius:24px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,43,.05);">
-          <sc-if value="{{ galIsLive }}" hint-placeholder-val="{{ true }}">
-            <div style="height:520px;background:radial-gradient(130% 100% at 50% 12%,#FCFCFE 0%,#EEF0F5 62%,#E6E9F1 100%);display:flex;align-items:center;justify-content:center;padding:26px;" dangerouslySetInnerHTML="{{ galleryArt }}"></div>
-          </sc-if>
-          <sc-if value="{{ galIsPhoto }}" hint-placeholder-val="{{ false }}">
-            <div style="position:relative;height:520px;background:#fff;">
-              <img src="{{ photoSrc }}" alt="product photo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:24px;">
-              <div style="position:absolute;inset:0;background:{{ selectedHex }};mix-blend-mode:multiply;-webkit-mask-image:url('{{ photoSrc }}');mask-image:url('{{ photoSrc }}');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></div>
-              <div style="position:absolute;left:18px;bottom:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#B4BAC7;">recoloured live · {{ colorName }}</div>
-            </div>
-          </sc-if>
+        <div style="position:relative;height:520px;background:#fff;border:1px solid #E7E9F0;border-radius:24px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,43,.05);">
+          <img src="{{ photoSrc }}" alt="product photo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:24px;">
+          <div style="position:absolute;inset:0;background:{{ selectedHex }};mix-blend-mode:multiply;-webkit-mask-image:url('{{ photoSrc }}');mask-image:url('{{ photoSrc }}');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></div>
+          <div style="position:absolute;inset:24px;pointer-events:none;" dangerouslySetInnerHTML="{{ galleryComposite }}"></div>
           <div style="position:absolute;top:16px;left:18px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;color:#B4BAC7;pointer-events:none;">{{ galleryLabel }}</div>
         </div>
         <div style="display:flex;gap:10px;margin-top:14px;">
-          <sc-for list="{{ galThumbs }}" as="t" hint-placeholder-count="4">
+          <sc-for list="{{ galThumbs }}" as="t" hint-placeholder-count="3">
             <button onClick="{{ t.onClick }}" style="{{ t.style }}">
-              <sc-if value="{{ t.isArt }}" hint-placeholder-val="{{ true }}">
-                <div style="width:100%;height:100%;padding:6px;" dangerouslySetInnerHTML="{{ t.art }}"></div>
-              </sc-if>
-              <sc-if value="{{ t.isTag }}" hint-placeholder-val="{{ false }}">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:0.5px;color:rgba(20,20,43,.4);">{{ t.tag }}</span>
-              </sc-if>
+              <img src="{{ t.src }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:5px;">
+              <div style="position:absolute;inset:0;background:{{ selectedHex }};mix-blend-mode:multiply;-webkit-mask-image:url('{{ t.src }}');mask-image:url('{{ t.src }}');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></div>
             </button>
           </sc-for>
         </div>
@@ -173,6 +137,12 @@
 
         <!-- Colour -->
         <div style="margin-top:22px;padding-top:22px;border-top:1px solid #E7E9F0;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Blank</div>
+          <div style="display:flex;gap:8px;margin-bottom:18px;">
+            <sc-for list="{{ blankBtns }}" as="b" hint-placeholder-count="2">
+              <button onClick="{{ b.onSelect }}" style="{{ b.style }}"><span style="font-weight:600;">{{ b.name }}</span><span style="display:block;font-size:11px;opacity:.7;margin-top:1px;">{{ b.meta }}</span></button>
+            </sc-for>
+          </div>
           <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Colour <span style="color:#9AA3B2;font-weight:500;">· {{ colorName }}</span></div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <sc-for list="{{ colorSwatches }}" as="c" hint-placeholder-count="8">
@@ -1063,26 +1033,20 @@ class Component extends DCLogic {
     const bottleArt='<svg viewBox="0 0 120 150" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="8" width="36" height="12" rx="3" fill="#8B93A9"/><path d="M38 24 h44 a6 6 0 0 1 6 6 v104 a10 10 0 0 1 -10 10 h-42 a10 10 0 0 1 -10 -10 v-104 a6 6 0 0 1 6 -6 z" fill="#2D5BFF"/><rect x="40" y="60" width="40" height="34" rx="5" fill="#EAF0FE"/></svg>';
     const pickerTiles=[
       {name:'Drinkware', blurb:'Insulated tumblers and bottles. One decision, laser-sharp.', lead:'ships in 2 days', heroBg:'background:radial-gradient(120% 100% at 50% 20%,#FBFCFE,#E7EBF2);', art:{__html:bottleArt}, onClick:()=>{ if(typeof window!=='undefined'){ window.location.href='/PromoDash%20Prototype.dc.html?v=2'; } }},
-      {name:'T-shirts', blurb:'Custom tees and polos — order one, or sort a whole team.', lead:'ships in 3 days', heroBg:'background:radial-gradient(120% 100% at 50% 15%,#FCFCFE,#EEF0F5);', art:{__html:this.garment({face:'front',type:'crew',h:210})}, onClick:()=>this.go('list')}
+      {name:'T-shirts', blurb:'Custom tees and polos — order one, or sort a whole team.', lead:'ships in 3 days', heroBg:'background:radial-gradient(120% 100% at 50% 15%,#FCFCFE,#EEF0F5);', art:{__html:'<img src="./assets/house-polo-front.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">'}, onClick:()=>this.go('pdp')}
     ];
-    // ---- PDP gallery (live SVG design view + real-photo image-slots) ----
-    const galItems=[
-      {view:'live',   live:true,  label:'LIVE · your design in '+color.name, tag:'LIVE'},
-      {view:'pfront', photo:true, label:'PRODUCT · front', tag:'FRONT'},
-      {view:'pback',  photo:true, label:'PRODUCT · back',  tag:'BACK'},
-      {view:'pside',  photo:true, label:'PRODUCT · side',  tag:'SIDE'}
-    ];
-    const cur=galItems.find(x=>x.view===S.pdpView)||galItems[0];
-    const galThumbs=galItems.map(it=>({isArt:!!it.live,isTag:!it.live,tag:it.tag||'',
-      onClick:()=>this.set('pdpView',it.view),
-      art: it.live?{__html:this.garment({face:'front',box:false,h:78})}:null,
-      style:'position:relative;width:66px;height:78px;border-radius:12px;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border:2px solid '+(it.view===S.pdpView?'#2D5BFF':'#E7E9F0')+';'+(it.live?'background:radial-gradient(120% 100% at 50% 20%,#FCFCFE,#EAEEF4);':'background:#F2F4F8;')}));
-    const galleryArt = {__html:this.garment({face:'front',box:true,h:460})};
-
-    // ---- blanks + colours ----
-    const blankCards=this.BLANKS.map((b,i)=>({name:b.name, fabric:b.fabric, from:this.fmt(this.unit('screen',1,1)),
-      photo:'./assets/'+b.slug+'-front.png',
-      onSelect:()=>this.setState({blankIdx:i,screen:'pdp'})}));
+    // ---- PDP gallery: real photos, recoloured, with the design composited on ----
+    const galViews=[{view:'pfront',v:'front',panel:'front',label:'FRONT'},{view:'pback',v:'back',panel:'back',label:'BACK'},{view:'pside',v:'side',panel:'rSleeve',label:'SIDE'}];
+    const gcur=galViews.find(x=>x.view===S.pdpView)||galViews[0];
+    const gTall=blank.type!=='polo'; const gVB=gTall?120:100;
+    const gArea=gcur.v==='side'?(gTall?{cx:44,cy:42,w:13,h:18}:{cx:43,cy:40,w:12,h:16}):(gTall?{cx:50,cy:52,w:34,h:36}:{cx:50,cy:46,w:28,h:30});
+    const galleryComposite={__html:'<svg viewBox="0 0 100 '+gVB+'" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">'+this.artOn(gcur.panel,1,gArea)+'</svg>'};
+    const galleryLabel=gcur.label; const photoSrc='./assets/'+blank.slug+'-'+gcur.v+'.png';
+    const galThumbs=galViews.map(it=>({ src:'./assets/'+blank.slug+'-'+it.v+'.png', onClick:()=>this.set('pdpView',it.view),
+      style:'position:relative;width:72px;height:84px;border-radius:12px;overflow:hidden;cursor:pointer;background:#fff;padding:0;border:2px solid '+(it.view===S.pdpView?'#2D5BFF':'#E7E9F0')+';'}));
+    // ---- blank selector + colours ----
+    const blankBtns=this.BLANKS.map((b,i)=>({name:b.short.replace(/^\w/,c=>c.toUpperCase()), meta:b.fabric, onSelect:()=>this.setState({blankIdx:i}),
+      style:'flex:1;text-align:left;cursor:pointer;border-radius:11px;padding:10px 13px;border:1.5px solid '+(i===S.blankIdx?'#2D5BFF':'#E7E9F0')+';background:'+(i===S.blankIdx?'#EEF3FF':'#fff')+';color:'+(i===S.blankIdx?'#0B2A8A':'#14142B')+';font-size:13px;'}));
     const swatch=(i)=>{ const c=this.COLORS[i]; const on=i===S.colorIdx;
       return 'width:34px;height:34px;border-radius:10px;cursor:pointer;background:'+c.hex+';border:2px solid '+(on?'#2D5BFF':'transparent')+';box-shadow:0 0 0 1px rgba(0,0,0,.14)'+(on?', 0 0 0 4px rgba(45,91,255,.18)':'')+';'; };
     const colorSwatches=this.COLORS.map((c,i)=>({name:c.name,onSelect:()=>this.set('colorIdx',i),style:swatch(i)}));
@@ -1226,23 +1190,21 @@ class Component extends DCLogic {
     return {
       showHeader:!isSam, catTag:(scr==='picker'?'CUSTOM MERCH · US':'T-SHIRTS · US'),
       cartCount:String(cartUnits),
-      goHome:()=>this.go('picker'), goList:()=>this.go('list'), goCart:()=>this.go('cart'),
+      goHome:()=>this.go('picker'), goCart:()=>this.go('cart'),
       goCheckout:()=>this.go('checkout'), goPdp:()=>this.go('pdp'),
 
-      isPicker:scr==='picker', isList:scr==='list', isPdp:scr==='pdp', blankCards,
+      isPicker:scr==='picker', isPdp:scr==='pdp',
       isCart:scr==='cart', isCheckout:scr==='checkout', isConfirm:scr==='confirm', isSam,
 
       pickerTiles,
 
       // PDP
-      blankName:blank.name, blankShort:blank.short, colorName:color.name,
+      blankName:blank.name, blankShort:blank.short, colorName:color.name, blankBtns,
       unitFmt:this.fmt(unit), qtyTotal:qt, shirtWord:qt===1?'shirt':'shirts',
       bulkHint: qt>=40?' · volume price applied':(qt<40?' · '+this.fmt(this.unit(method,40,nP))+' each at 40+':''),
       specs:blank.specs.map(v=>({v})),
       colorSwatches,
-      galleryArt, galleryLabel:cur.label, galThumbs,
-      galIsLive:!!cur.live, galIsPhoto:!!cur.photo, selectedHex:color.hex,
-      photoSrc:'./assets/'+blank.slug+'-'+({pfront:'front',pback:'back',pside:'side'}[S.pdpView]||'front')+'.png',
+      galleryLabel, galThumbs, galleryComposite, selectedHex:color.hex, photoSrc,
       noDesign:!this.hasDesign(), hasDesign:this.hasDesign(),
       designSummary, chipArt:{__html:this.garment({face:'front',art:true,h:52})},
       showLowResPdp:this.anyLowRes(),
@@ -1269,7 +1231,7 @@ class Component extends DCLogic {
       ],
 
       // studio
-      studioOpen:S.studioOpen, closeStudio:()=>this.setState({studioOpen:false, pdpView:this.hasDesign()?'live':S.pdpView}),
+      studioOpen:S.studioOpen, closeStudio:()=>this.set('studioOpen',false),
       facingLabel, facingTabs, activePanelName:apName,
       studioIllus:S.studioMode==='illustration', studioPhoto:S.studioMode==='photo',
       setModeIllus:()=>this.set('studioMode','illustration'), setModePhoto:()=>this.set('studioMode','photo'),
@@ -1307,7 +1269,7 @@ class Component extends DCLogic {
       methodChips, overrideOn:S.methodOverride!=null, useRecommend:()=>this.set('methodOverride',null),
       noArtwork:nP===0, showQuestions:S.showQuestions, toggleQuestions:()=>this.set('showQuestions',!S.showQuestions), qChevron:S.showQuestions?'▾':'▸',
       panelCountLabel:(nP===0?'blank':nP+' panel'+(nP>1?'s':'')), studioUnitFmt:this.fmt(unit),
-      applyDesign:()=>this.setState({studioOpen:false, pdpView:this.hasDesign()?'live':S.pdpView}),
+      applyDesign:()=>this.set('studioOpen',false),
       addFromStudio:()=>this.addToCart(),
       quickUpload:()=>this.setState({studioOpen:true,studioTab:'art',activePanel:'front',addMode:'upload',viewAngle:0}),
       quickText:()=>this.setState({studioOpen:true,studioTab:'art',activePanel:'front',addMode:'text',viewAngle:0}),
