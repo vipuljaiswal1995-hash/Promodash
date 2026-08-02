@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PromoDash — Custom T-Shirts</title>
+<script src="./support.js?v=2"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700;800&family=Bebas+Neue&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#F4F5F8;}
+  *{box-sizing:border-box;}
+  input,button,textarea,select{font-family:inherit;}
+  input:focus,textarea:focus,select:focus{outline:none;}
+  ::placeholder{color:#9AA3B2;}
+  .thread::-webkit-scrollbar,.tools::-webkit-scrollbar{height:8px;width:8px;}
+  .thread::-webkit-scrollbar-thumb,.tools::-webkit-scrollbar-thumb{background:#E1E5EE;border-radius:8px;}
+  input[type=range].rng{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:#E4E7EF;cursor:pointer;}
+  input[type=range].rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#2D5BFF;border:3px solid #fff;box-shadow:0 2px 6px rgba(45,91,255,.4);}
+  input[type=range].rng-dark{background:#2C2C3A;}
+  input[type=range].rng-dark::-webkit-slider-thumb{border-color:#16161F;}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  @media (max-width:900px){
+    .rgrid{grid-template-columns:1fr !important;gap:30px !important;}
+    .studio-modal{grid-template-columns:1fr !important;max-height:none !important;}
+    .g3{grid-template-columns:1fr 1fr !important;}
+    .padwrap{padding-left:20px !important;padding-right:20px !important;}
+  }
+  @media (max-width:560px){ .g2,.g3{grid-template-columns:1fr !important;} }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#F4F5F8;font-family:'IBM Plex Sans',sans-serif;color:#14142B;">
+
+  <!-- ============ HEADER ============ -->
+  <sc-if value="{{ showHeader }}" hint-placeholder-val="{{ true }}">
+  <header style="position:sticky;top:0;z-index:40;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid #E7E9F0;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;">
+    <div style="display:flex;align-items:center;gap:11px;cursor:pointer;" onClick="{{ goHome }}">
+      <div style="display:flex;gap:3px;">
+        <span style="width:9px;height:20px;background:#2D5BFF;border-radius:2px;"></span>
+        <span style="width:9px;height:20px;background:#1F9D6B;border-radius:2px;"></span>
+        <span style="width:9px;height:20px;background:#FF5A5F;border-radius:2px;"></span>
+      </div>
+      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:21px;letter-spacing:-0.5px;">promodash</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:24px;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#9AA3B2;">{{ catTag }}</span>
+      <button onClick="{{ goCart }}" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid #E7E9F0;border-radius:10px;background:#fff;cursor:pointer;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14142B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;">{{ cartCount }}</span>
+      </button>
+    </div>
+  </header>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- CATEGORY PICKER                                                       -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ isPicker }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1060px;margin:0 auto;padding:72px 40px;">
+    <div style="text-align:center;margin-bottom:44px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1.5px;color:#2D5BFF;font-weight:600;margin-bottom:14px;">CUSTOM MERCH · SHIPS IN DAYS</div>
+      <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:40px;letter-spacing:-1.2px;margin:0 0 12px;">What are you making?</h1>
+      <p style="font-size:15px;color:#6B7280;margin:0;">Order one or four hundred — live pricing, a dated ship-by, no minimums either way.</p>
+    </div>
+    <div class="g2" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <sc-for list="{{ pickerTiles }}" as="t" hint-placeholder-count="2">
+        <button onClick="{{ t.onClick }}" style="text-align:left;background:#fff;border:1px solid #E7E9F0;border-radius:24px;padding:0;cursor:pointer;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,43,.05);">
+          <div style="height:240px;display:flex;align-items:center;justify-content:center;{{ t.heroBg }}">
+            <div style="width:210px;height:210px;" dangerouslySetInnerHTML="{{ t.art }}"></div>
+          </div>
+          <div style="padding:22px 24px 24px;">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:23px;letter-spacing:-0.5px;">{{ t.name }}</div>
+            <div style="font-size:14px;color:#6B7280;margin-top:5px;line-height:1.5;">{{ t.blurb }}</div>
+            <div style="display:inline-flex;align-items:center;gap:7px;margin-top:14px;background:#E7F6EF;border:1px solid #B9E4CE;border-radius:999px;padding:6px 12px;font-size:12px;color:#1F8A5B;font-weight:600;">
+              <span style="width:7px;height:7px;border-radius:50%;background:#1F9D6B;"></span>{{ t.lead }}
+            </div>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- PRODUCT LISTING                                                       -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1100px;margin:0 auto;padding:32px 40px 72px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9AA3B2;letter-spacing:0.3px;margin-bottom:22px;"><span onClick="{{ goHome }}" style="cursor:pointer;">Home</span> <span style="margin:0 6px;">/</span> <span style="color:#14142B;">T-shirts</span></div>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:34px;letter-spacing:-1px;margin:0 0 6px;">Pick a shirt</h1>
+    <p style="font-size:15px;color:#6B7280;margin:0 0 28px;">Choose the blank — you'll design and size it on the next screen.</p>
+    <div class="g2" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <sc-for list="{{ blankCards }}" as="b" hint-placeholder-count="2">
+        <button onClick="{{ b.onSelect }}" style="text-align:left;background:#fff;border:1px solid #E7E9F0;border-radius:20px;padding:0;cursor:pointer;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,43,.05);">
+          <div style="height:230px;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 100% at 50% 16%,#FCFCFE,#EEF0F5);padding:18px;"><img src="{{ b.photo }}" alt="{{ b.name }}" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+          <div style="padding:18px 22px 22px;display:flex;align-items:flex-end;justify-content:space-between;">
+            <div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;letter-spacing:-0.4px;">{{ b.name }}</div>
+              <div style="font-size:13px;color:#6B7280;margin-top:3px;">{{ b.fabric }} · ships in 3 days</div>
+            </div>
+            <div style="text-align:right;flex:none;"><div style="font-size:11px;color:#9AA3B2;">from</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;">{{ b.from }}</div></div>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- PDP                                                                   -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ isPdp }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1200px;margin:0 auto;padding:32px 40px 72px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9AA3B2;letter-spacing:0.3px;margin-bottom:26px;"><span onClick="{{ goHome }}" style="cursor:pointer;">Home</span> <span style="margin:0 6px;">/</span> <span onClick="{{ goList }}" style="cursor:pointer;">T-shirts</span> <span style="margin:0 6px;">/</span> <span style="color:#14142B;">{{ blankName }}</span></div>
+
+    <div class="rgrid" style="display:grid;grid-template-columns:1.08fr 1fr;gap:56px;align-items:start;">
+
+      <!-- LEFT gallery -->
+      <div style="position:sticky;top:88px;">
+        <div style="position:relative;background:#FFFFFF;border:1px solid #E7E9F0;border-radius:24px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,43,.05);">
+          <sc-if value="{{ galIsLive }}" hint-placeholder-val="{{ true }}">
+            <div style="height:520px;background:radial-gradient(130% 100% at 50% 12%,#FCFCFE 0%,#EEF0F5 62%,#E6E9F1 100%);display:flex;align-items:center;justify-content:center;padding:26px;" dangerouslySetInnerHTML="{{ galleryArt }}"></div>
+          </sc-if>
+          <sc-if value="{{ galIsPhoto }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;height:520px;background:#fff;">
+              <img src="{{ photoSrc }}" alt="product photo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:24px;">
+              <div style="position:absolute;inset:0;background:{{ selectedHex }};mix-blend-mode:multiply;-webkit-mask-image:url('{{ photoSrc }}');mask-image:url('{{ photoSrc }}');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></div>
+              <div style="position:absolute;left:18px;bottom:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#B4BAC7;">recoloured live · {{ colorName }}</div>
+            </div>
+          </sc-if>
+          <div style="position:absolute;top:16px;left:18px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;color:#B4BAC7;pointer-events:none;">{{ galleryLabel }}</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <sc-for list="{{ galThumbs }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.onClick }}" style="{{ t.style }}">
+              <sc-if value="{{ t.isArt }}" hint-placeholder-val="{{ true }}">
+                <div style="width:100%;height:100%;padding:6px;" dangerouslySetInnerHTML="{{ t.art }}"></div>
+              </sc-if>
+              <sc-if value="{{ t.isTag }}" hint-placeholder-val="{{ false }}">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:0.5px;color:rgba(20,20,43,.4);">{{ t.tag }}</span>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- RIGHT info -->
+      <div style="display:flex;flex-direction:column;">
+        <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:34px;line-height:1.05;letter-spacing:-1px;margin:0;">{{ blankName }}</h1>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:8px;">
+          <span style="color:#F4A100;font-size:15px;letter-spacing:2px;">★★★★★</span>
+          <span style="font-size:13.5px;font-weight:600;">4.8</span>
+          <span style="font-size:13.5px;color:#6B7280;">· 1,320 reviews</span>
+        </div>
+
+        <div style="display:flex;align-items:flex-end;gap:12px;margin-top:16px;">
+          <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:38px;letter-spacing:-1.2px;line-height:0.9;">{{ unitFmt }}</span>
+          <span style="font-size:13.5px;color:#6B7280;padding-bottom:4px;">each · {{ qtyTotal }} {{ shirtWord }}{{ bulkHint }}</span>
+        </div>
+
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;">
+          <sc-for list="{{ specs }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#3C4152;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1F9D6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ s.v }}
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- Colour -->
+        <div style="margin-top:22px;padding-top:22px;border-top:1px solid #E7E9F0;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Colour <span style="color:#9AA3B2;font-weight:500;">· {{ colorName }}</span></div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <sc-for list="{{ colorSwatches }}" as="c" hint-placeholder-count="8">
+              <button title="{{ c.name }}" onClick="{{ c.onSelect }}" style="{{ c.style }}"></button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- Make it yours (after size) -->
+        <div style="order:2;margin-top:22px;padding-top:22px;border-top:1px solid #E7E9F0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <span style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;">Make it yours</span>
+            <span style="font-size:12.5px;color:#9AA3B2;">Free proof before print</span>
+          </div>
+          <sc-if value="{{ noDesign }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ openStudio }}" style="width:100%;display:flex;align-items:center;gap:16px;text-align:left;background:#14142B;color:#fff;border:none;border-radius:16px;padding:18px 20px;cursor:pointer;box-shadow:0 10px 24px rgba(20,20,43,.18);">
+              <span style="flex:none;width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#2D5BFF,#5B8CFF);display:flex;align-items:center;justify-content:center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path><circle cx="12" cy="12" r="3.4"></circle></svg>
+              </span>
+              <span style="flex:1;"><span style="display:block;font-size:16px;font-weight:600;">Open the Design Studio</span><span style="display:block;font-size:13px;color:#AEB4C6;margin-top:3px;">Upload, type or describe artwork — drag to rotate the shirt, front to back.</span></span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AEB4C6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+            </button>
+            <div style="display:flex;gap:10px;margin-top:10px;">
+              <button onClick="{{ quickUpload }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#14142B;border:1.5px solid #D9DEE8;border-radius:12px;padding:12px;font-size:13.5px;font-weight:600;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14142B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M8 9l4-4 4 4"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg>Upload</button>
+              <button onClick="{{ quickText }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#14142B;border:1.5px solid #D9DEE8;border-radius:12px;padding:12px;font-size:13.5px;font-weight:600;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14142B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>Add text</button>
+            </div>
+            <div style="margin-top:10px;font-size:12.5px;color:#9AA3B2;text-align:center;">Or skip it — a blank {{ blankShort }} is fine too.</div>
+          </sc-if>
+          <sc-if value="{{ hasDesign }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:14px;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:14px;padding:12px 14px;">
+              <div style="width:40px;height:52px;flex:none;" dangerouslySetInnerHTML="{{ chipArt }}"></div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;color:#1F9D6B;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1F9D6B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Design applied</div>
+                <div style="font-size:12.5px;color:#3C4152;margin-top:3px;">{{ designSummary }}</div>
+              </div>
+              <button onClick="{{ openStudio }}" style="flex:none;background:#fff;border:1px solid #D9DEE8;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;">Edit</button>
+              <button onClick="{{ clearDesign }}" title="Remove design" style="flex:none;background:none;border:none;color:#C7CCDA;font-size:20px;cursor:pointer;">×</button>
+            </div>
+            <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #E7E9F0;border-radius:12px;padding:11px 14px;">
+              <div style="display:flex;align-items:center;gap:9px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 14h12v8H6z"></path></svg>
+                <span style="font-size:13px;"><span style="color:#6B7280;">Printing</span> <span style="font-weight:600;text-transform:capitalize;">{{ methodSummary }}</span> <span style="color:#9AA3B2;">· {{ detColorsShort }} · {{ unitFmt }} ea</span></span>
+              </div>
+              <button onClick="{{ openStudioPrint }}" style="background:none;border:none;color:#2D5BFF;font-size:12.5px;font-weight:600;cursor:pointer;">change</button>
+            </div>
+            <sc-if value="{{ showLowResPdp }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:8px;font-size:12px;color:#7A5200;background:#FFF8EC;border:1px solid #F0DCA8;border-radius:9px;padding:8px 12px;">One panel's file is too soft to print — open the studio to redraw it before you pay.</div>
+            </sc-if>
+          </sc-if>
+        </div>
+
+        <!-- Quantity + sizes (before design) -->
+        <div style="order:1;margin-top:22px;padding-top:22px;border-top:1px solid #E7E9F0;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:11px;">How many, and what sizes?</div>
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <sc-for list="{{ modeBtns }}" as="m" hint-placeholder-count="3">
+              <button onClick="{{ m.onClick }}" style="{{ m.style }}"><span style="font-weight:600;">{{ m.label }}</span><span style="display:block;font-size:11px;opacity:.72;margin-top:1px;">{{ m.sub }}</span></button>
+            </sc-for>
+          </div>
+
+          <!-- ONE SIZE (covers single buyer + bulk same size) -->
+          <sc-if value="{{ modeSingle }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+              <sc-for list="{{ sizeBtns }}" as="s" hint-placeholder-count="7">
+                <button onClick="{{ s.onSelect }}" style="{{ s.style }}">{{ s.label }}</button>
+              </sc-for>
+            </div>
+            <div style="font-size:12.5px;color:#6B7280;margin-bottom:14px;"><span style="color:#14142B;font-weight:600;">{{ oneSize }}</span> fits a {{ oneChest }} in chest · body width {{ oneWidth }} in</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:13px;color:#6B7280;">Quantity</span>
+              <div style="display:flex;align-items:center;border:1px solid #D9DEE8;border-radius:12px;overflow:hidden;background:#fff;">
+                <button onClick="{{ qtyDec }}" style="width:40px;height:46px;border:none;background:#fff;font-size:20px;cursor:pointer;">–</button>
+                <div style="width:56px;height:46px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:16px;">{{ qty }}</div>
+                <button onClick="{{ qtyInc }}" style="width:40px;height:46px;border:none;background:#fff;font-size:20px;cursor:pointer;">+</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- MIXED SIZES -->
+          <sc-if value="{{ modeMix }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-size:13px;color:#6B7280;">Ordering for</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="display:flex;align-items:center;border:1px solid #D9DEE8;border-radius:10px;overflow:hidden;background:#fff;">
+                  <button onClick="{{ mixTargetDec }}" style="width:32px;height:38px;border:none;background:#fff;font-size:17px;cursor:pointer;">–</button>
+                  <div style="width:42px;text-align:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;">{{ mixTarget }}</div>
+                  <button onClick="{{ mixTargetInc }}" style="width:32px;height:38px;border:none;background:#fff;font-size:17px;cursor:pointer;">+</button>
+                </div>
+                <span style="font-size:13px;color:#6B7280;">people</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:14px;">
+              <sc-for list="{{ mixSourceBtns }}" as="b" hint-placeholder-count="2"><button onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</button></sc-for>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#9AA3B2;letter-spacing:0.5px;margin-bottom:8px;">THE SPLIT</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+              <sc-for list="{{ splitRows }}" as="s" hint-placeholder-count="7">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #E7E9F0;border-radius:11px;padding:6px 6px 6px 12px;">
+                  <div><div style="font-weight:600;font-size:13.5px;">{{ s.label }}</div><div style="font-size:10.5px;color:#9AA3B2;">{{ s.meas }}</div></div>
+                  <div style="display:flex;align-items:center;border:1px solid #E7E9F0;border-radius:9px;overflow:hidden;">
+                    <button onClick="{{ s.onDec }}" style="width:28px;height:32px;border:none;background:#F7F8FB;font-size:15px;cursor:pointer;">–</button>
+                    <div style="width:30px;text-align:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;">{{ s.count }}</div>
+                    <button onClick="{{ s.onInc }}" style="width:28px;height:32px;border:none;background:#F7F8FB;font-size:15px;cursor:pointer;">+</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:10px;{{ reconcileStyle }}">
+              <span style="{{ reconcileDot }}"></span>
+              <span style="font-size:13px;font-weight:600;color:{{ reconcileTextColor }};">{{ reconcileText }}</span>
+            </div>
+            <sc-if value="{{ normalizeShown }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;display:flex;align-items:center;gap:11px;background:#FFF8EC;border:1px solid #F0DCA8;border-radius:10px;padding:10px 13px;">
+                <div style="flex:1;font-size:12.5px;color:#7A5200;line-height:1.4;">Four people wrote “medium” rather than M — we read both the same.</div>
+                <button onClick="{{ dismissNormalize }}" style="flex:none;background:#fff;border:1px solid #F0DCA8;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;color:#7A5200;cursor:pointer;">Got it</button>
+              </div>
+            </sc-if>
+            <div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:11px;font-weight:700;color:#9AA3B2;letter-spacing:0.5px;">WHO’S GETTING ONE</span>
+              <span style="font-size:10px;font-weight:600;color:#9AA3B2;background:#F2F4F8;border-radius:999px;padding:2px 7px;">optional</span>
+            </div>
+            <div style="margin-top:8px;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:11px;padding:4px 4px;">
+              <sc-for list="{{ roster }}" as="r" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 11px;font-size:12.5px;"><span>{{ r.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#6B7280;">{{ r.size }}</span></div>
+              </sc-for>
+              <div style="padding:6px 11px;font-size:11.5px;color:#9AA3B2;">Not required to check out.</div>
+            </div>
+          </sc-if>
+
+          <!-- ASK THE TEAM (group link) -->
+          <sc-if value="{{ modeGroup }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E7E9F0;border-radius:14px;padding:16px;">
+              <div style="font-size:13.5px;font-weight:600;margin-bottom:5px;">Send one link. They pick their own size.</div>
+              <div style="font-size:12.5px;color:#6B7280;line-height:1.5;margin-bottom:12px;">No account for them, ever. Sizes fill in as people answer — checkout is never blocked on stragglers.</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <span style="font-size:13px;color:#6B7280;">Headcount</span>
+                <div style="display:flex;align-items:center;border:1px solid #D9DEE8;border-radius:12px;overflow:hidden;background:#fff;">
+                  <button onClick="{{ tgtDec }}" style="width:36px;height:42px;border:none;background:#fff;font-size:18px;cursor:pointer;">–</button>
+                  <div style="width:52px;text-align:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;">{{ targetQty }}</div>
+                  <button onClick="{{ tgtInc }}" style="width:36px;height:42px;border:none;background:#fff;font-size:18px;cursor:pointer;">+</button>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <input value="{{ groupLink }}" style="flex:1;font-size:12px;font-family:'IBM Plex Mono',monospace;padding:10px 12px;border:1px solid #D9DEE8;border-radius:10px;background:#F7F8FB;color:#3C4152;">
+                <button onClick="{{ copyLink }}" style="flex:none;background:#14142B;color:#fff;border:none;border-radius:10px;padding:0 16px;font-size:13px;font-weight:600;cursor:pointer;">{{ copyLabel }}</button>
+              </div>
+              <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12.5px;color:#6B7280;"><span style="color:#14142B;font-weight:600;">{{ repliedCount }} of {{ targetQty }}</span> replied</span>
+                <button onClick="{{ openSam }}" style="background:#fff;border:1px solid #D9DEE8;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;color:#2D5BFF;cursor:pointer;">Preview what they see →</button>
+              </div>
+              <sc-if value="{{ hasOutstanding }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:12px;background:#FFF8EC;border:1px solid #F0DCA8;border-radius:10px;padding:10px 13px;font-size:12.5px;color:#7A5200;line-height:1.45;">{{ outstandingNote }} <span onClick="{{ chaseAll }}" style="color:#C77700;font-weight:600;cursor:pointer;">Chase them</span> or <span onClick="{{ assignDefault }}" style="color:#C77700;font-weight:600;cursor:pointer;">assign a default</span> — we never block checkout on it.</div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- Floating add-to-cart bar -->
+        <div style="order:3;position:sticky;bottom:0;z-index:20;margin-top:20px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border:1px solid #E7E9F0;border-radius:16px 16px 0 0;box-shadow:0 12px 30px rgba(20,20,43,.12);padding:12px 14px;">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;font-size:12.5px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#1F9D6B;box-shadow:0 0 0 3px rgba(31,157,107,.16);"></span>
+            <span style="color:#14142B;font-weight:600;">Order today → arrives {{ shipShort }}</span>
+            <span style="color:#C7CCDA;">·</span>
+            <span style="color:#6B7280;">free exchange if a size is off</span>
+          </div>
+          <button onClick="{{ addToCart }}" style="{{ addBtnStyle }}">{{ addLabel }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- how it prints teaser -->
+    <div style="margin-top:56px;padding-top:40px;border-top:1px solid #E7E9F0;">
+      <div class="g3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;">
+        <sc-for list="{{ details }}" as="d" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #E7E9F0;border-radius:16px;padding:22px 24px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1.5px;color:#2D5BFF;font-weight:600;">{{ d.tag }}</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;margin:10px 0 7px;">{{ d.title }}</div>
+            <div style="font-size:13.5px;color:#6B7280;line-height:1.55;">{{ d.body }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- CART                                                                  -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:980px;margin:0 auto;padding:34px 40px 72px;">
+    <button onClick="{{ goPdp }}" style="background:none;border:none;color:#6B7280;font-size:13px;cursor:pointer;padding:0;margin-bottom:18px;">← Continue shopping</button>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:32px;letter-spacing:-0.8px;margin:0 0 24px;">Your cart</h1>
+
+    <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:60px;text-align:center;">
+        <div style="font-size:15px;color:#6B7280;margin-bottom:16px;">Nothing here yet.</div>
+        <button onClick="{{ goPdp }}" style="background:#14142B;color:#fff;border:none;border-radius:11px;padding:12px 22px;font-size:14px;font-weight:600;cursor:pointer;">Design a shirt</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:6px 24px;margin-bottom:18px;">
+        <sc-for list="{{ cartLines }}" as="l" hint-placeholder-count="1">
+          <div style="display:flex;gap:18px;align-items:center;padding:20px 0;border-bottom:1px solid #F2F4F8;">
+            <div style="width:64px;height:80px;flex:none;background:radial-gradient(120% 100% at 50% 20%,#FBFCFE,#EAEEF4);border-radius:12px;padding:6px;" dangerouslySetInnerHTML="{{ l.art }}"></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:15px;font-weight:600;">{{ l.name }}</div>
+              <div style="font-size:12.5px;color:#6B7280;margin-top:3px;">{{ l.design }}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+                <sc-for list="{{ l.sizeChips }}" as="sc" hint-placeholder-count="3">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;background:#F2F4F8;border-radius:999px;padding:4px 9px;color:#3C4152;">{{ sc.t }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="text-align:right;flex:none;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;">{{ l.lineTotal }}</div>
+              <div style="font-size:11.5px;color:#9AA3B2;">{{ l.qty }} × {{ l.unit }}</div>
+              <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end;">
+                <button onClick="{{ l.onEdit }}" style="background:none;border:none;color:#2D5BFF;font-size:12px;font-weight:600;cursor:pointer;">edit</button>
+                <button onClick="{{ l.onRemove }}" style="background:none;border:none;color:#C7CCDA;font-size:16px;cursor:pointer;">×</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:18px 0;">
+          <span style="font-size:14px;font-weight:600;">Subtotal</span>
+          <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;">{{ cartTotalFmt }}</span>
+        </div>
+      </div>
+      <div style="font-size:12.5px;color:#6B7280;margin-bottom:16px;">Need several designs or destinations? Add each as its own line — you'll split shipping at checkout.</div>
+      <button onClick="{{ goCheckout }}" style="width:100%;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(31,157,107,.24);">Checkout · {{ cartTotalFmt }}</button>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- CHECKOUT                                                              -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1060px;margin:0 auto;padding:34px 40px 72px;">
+    <button onClick="{{ goCart }}" style="background:none;border:none;color:#6B7280;font-size:13px;cursor:pointer;padding:0;margin-bottom:14px;">← Back to cart</button>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:32px;letter-spacing:-0.8px;margin:0 0 24px;">Checkout</h1>
+    <div class="rgrid" style="display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:8px 24px;">
+          <sc-for list="{{ cartLines }}" as="l" hint-placeholder-count="1">
+            <div style="display:flex;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid #F2F4F8;">
+              <div style="width:52px;height:64px;flex:none;background:radial-gradient(120% 100% at 50% 20%,#FBFCFE,#EAEEF4);border-radius:10px;padding:5px;" dangerouslySetInnerHTML="{{ l.art }}"></div>
+              <div style="flex:1;"><div style="font-size:14px;font-weight:600;">{{ l.name }}</div><div style="font-size:12px;color:#6B7280;margin-top:2px;">{{ l.design }} · {{ l.sizeSummary }}</div></div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;">{{ l.lineTotal }}</div>
+            </div>
+          </sc-for>
+          <div style="padding:14px 0;">
+            <sc-for list="{{ breakdown }}" as="b" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;"><span style="color:#6B7280;">{{ b.label }}</span><span style="{{ b.valStyle }}">{{ b.val }}</span></div>
+            </sc-for>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;padding-top:12px;border-top:1px solid #E7E9F0;"><span style="font-size:14px;font-weight:600;">Total</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:23px;color:#1F9D6B;">{{ cartTotalFmt }}</span></div>
+            <div style="margin-top:6px;font-size:12px;color:#9AA3B2;">the price from the product page — nothing added here.</div>
+          </div>
+        </div>
+      </div>
+      <div style="position:sticky;top:88px;display:flex;flex-direction:column;gap:16px;">
+        <div style="background:#fff;border:1.5px solid #1F9D6B;border-radius:16px;padding:18px 20px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1.5px;color:#1F8A5B;font-weight:600;">ARRIVES</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;margin-top:4px;">{{ shipLong }}</div>
+          <div style="font-size:12.5px;color:#6B7280;margin-top:3px;">ships in 3 days · free exchange on sizes</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E7E9F0;border-radius:18px;padding:20px 22px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Fastest — pay in 2 clicks</div>
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <button onClick="{{ pay }}" style="flex:1;background:#14142B;color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;"> Pay</button>
+            <button onClick="{{ pay }}" style="flex:1;background:#fff;border:1px solid #E7E9F0;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;color:#3C4152;">G Pay</button>
+            <button onClick="{{ pay }}" style="flex:1;background:#fff;border:1px solid #E7E9F0;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;color:#0B2A8A;">PayPal</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin:6px 0 14px;"><span style="flex:1;height:1px;background:#E7E9F0;"></span><span style="font-size:11.5px;color:#9AA3B2;">or pay by link</span><span style="flex:1;height:1px;background:#E7E9F0;"></span></div>
+          <input value="{{ email }}" onChange="{{ onEmail }}" placeholder="Email address" style="width:100%;font-size:14px;padding:12px 14px;border:1px solid #D9DEE8;border-radius:10px;margin-bottom:6px;">
+          <div style="font-size:11.5px;color:#9AA3B2;margin-bottom:14px;">no account · no card typing if your wallet is set up</div>
+          <button onClick="{{ pay }}" style="width:100%;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:15px;font-size:15.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(31,157,107,.26);">Pay {{ cartTotalFmt }}</button>
+          <div style="margin-top:12px;font-size:11.5px;color:#9AA3B2;text-align:center;">artwork checked by hand · we email before it prints</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- CONFIRM                                                               -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ isConfirm }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:640px;margin:0 auto;padding:74px 40px;text-align:center;">
+    <div style="width:78px;height:78px;border-radius:50%;background:#E7F6EF;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1F9D6B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:34px;letter-spacing:-0.8px;margin:0 0 8px;">You're all set.</h1>
+    <p style="font-size:15px;color:#6B7280;margin:0 0 6px;">{{ cartTotalFmt }} · arriving {{ shipLong }}</p>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#14142B;font-weight:600;margin-bottom:26px;">Order {{ orderId }}</div>
+    <div style="background:#fff;border:1px solid #E7E9F0;border-radius:16px;padding:20px 24px;text-align:left;font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:26px;">We check the artwork by hand and email you before it prints. If a size is wrong, exchanges are free — nothing to sign off, ever.</div>
+    <button onClick="{{ startNew }}" style="background:#14142B;color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:14px;font-weight:600;cursor:pointer;">Start a new order</button>
+  </div>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- SAM (recipient)                                                       -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ isSam }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#F4F5F8;">
+    <div style="width:100%;max-width:420px;">
+      <div style="display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:24px;">
+        <div style="display:flex;gap:2.5px;"><span style="width:7px;height:16px;background:#2D5BFF;border-radius:2px;"></span><span style="width:7px;height:16px;background:#1F9D6B;border-radius:2px;"></span><span style="width:7px;height:16px;background:#FF5A5F;border-radius:2px;"></span></div>
+        <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;">promodash</span>
+      </div>
+      <div style="text-align:center;margin-bottom:14px;"><button onClick="{{ goPdp }}" style="background:#EEF3FF;border:1px solid #D6E0FF;border-radius:999px;padding:5px 12px;font-size:11.5px;font-weight:600;color:#2D5BFF;cursor:pointer;">Prototype preview — ← back to the order</button></div>
+      <sc-if value="{{ samOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;border:1px solid #E7E9F0;border-radius:20px;padding:28px 26px;">
+        <div style="font-size:13px;color:#6B7280;margin-bottom:4px;">Priya is ordering team shirts.</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:22px;margin-bottom:20px;">What's your size?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;">
+          <sc-for list="{{ samSizeBtns }}" as="s" hint-placeholder-count="7">
+            <button onClick="{{ s.onSelect }}" style="{{ s.style }}">{{ s.label }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ samToggleCompare }}" style="width:100%;margin-top:16px;background:none;border:none;color:#2D5BFF;font-size:13px;font-weight:600;cursor:pointer;">Not sure? Compare with a shirt you own ↓</button>
+        <sc-if value="{{ samCompare }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:10px;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:12px;padding:14px;font-size:12.5px;color:#6B7280;line-height:1.5;">Lay a t-shirt you like flat, measure pit-to-pit. Under 19 in → S · 19–20 → M · 21–22 → L · 23+ → XL.</div>
+        </sc-if>
+        <div style="margin-top:16px;text-align:center;font-size:11.5px;color:#9AA3B2;">One tap. No account. You're done.</div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ samDoneView }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #E7E9F0;border-radius:20px;padding:36px 26px;text-align:center;">
+        <div style="width:60px;height:60px;border-radius:50%;background:#E7F6EF;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F9D6B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;margin-bottom:6px;">Got it — {{ samPicked }}.</div>
+        <div style="font-size:13px;color:#6B7280;">Thanks. You can close this now.</div>
+      </div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ==================================================================== -->
+  <!-- DESIGN STUDIO (overlay)                                               -->
+  <!-- ==================================================================== -->
+  <sc-if value="{{ studioOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:80;background:rgba(10,10,18,.55);backdrop-filter:blur(4px);display:flex;align-items:stretch;justify-content:center;">
+    <div class="studio-modal" style="width:100%;max-width:1180px;margin:24px;background:#fff;border-radius:22px;overflow:auto;max-height:calc(100vh - 48px);display:grid;grid-template-columns:1.25fr 1fr;box-shadow:0 30px 80px rgba(0,0,0,.4);">
+
+      <!-- canvas -->
+      <div style="position:relative;background:radial-gradient(120% 90% at 50% 20%,#1B1B26,#111119);display:flex;flex-direction:column;">
+        <div style="position:absolute;top:18px;left:22px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1.5px;color:#6B7285;">DESIGN STUDIO · {{ facingLabel }}</div>
+        <div style="position:absolute;top:16px;right:18px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;color:#4A4A5C;">↔ DRAG TO ROTATE</div>
+        <div style="position:absolute;top:44px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:6px;">
+          <button onClick="{{ setModeIllus }}" style="{{ modeIllusStyle }}">Illustration</button>
+          <button onClick="{{ setModePhoto }}" style="{{ modePhotoStyle }}">Photo</button>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;user-select:none;">
+          <sc-if value="{{ studioIllus }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;width:74%;max-width:400px;aspect-ratio:320 / 384;cursor:grab;touch-action:none;" onPointerDown="{{ canvasDown }}" onPointerMove="{{ canvasMove }}" onPointerUp="{{ canvasUp }}" onPointerLeave="{{ canvasUp }}">
+              <div style="position:absolute;inset:0;pointer-events:none;" dangerouslySetInnerHTML="{{ studioBaseArt }}"></div>
+              <sc-if value="{{ canvasArtShow }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ canvasItems }}" as="ci" hint-placeholder-count="1">
+                  <div style="{{ ci.wrap }}" onPointerDown="{{ ci.onDown }}">
+                    <sc-if value="{{ ci.isImg }}" hint-placeholder-val="{{ false }}"><img src="{{ ci.url }}" alt="" style="width:100%;height:100%;object-fit:contain;pointer-events:none;display:block;"></sc-if>
+                    <sc-if value="{{ ci.isSvg }}" hint-placeholder-val="{{ true }}"><div style="width:100%;height:100%;pointer-events:none;" dangerouslySetInnerHTML="{{ ci.inner }}"></div></sc-if>
+                    <sc-if value="{{ ci.selected }}" hint-placeholder-val="{{ true }}">
+                      <div style="{{ rotStemStyle }}"></div>
+                      <div style="{{ rotHandleStyle }}" onPointerDown="{{ rotHandleDown }}"></div>
+                      <div style="{{ scaleHandleStyle }}" onPointerDown="{{ scaleDown }}"></div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ studioPhoto }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;width:74%;max-width:440px;cursor:grab;touch-action:none;" onPointerDown="{{ startRotate }}" onPointerMove="{{ rotateMove }}" onPointerUp="{{ endRotate }}" onPointerLeave="{{ endRotate }}">
+              <img src="{{ studioPhotoSrc }}" alt="" style="width:100%;display:block;pointer-events:none;">
+              <div style="position:absolute;inset:0;pointer-events:none;background:{{ selectedHex }};mix-blend-mode:multiply;-webkit-mask-image:url('{{ studioPhotoSrc }}');mask-image:url('{{ studioPhotoSrc }}');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></div>
+              <div style="position:absolute;inset:0;pointer-events:none;" dangerouslySetInnerHTML="{{ studioPhotoArt }}"></div>
+            </div>
+          </sc-if>
+        </div>
+        <button onClick="{{ rotateLeft }}" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1px solid #2C2C3A;background:rgba(30,30,42,.9);color:#AEB4C6;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#AEB4C6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+        <button onClick="{{ rotateRight }}" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1px solid #2C2C3A;background:rgba(30,30,42,.9);color:#AEB4C6;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#AEB4C6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+        <div style="display:flex;gap:8px;justify-content:center;padding:16px 16px 22px;">
+          <sc-for list="{{ facingTabs }}" as="f" hint-placeholder-count="4">
+            <button onClick="{{ f.onClick }}" style="{{ f.style }}"><span style="{{ f.dot }}"></span>{{ f.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- tools -->
+      <div class="tools" style="display:flex;flex-direction:column;max-height:calc(100vh - 48px);overflow-y:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #EEF0F5;">
+          <span style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:18px;">Design the {{ activePanelName }}</span>
+          <button onClick="{{ closeStudio }}" style="background:#F2F4F8;border:none;width:32px;height:32px;border-radius:9px;font-size:16px;color:#6B7280;cursor:pointer;">×</button>
+        </div>
+        <div style="display:flex;padding:0 22px;border-bottom:1px solid #EEF0F5;">
+          <button onClick="{{ setTabArt }}" style="{{ artTabStyle }}">1 · Artwork</button>
+          <button onClick="{{ setTabPrint }}" style="{{ printTabStyle }}">2 · Colours &amp; printing</button>
+        </div>
+        <sc-if value="{{ tabArt }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:20px 22px;">
+          <div style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:0.6px;margin-bottom:10px;">WHAT GOES ON IT · {{ activePanelName }}</div>
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <sc-for list="{{ addModeBtns }}" as="m" hint-placeholder-count="3">
+              <button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ modeUpload }}" hint-placeholder-val="{{ true }}">
+            <label style="display:block;width:100%;background:#F7F8FB;border:1.5px dashed #D9DEE8;border-radius:12px;padding:20px;text-align:center;cursor:pointer;margin-bottom:8px;"><div style="font-size:13px;font-weight:600;">Drop a file, or click to browse</div><div style="font-size:11.5px;color:#6B7280;margin-top:3px;">add as many as you like — we read the colours for you</div><input type="file" accept="image/*" onChange="{{ onUpload }}" style="display:none;"></label>
+          </sc-if>
+
+          <sc-if value="{{ modeText }}" hint-placeholder-val="{{ false }}">
+            <input value="{{ panelTextDraft }}" onChange="{{ onPanelText }}" placeholder="Type your text…" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:700;color:#9AA3B2;letter-spacing:0.5px;margin-bottom:7px;">FONT</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <sc-for list="{{ textFontBtns }}" as="f" hint-placeholder-count="5">
+                <button onClick="{{ f.onSelect }}" style="{{ f.style }}">{{ f.label }}</button>
+              </sc-for>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#9AA3B2;letter-spacing:0.5px;margin-bottom:7px;">COLOUR</div>
+            <div style="display:flex;gap:9px;margin-bottom:12px;">
+              <sc-for list="{{ textColorBtns }}" as="c" hint-placeholder-count="6">
+                <button title="{{ c.title }}" onClick="{{ c.onSelect }}" style="{{ c.style }}"></button>
+              </sc-for>
+            </div>
+            <button onClick="{{ applyText }}" style="width:100%;background:#14142B;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:8px;">Add text to {{ activePanelName }}</button>
+          </sc-if>
+
+          <sc-if value="{{ modeAi }}" hint-placeholder-val="{{ false }}">
+            <textarea value="{{ aiDraft }}" onChange="{{ onAiDraft }}" placeholder="Describe the artwork…" style="width:100%;font-size:14px;padding:11px 13px;border:1px solid #D9DEE8;border-radius:10px;min-height:64px;resize:none;margin-bottom:8px;"></textarea>
+            <button onClick="{{ genAi }}" style="width:100%;background:#14142B;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:8px;">Generate</button>
+          </sc-if>
+
+          <sc-if value="{{ showLowRes }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:11px;background:#fff;border:1.5px solid #1F9D6B;border-radius:12px;padding:11px 13px;margin-bottom:8px;">
+              <div style="flex:1;font-size:12.5px;color:#14142B;line-height:1.4;">This file is 640px — too soft to print. We can redraw it sharp <span style="color:#6B7280;">before you pay</span>.</div>
+              <button onClick="{{ redraw }}" style="flex:none;background:#1F9D6B;color:#fff;border:none;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;">Redraw it</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ panelHasArt }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:0.6px;">ON THIS PANEL · {{ panelItemCount }}</span>
+              <sc-if value="{{ multiItems }}" hint-placeholder-val="{{ false }}"><button onClick="{{ autofit }}" style="background:#EEF3FF;border:1px solid #D6E0FF;border-radius:8px;padding:6px 11px;font-size:11.5px;font-weight:600;color:#2D5BFF;cursor:pointer;">Arrange evenly</button></sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+              <sc-for list="{{ panelItemList }}" as="it" hint-placeholder-count="2">
+                <div style="{{ it.rowStyle }}"><button onClick="{{ it.onSelect }}" style="{{ it.style }}">{{ it.label }}</button><button onClick="{{ it.onDelete }}" style="flex:none;background:none;border:none;color:#C0C6D6;font-size:16px;cursor:pointer;">×</button></div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ showAutofit }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:10px;background:#FFF8EC;border:1px solid #F0DCA8;border-radius:10px;padding:9px 12px;margin-bottom:14px;">
+                <span style="flex:1;font-size:12px;color:#7A5200;">Something runs past the print area — it'll be cut.</span>
+                <button onClick="{{ autofit }}" style="flex:none;background:#14142B;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;">Arrange to fit</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noSelected }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px;color:#9AA3B2;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:10px;padding:10px 12px;">Pick an item above — or click it on the shirt — to move, resize, rotate or recolour it.</div>
+            </sc-if>
+            <sc-if value="{{ hasSelected }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ hasPlacement }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:0.6px;margin-bottom:8px;">PLACE SELECTED</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+                  <sc-for list="{{ placementBtns }}" as="p" hint-placeholder-count="4"><button onClick="{{ p.onSelect }}" style="{{ p.style }}">{{ p.label }}</button></sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ isFacePanel }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#3C4152;background:#EEF3FF;border:1px solid #D6E0FF;border-radius:10px;padding:10px 12px;line-height:1.4;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M13 2 3 14h7l-1 8 10-12h-7z"></path></svg>
+                  <span><b>Drag the selected item</b> on the shirt · pull the <b>corner</b> to resize · the <b>top dot</b> to rotate.</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ isSleevePanel }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:0.6px;margin-bottom:6px;">SIZE</div>
+                <input type="range" class="rng" min="2" max="6" step="0.5" value="{{ artW }}" onChange="{{ onArtW }}">
+                <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA3B2;margin-top:5px;margin-bottom:14px;"><span>small</span><span style="color:#2D5BFF;font-weight:600;">{{ artW }} in</span><span>full</span></div>
+                <div style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:0.6px;margin-bottom:6px;">ROTATE</div>
+                <input type="range" class="rng" min="0" max="360" value="{{ artRot }}" onChange="{{ onArtRot }}">
+                <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA3B2;margin-top:5px;"><span>0°</span><span style="color:#2D5BFF;font-weight:600;">{{ artRot }}°</span><span>360°</span></div>
+              </sc-if>
+              <sc-if value="{{ apHasColors }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #EEF0F5;display:flex;align-items:center;gap:8px;">
+                  <sc-for list="{{ apSwatches }}" as="c" hint-placeholder-count="2"><span style="{{ c.style }}"></span></sc-for>
+                  <span style="font-size:12px;font-weight:600;">{{ apColorsLabel }}</span>
+                  <button onClick="{{ setTabPrint }}" style="margin-left:auto;background:none;border:none;color:#2D5BFF;font-size:12px;font-weight:600;cursor:pointer;">how this prints →</button>
+                </div>
+              </sc-if>
+            </sc-if>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- Colours & printing tab -->
+        <sc-if value="{{ tabPrint }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:20px 22px;">
+          <!-- no design yet: method depends on artwork -->
+          <sc-if value="{{ noArtwork }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;padding:28px 18px;background:#F7F8FB;border:1px dashed #D9DEE8;border-radius:14px;">
+              <div style="font-size:14px;font-weight:600;margin-bottom:5px;">Add a design first</div>
+              <div style="font-size:12.5px;color:#6B7280;line-height:1.55;margin-bottom:16px;">How it prints — and the price — depends on your artwork: its colours and how fine the detail is. There's nothing to print on a blank shirt.</div>
+              <button onClick="{{ setTabArt }}" style="background:#14142B;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;">← Add artwork</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasArtwork }}" hint-placeholder-val="{{ true }}">
+            <!-- colours read from the file -->
+            <div style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:0.6px;margin-bottom:10px;">COLOURS IN YOUR ARTWORK</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <sc-for list="{{ detSwatches }}" as="s" hint-placeholder-count="2"><span style="{{ s.style }}"></span></sc-for>
+              <span style="font-size:12.5px;font-weight:600;color:#14142B;margin-left:2px;">{{ detColorsLabel }}</span>
+            </div>
+            <div style="font-size:12.5px;color:#6B7280;line-height:1.5;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:10px;padding:10px 12px;margin-bottom:20px;">{{ colorEdu }}</div>
+
+            <!-- PRIMARY: pick the method directly -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:700;color:#9AA3B2;letter-spacing:0.6px;">HOW IT PRINTS</span>
+              <sc-if value="{{ overrideOn }}" hint-placeholder-val="{{ false }}"><button onClick="{{ useRecommend }}" style="background:none;border:none;color:#2D5BFF;font-size:12px;font-weight:600;cursor:pointer;">reset to our pick</button></sc-if>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <sc-for list="{{ methodChips }}" as="m" hint-placeholder-count="4">
+                <button onClick="{{ m.onSelect }}" style="{{ m.style }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-weight:600;font-size:13px;text-transform:capitalize;">{{ m.label }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;">{{ m.price }}</span></div>
+                  <div style="font-size:11px;color:#6B7280;margin-top:2px;">{{ m.note }}</div>
+                  <sc-if value="{{ m.isRec }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-top:5px;font-size:10px;font-weight:700;color:#1F8A5B;background:#E7F6EF;border-radius:999px;padding:1px 7px;">{{ m.isRec }}</span></sc-if>
+                </button>
+              </sc-for>
+            </div>
+            <div style="margin-top:10px;font-size:12px;color:#6B7280;line-height:1.5;">{{ verdictWhy }} <span style="color:#9AA3B2;">{{ verdictAlts }}</span></div>
+            <sc-if value="{{ showPolyNote }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;font-size:11.5px;color:#7A5200;background:#FFF8EC;border:1px solid #F0DCA8;border-radius:8px;padding:7px 10px;">This blank is part-poly, so two methods drop out — only what works on it is selectable.</div>
+            </sc-if>
+
+            <!-- SECONDARY: questions as a helper -->
+            <button onClick="{{ toggleQuestions }}" style="width:100%;margin-top:16px;display:flex;align-items:center;justify-content:space-between;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:10px;padding:11px 14px;font-size:12.5px;font-weight:600;color:#14142B;cursor:pointer;">
+              <span>Not sure which? Answer 3 quick questions</span>
+              <span style="color:#9AA3B2;">{{ qChevron }}</span>
+            </button>
+            <sc-if value="{{ showQuestions }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px;">
+                <sc-for list="{{ printQuestions }}" as="q" hint-placeholder-count="3">
+                  <div style="margin-bottom:14px;">
+                    <div style="font-size:12.5px;font-weight:600;margin-bottom:8px;">{{ q.label }}</div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <sc-for list="{{ q.options }}" as="o" hint-placeholder-count="3">
+                        <button onClick="{{ o.onSelect }}" style="{{ o.style }}">{{ o.label }}</button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="font-size:12px;color:#9AA3B2;">Your answers update the recommended pick above — you can always override it.</div>
+              </div>
+            </sc-if>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <div style="margin-top:auto;padding:14px 22px;border-top:1px solid #EEF0F5;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;bottom:0;background:#fff;">
+          <div><div style="font-size:11.5px;color:#9AA3B2;">{{ panelCountLabel }} · per shirt</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;">{{ studioUnitFmt }}</div></div>
+          <div style="display:flex;gap:8px;">
+            <button onClick="{{ applyDesign }}" style="background:#fff;color:#14142B;border:1.5px solid #D9DEE8;border-radius:11px;padding:12px 16px;font-size:13.5px;font-weight:600;cursor:pointer;">Save &amp; close</button>
+            <button onClick="{{ addFromStudio }}" style="background:#1F9D6B;color:#fff;border:none;border-radius:11px;padding:12px 18px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(31,157,107,.22);">{{ addLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.BLANKS = [
+      {slug:'bella-canvas-3001', name:'Bella+Canvas 3001', short:'crew tee', type:'crew', fabric:'100% cotton', gsm:145, poly:false,
+        specs:['Mid-weight, 145 gsm ringspun','Pre-shrunk, keeps its shape','Side-seamed, not boxy','Holds colour past 50 washes']},
+      {slug:'house-polo', name:'House knit polo', short:'polo', type:'polo', fabric:'cotton-poly piqué', gsm:180, poly:true,
+        specs:['Fine-gauge knit, 180 gsm','Ribbed collar and cuffs','Holds a pressed look','Soft, breathable piqué']}
+    ];
+    this.COLORS = [
+      {name:'forest', hex:'#1F5F57'},
+      {name:'kelly green', hex:'#2E8B4E'},
+      {name:'heather grey', hex:'#AAB0B8'},
+      {name:'white', hex:'#EEF0F2'},
+      {name:'black', hex:'#1B1B22'},
+      {name:'navy', hex:'#26324E'},
+      {name:'sand', hex:'#D8C9A8'},
+      {name:'maroon', hex:'#6E2B3A'}
+    ];
+    this.SIZES = ['XS','S','M','L','XL','2XL','3XL'];
+    this.MEAS = {'XS':{chest:'32–34',width:18},'S':{chest:'35–37',width:19},'M':{chest:'38–41',width:20},'L':{chest:'42–44',width:21},'XL':{chest:'45–48',width:22},'2XL':{chest:'49–52',width:24},'3XL':{chest:'53–56',width:26}};
+    this.PANELS = [{k:'front',name:'front'},{k:'back',name:'back'},{k:'lSleeve',name:'left sleeve'},{k:'rSleeve',name:'right sleeve'}];
+    this.FIRST = {screen:6.00, dtg:10.40, dtf:9.00, emb:12.80};
+    this.EXTRA = {screen:3.25, dtg:5.60, dtf:4.80, emb:6.90};
+    this.METHODS = {
+      screen:{verb:'screen print it', plain:'hardest wearing', poly:false},
+      dtg:{verb:'print it in full colour', plain:'full colour', poly:false},
+      dtf:{verb:'print it so it works on any fabric', plain:'works on any fabric', poly:true},
+      emb:{verb:'stitch it', plain:'stitched', poly:true}
+    };
+    this.FONTS=[
+      {id:'grotesk',name:'Modern',family:'Space Grotesk, sans-serif',weight:700,upper:true,ls:'1'},
+      {id:'plex',name:'Clean',family:'IBM Plex Sans, sans-serif',weight:600,upper:false,ls:'0'},
+      {id:'serif',name:'Elegant',family:'Playfair Display, serif',weight:700,upper:false,ls:'0'},
+      {id:'condensed',name:'Bold',family:'Bebas Neue, sans-serif',weight:400,upper:true,ls:'2'},
+      {id:'script',name:'Script',family:'Pacifico, cursive',weight:400,upper:false,ls:'0'}
+    ];
+    this.TEXT_COLORS=[{name:'White',hex:'#FFFFFF'},{name:'Black',hex:'#14142B'},{name:'Blue',hex:'#2D5BFF'},{name:'Green',hex:'#1F9D6B'},{name:'Red',hex:'#E8484D'},{name:'Gold',hex:'#D9A441'}];
+    this.SHIP_SHORT='Fri 7 Aug'; this.SHIP_LONG='Friday 7 August';
+    this.state = {
+      screen:'picker',
+      blankIdx:0, colorIdx:0,
+      // preview
+      pdpView:'pfront', viewAngle:0,
+      // design
+      studioOpen:false, studioTab:'art', studioMode:'illustration', activePanel:'front', addMode:'upload',
+      panels:{front:{items:[]},back:{items:[]},lSleeve:{items:[]},rSleeve:{items:[]}},
+      selectedId:null, objSeq:1,
+      panelTextDraft:'', aiDraft:'', textFont:'grotesk', textColor:'#FFFFFF',
+      answers:{wear:'week', feel:'soft', detail:'fine'}, methodOverride:null, showQuestions:false,
+      // size / qty
+      sizeMode:'single', oneSize:'M', qty:1,
+      split:{'XS':0,'S':0,'M':0,'L':0,'XL':0,'2XL':0,'3XL':0},
+      mixTarget:12, mixSource:'type', normalizeShown:false,
+      targetQty:12, repliedCount:8, copied:false,
+      // cart
+      cart:[], editId:null,
+      // checkout
+      email:'',
+      // sam
+      samPicked:null, samCompare:false,
+      orderId:'PD-4820', seq:1
+    };
+    this._drag=null;
+  }
+  fmt(n){ return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  set(k,v){ this.setState({[k]:v}); }
+  go(s){ const patch={screen:s}; if(s==='picker'||s==='list') patch.editId=null; this.setState(patch); if(typeof window!=='undefined'&&window.scrollTo){ try{window.scrollTo(0,0);}catch(e){} } }
+  blank(){ return this.BLANKS[this.state.blankIdx]; }
+  _hx(hex){ const h=(hex||'#333').replace('#',''); const s=h.length===3?h.split('').map(c=>c+c).join(''):h; const n=parseInt(s,16); return {r:(n>>16)&255,g:(n>>8)&255,b:n&255}; }
+  darken(hex,a){ const c=this._hx(hex); return 'rgb('+Math.round(c.r*(1-a))+','+Math.round(c.g*(1-a))+','+Math.round(c.b*(1-a))+')'; }
+  lighten(hex,a){ const c=this._hx(hex); return 'rgb('+Math.round(c.r+(255-c.r)*a)+','+Math.round(c.g+(255-c.g)*a)+','+Math.round(c.b+(255-c.b)*a)+')'; }
+  isLight(hex){ const c=this._hx(hex); return (0.299*c.r+0.587*c.g+0.114*c.b)>150; }
+  garmentVol(q){ return q>=100?6.10:q>=50?6.25:q>=40?6.40:q>=24?6.90:q>=12?7.40:q>=6?7.80:8.20; }
+  items(k){ const p=this.state.panels[k]; return (p&&p.items)||[]; }
+  panelHasArt(k){ return this.items(k).length>0; }
+  nPanels(){ return this.PANELS.filter(p=>this.items(p.k).length>0).length; }
+  hasDesign(){ return this.PANELS.some(p=>this.items(p.k).length>0); }
+  allItems(){ let a=[]; this.PANELS.forEach(p=>{ a=a.concat(this.items(p.k)); }); return a; }
+  maxColors(){ return this.allItems().reduce((mx,o)=>Math.max(mx,o.colors||1),0)||1; }
+  totalColors(){ const s={}; this.allItems().forEach(o=>(o.palette||[]).forEach(h=>{s[h]=1;})); const n=Object.keys(s).length; return n||this.maxColors(); }
+  findItem(id){ let f=null; this.PANELS.forEach(p=>this.items(p.k).forEach(o=>{ if(o.id===id)f=o; })); return f; }
+  selItem(){ return this.findItem(this.state.selectedId); }
+  addItem(k,obj){ const it=Object.assign({id:this.state.objSeq},obj); const c=this.items(k).length; if(it.x===undefined){ it.x=((c%3)-1)*0.42; it.y=(Math.floor(c/3)-1)*0.42; } const np=Object.assign({},this.state.panels,{[k]:{items:this.items(k).concat([it])}}); this.setState({panels:np, selectedId:it.id, objSeq:this.state.objSeq+1}); }
+  updItem(id,patch){ if(id==null)return; const np={}; this.PANELS.forEach(p=>{ np[p.k]={items:this.items(p.k).map(o=>o.id===id?Object.assign({},o,patch):o)}; }); this.setState({panels:np}); }
+  delItem(id){ const np={}; this.PANELS.forEach(p=>{ np[p.k]={items:this.items(p.k).filter(o=>o.id!==id)}; }); this.setState({panels:np, selectedId:this.state.selectedId===id?null:this.state.selectedId}); }
+  selectItem(id){ this.setState({selectedId:id}); }
+  arrangePanel(k){ const its=this.items(k); const N=its.length; if(!N)return; const A=this.printArea(k);
+    const cols=Math.ceil(Math.sqrt(N)), rows=Math.ceil(N/cols), cellW=A.w/cols, cellH=A.h/rows;
+    const ni=its.map((it,i)=>{ const col=i%cols, row=Math.floor(i/cols);
+      const cxpx=-A.w/2+(col+0.5)*cellW, cypx=-A.h/2+(row+0.5)*cellH, ar=it.ar||1;
+      let awpx=Math.min(cellW,cellH*ar)*0.82; const w=awpx/(A.w/12);
+      return Object.assign({},it,{x:Math.round(cxpx/(A.w/2)*100)/100, y:Math.round(cypx/(A.h/2)*100)/100, rot:0, w:Math.max(2,Math.round(w*10)/10)}); });
+    this.setState({panels:Object.assign({},this.state.panels,{[k]:{items:ni}})}); }
+  recommend(){ const a=this.state.answers, poly=this.blank().poly, cols=this.maxColors();
+    let m;
+    if(a.feel==='raised') m='emb';
+    else if(cols>3) m='dtg';                 // many colours → full colour
+    else if(a.detail!=='fine' && cols>2) m='dtg';
+    else m='screen';
+    if(poly && !this.METHODS[m].poly) m='dtf'; // poly-safe fallback
+    return m; }
+  chosenMethod(){ const o=this.state.methodOverride; if(o && (!this.blank().poly || this.METHODS[o].poly)) return o; return this.recommend(); }
+  unit(method,q,nP){ const g=this.garmentVol(q); const p=nP>0?(this.FIRST[method]+Math.max(0,nP-1)*this.EXTRA[method]):0; return Math.round((g+p)*100)/100; }
+  splitTotal(){ const s=this.state.split; return this.SIZES.reduce((a,k)=>a+(s[k]||0),0); }
+  qtyTotal(){ const S=this.state; if(S.sizeMode==='mix'){ const t=this.splitTotal(); return t>0?t:0; } if(S.sizeMode==='group') return S.targetQty; return S.qty; }
+  updSplit(k,dv){ const s=Object.assign({},this.state.split); s[k]=Math.max(0,(s[k]||0)+dv); this.setState({split:s, mixSource:'type'}); }
+  shipInfo(method,qty){ const days=method==='emb'?3:(qty>=100?2:((method==='dtg'||method==='dtf')?1:0));
+    const o=[['Fri 7 Aug','Friday 7 August'],['Sat 8 Aug','Saturday 8 August'],['Mon 10 Aug','Monday 10 August'],['Tue 11 Aug','Tuesday 11 August']];
+    const i=Math.min(days,o.length-1); return {short:o[i][0], long:o[i][1]}; }
+  distribute(N){ const props={'XS':0.05,'S':0.15,'M':0.25,'L':0.27,'XL':0.17,'2XL':0.08,'3XL':0.03}; const out={}; let sum=0;
+    this.SIZES.forEach(k=>{ out[k]=Math.round(N*props[k]); sum+=out[k]; });
+    let diff=N-sum; const order=['M','L','S','XL','XS','2XL','3XL']; let i=0;
+    while(diff!==0 && i<200){ const k=order[i%order.length]; const nv=out[k]+(diff>0?1:-1); if(nv>=0){ out[k]=nv; diff+=(diff>0?-1:1); } i++; }
+    return out; }
+  setMixSource(s){ if(s==='paste'){ this.setState({mixSource:'paste', split:this.distribute(this.state.mixTarget), normalizeShown:true}); } else { this.setState({mixSource:'type', normalizeShown:false}); } }
+  anyLowRes(){ return this.allItems().some(o=>o.resOk===false); }
+
+  // ---------- artwork items on a panel ----------
+  printArea(panelKey){
+    if(panelKey==='lSleeve') return {cx:58,cy:116,w:34,h:44};
+    if(panelKey==='rSleeve') return {cx:262,cy:116,w:34,h:44};
+    return {cx:160,cy:214,w:98,h:130}; // chest, ~12 x 16 in
+  }
+  itemMetrics(it,panelKey,areaOv){
+    const A=areaOv||this.printArea(panelKey);
+    const w=it.w||6, spx=A.w/12, awpx=Math.max(6,w*spx), ar=it.ar||1, awh=awpx/ar;
+    const x=it.x||0, y=it.y||0, rot=it.rot||0;
+    return {A,awpx,awh,rot,cx:A.cx+x*(A.w/2),cy:A.cy+y*(A.h/2)};
+  }
+  itemOverflow(it,panelKey){ const A=this.printArea(panelKey); const m=this.itemMetrics(it,panelKey);
+    return (m.awpx/2+Math.abs(it.x||0)*A.w/2 > A.w/2+0.5) || (m.awh/2+Math.abs(it.y||0)*A.h/2 > A.h/2+0.5); }
+  artOverflow(panelKey){ return this.items(panelKey).some(it=>this.itemOverflow(it,panelKey)); }
+  _itemSvg(it,m,op){ const cx=m.cx,cy=m.cy,awpx=m.awpx,awh=m.awh,rot=m.rot;
+    const tf=rot?' transform="rotate('+rot.toFixed(1)+' '+cx.toFixed(1)+' '+cy.toFixed(1)+')"':'';
+    if(it.url){ return '<image href="'+it.url+'" xlink:href="'+it.url+'" x="'+(cx-awpx/2).toFixed(1)+'" y="'+(cy-awh/2).toFixed(1)+'" width="'+awpx.toFixed(1)+'" height="'+awh.toFixed(1)+'"'+tf+' opacity="'+op+'" preserveAspectRatio="xMidYMid meet"/>'; }
+    if(it.src==='text'){ const ft=this.FONTS.find(f=>f.id===(it.font||'grotesk'))||this.FONTS[0];
+      let t=(it.text||'Text').replace(/["“”]/g,''); if(ft.upper)t=t.toUpperCase(); const col=it.color||'#14142B';
+      return '<g'+tf+' opacity="'+op+'"><text x="'+cx.toFixed(1)+'" y="'+(cy+awpx*0.12).toFixed(1)+'" text-anchor="middle" font-family="'+ft.family+'" font-weight="'+ft.weight+'" letter-spacing="'+ft.ls+'" font-size="'+(awpx*0.34).toFixed(1)+'" fill="'+col+'">'+t+'</text></g>'; }
+    const pal=(it.palette&&it.palette.length)?it.palette:['#2D5BFF','#14142B']; const c1=pal[0], c2=pal[1]||'#14142B', c3=pal[2]||'#EEF0F2', aw=awpx;
+    return '<g transform="translate('+cx.toFixed(1)+','+cy.toFixed(1)+') rotate('+rot.toFixed(1)+')" opacity="'+op+'"><polygon points="0,'+(-aw*0.36)+' '+(aw*0.32)+','+(aw*0.16)+' '+(-aw*0.32)+','+(aw*0.16)+'" fill="'+c1+'"/><polygon points="0,'+(-aw*0.20)+' '+(aw*0.18)+','+(aw*0.10)+' '+(-aw*0.18)+','+(aw*0.10)+'" fill="'+c3+'"/><text x="0" y="'+(aw*0.44)+'" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(aw*0.26)+'" fill="'+c2+'" letter-spacing="1">ACME</text></g>'; }
+  artOn(panelKey,op,areaOv){ const its=this.items(panelKey); if(!its.length) return '';
+    return its.map(it=>this._itemSvg(it,this.itemMetrics(it,panelKey,areaOv),op)).join(''); }
+
+  // ---------- garment renderer (crew or polo, front/back, rotatable) ----------
+  garment(opts){
+    opts=opts||{};
+    const S=this.state, hex=opts.hex||this.COLORS[S.colorIdx].hex, type=opts.type||this.blank().type;
+    const forced=opts.face; const angle=opts.angle!==undefined?opts.angle:0;
+    let facing, sx;
+    if(forced){ facing=forced==='back'?2:0; sx=1; }
+    else { const norm=((angle%360)+360)%360, seg=norm/90; facing=Math.round(seg)%4; const frac=seg-Math.round(seg); sx=Math.max(0.32,1-Math.abs(frac)*1.3); }
+    const op = Math.max(0,Math.min(1,(sx-0.32)/0.45));
+    if(facing===1||facing===3){ return this.sideGarment(opts, facing===1?'right':'left', sx, op); }
+    const front = facing===0;
+    const showArt = opts.art!==false;
+    const showBox = opts.box;
+    const dark=this.darken(hex,.18), dd=this.darken(hex,.32), ddd=this.darken(hex,.46), light=this.lighten(hex,.16), ll=this.lighten(hex,.30);
+
+    // oversized boxy silhouette, heavy drop shoulders, wide short sleeves
+    const body='M126,56 C138,47 182,47 194,56 L212,66 L232,74 L296,104 L288,158 L236,147 L244,353 L76,353 L84,147 L32,158 L24,104 L88,74 L108,66 Z';
+    const ground='<ellipse cx="160" cy="368" rx="94" ry="9" fill="#000" opacity="0.06"/>';
+
+    // collar
+    let collar;
+    if(type==='polo'){
+      if(front){
+        collar='<path d="M138,58 L160,98 L182,58" fill="'+dd+'" opacity="0.9"/>'
+          +'<polygon points="108,66 152,60 158,98 128,86" fill="'+light+'" stroke="'+dark+'" stroke-width="1.4" stroke-linejoin="round"/>'
+          +'<polygon points="212,66 168,60 162,98 192,86" fill="'+light+'" stroke="'+dark+'" stroke-width="1.4" stroke-linejoin="round"/>';
+      } else {
+        collar='<path d="M120,60 C146,78 174,78 200,60" fill="none" stroke="'+ddd+'" stroke-width="9" stroke-linecap="round"/>';
+      }
+    } else {
+      if(front){
+        collar='<path d="M126,56 C142,94 178,94 194,56 C178,74 142,74 126,56 Z" fill="'+ddd+'" opacity="0.85"/>'
+          +'<path d="M126,56 C144,90 176,90 194,56" fill="none" stroke="'+dd+'" stroke-width="9" stroke-linecap="round"/>'
+          +'<path d="M129,57 C145,84 175,84 191,57" fill="none" stroke="'+ll+'" stroke-width="2" opacity="0.5"/>';
+      } else {
+        collar='<path d="M120,58 C147,76 173,76 200,58" fill="none" stroke="'+ddd+'" stroke-width="10" stroke-linecap="round"/>'
+          +'<path d="M124,59 C147,73 173,73 196,59" fill="none" stroke="'+dd+'" stroke-width="4" opacity="0.7"/>';
+      }
+    }
+
+    // fabric volume shading
+    const hiCore='<ellipse cx="158" cy="150" rx="66" ry="120" fill="#fff" opacity="0.07"/>';
+    const shadeL='<path d="M76,353 L84,147 L32,158 L24,104 L56,120 L112,152 L112,353 Z" fill="'+ddd+'" opacity="0.12"/>';
+    const shadeR='<path d="M244,353 L236,147 L288,158 L296,104 L266,120 L208,152 L208,353 Z" fill="'+ddd+'" opacity="0.08"/>';
+    const armL='<path d="M84,147 C96,150 106,156 112,166 L100,171 C92,158 86,152 82,150 Z" fill="'+ddd+'" opacity="0.14"/>';
+    const armR='<path d="M236,147 C224,150 214,156 208,166 L220,171 C228,158 234,152 238,150 Z" fill="'+ddd+'" opacity="0.10"/>';
+    const fold='<path d="M128,110 C124,180 126,270 122,330" fill="none" stroke="'+dd+'" stroke-width="1.6" opacity="0.14"/><path d="M196,110 C200,180 198,270 200,330" fill="none" stroke="'+dd+'" stroke-width="1.6" opacity="0.14"/>';
+    const hemBand='<path d="M78,341 L242,341" stroke="'+ddd+'" stroke-width="6" opacity="0.10"/><path d="M82,346 L238,346" stroke="'+ll+'" stroke-width="1.3" opacity="0.5" stroke-dasharray="3 3"/>';
+    const cuffL='<path d="M31,150 L37,160" stroke="'+ll+'" stroke-width="1.2" opacity="0.5"/><path d="M35,152 L41,162" stroke="'+ll+'" stroke-width="1.2" opacity="0.5"/>';
+    const cuffR='<path d="M289,150 L283,160" stroke="'+ll+'" stroke-width="1.2" opacity="0.5"/><path d="M285,152 L279,162" stroke="'+ll+'" stroke-width="1.2" opacity="0.5"/>';
+    const seam='<path d="M112,152 L112,353" stroke="'+dd+'" stroke-width="1" opacity="0.16"/><path d="M208,152 L208,353" stroke="'+dd+'" stroke-width="1" opacity="0.12"/>';
+    let knit='';
+    if(type==='polo'){ for(let x=102;x<=218;x+=12){ knit+='<path d="M'+x+',110 L'+x+',345" stroke="'+dd+'" stroke-width="0.7" opacity="0.08"/>'; } }
+
+    // artwork + always-on print area
+    let art='';
+    if(showArt){
+      const chestKey=front?'front':'back'; const A=this.printArea(chestKey);
+      if(showBox){
+        art+='<rect x="'+(A.cx-A.w/2)+'" y="'+(A.cy-A.h/2)+'" width="'+A.w+'" height="'+A.h+'" rx="5" fill="none" stroke="#B9C0CE" stroke-width="1.4" stroke-dasharray="5 5"/>';
+        if(!this.panelHasArt(chestKey)) art+='<text x="'+A.cx+'" y="'+(A.cy+2)+'" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" letter-spacing="0.5" fill="#B9C0CE">print area</text>';
+      }
+      if(!opts.noArt) art+=this.artOn(chestKey,op);
+    }
+
+    const inner=hiCore+shadeL+shadeR+armL+armR+fold+knit+hemBand+cuffL+cuffR+seam+collar+art;
+    const bodyG='<path d="'+body+'" fill="'+hex+'" stroke="'+dark+'" stroke-width="1.6" stroke-linejoin="round"/>'+inner;
+    const scaled='<g transform="translate(160,204) scale('+sx.toFixed(3)+',1) translate(-160,-204)">'+bodyG+'</g>';
+    return '<svg viewBox="0 0 320 384" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="max-height:'+(opts.h||460)+'px;">'+ground+scaled+'</svg>';
+  }
+
+  // ---------- side profile (left / right sleeve facing) ----------
+  sideGarment(opts,dir,sx,op){
+    const S=this.state, hex=opts.hex||this.COLORS[S.colorIdx].hex;
+    const dark=this.darken(hex,.18), ddd=this.darken(hex,.46), ll=this.lighten(hex,.28);
+    const bodyR='M150,120 Q138,118 136,150 L138,346 Q138,353 148,353 L182,353 Q193,352 193,344 L197,150 Q197,123 186,120 Z';
+    const sleeveR='M186,126 L236,134 Q249,139 244,157 L236,173 L186,164 Z';
+    const collarR='<path d="M168,121 Q182,116 192,127" fill="none" stroke="'+ddd+'" stroke-width="5" stroke-linecap="round"/>';
+    const shadeBack='<path d="M136,150 L138,346 L150,346 L150,150 Z" fill="'+ddd+'" opacity="0.16"/>';
+    const hiFront='<path d="M180,132 L188,132 L188,344 L180,344 Z" fill="#fff" opacity="0.06"/>';
+    const sleeveShade='<path d="M186,164 L236,173 L232,168 L188,158 Z" fill="'+ddd+'" opacity="0.14"/>';
+    const cuff='<path d="M231,138 L227,170" stroke="'+ll+'" stroke-width="1.3" opacity="0.5" stroke-dasharray="3 3"/>';
+    const hem='<path d="M140,344 L192,344" stroke="'+ll+'" stroke-width="1.3" opacity="0.5" stroke-dasharray="3 3"/>';
+    const ground='<ellipse cx="172" cy="368" rx="66" ry="8" fill="#000" opacity="0.06"/>';
+    const shape='<path d="'+bodyR+'" fill="'+hex+'" stroke="'+dark+'" stroke-width="1.6"/><path d="'+sleeveR+'" fill="'+hex+'" stroke="'+dark+'" stroke-width="1.6"/>'+collarR+shadeBack+hiFront+sleeveShade+cuff+hem;
+    const panelKey = dir==='right'?'rSleeve':'lSleeve';
+    const SA = dir==='right'?{cx:213,cy:148,w:44,h:54}:{cx:107,cy:148,w:44,h:54};
+    const boundary = (opts.box!==false)?'<rect x="'+(SA.cx-SA.w/2)+'" y="'+(SA.cy-SA.h/2)+'" width="'+SA.w+'" height="'+SA.h+'" rx="4" fill="none" stroke="#B9C0CE" stroke-width="1.3" stroke-dasharray="4 4"/>':'';
+    const sart = this.artOn(panelKey,op,SA);
+    let content;
+    if(dir==='right'){ content=shape+boundary+sart; }
+    else { content='<g transform="translate(320,0) scale(-1,1)">'+shape+'</g>'+boundary+sart; }
+    const scaled='<g transform="translate(160,204) scale('+sx.toFixed(3)+',1) translate(-160,-204)">'+content+'</g>';
+    return '<svg viewBox="0 0 320 384" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="max-height:'+(opts.h||460)+'px;">'+ground+scaled+'</svg>';
+  }
+
+  // ---------- direct manipulation of artwork (drag / scale / rotate on canvas) ----------
+  _cap(e){ try{ if(e&&e.currentTarget&&e.currentTarget.setPointerCapture&&e.pointerId!==undefined) e.currentTarget.setPointerCapture(e.pointerId); }catch(_){} }
+  canvasDown(e){ this._cap(e); this.startRotate(e); }
+  canvasMove(e){ if(this._man) this._manMove(e); else if(this._drag) this.rotateMove(e); }
+  canvasUp(e){ if(this._man) this._man=null; if(this._drag) this.endRotate(e); }
+  artDown(id,e){ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({selectedId:id}); this._cap(e); this._startMan('move',e,id); }
+  scaleDown(e){ if(e&&e.stopPropagation)e.stopPropagation(); this._cap(e); this._startMan('scale',e); }
+  rotHandleDown(e){ if(e&&e.stopPropagation)e.stopPropagation(); this._cap(e); this._startMan('rotate',e); }
+  _startMan(mode,e,idOverride){ const id=idOverride!==undefined?idOverride:this.state.selectedId; const it=this.findItem(id); if(!it)return;
+    this._man={mode,id,sx:e.clientX,sy:e.clientY,ox:it.x||0,oy:it.y||0,ow:it.w||6,orot:it.rot||0}; }
+  _manMove(e){ const M=this._man; if(!M)return; const box=e.currentTarget.getBoundingClientRect(); if(!box.width)return; const A=this.printArea(this._facePanel(this.state.viewAngle));
+    const ux=(e.clientX-M.sx)/box.width*320, uy=(e.clientY-M.sy)/box.height*384;
+    if(M.mode==='move'){ this.updItem(M.id,{x:Math.max(-1.4,Math.min(1.4,M.ox+ux/(A.w/2))), y:Math.max(-1.4,Math.min(1.4,M.oy+uy/(A.h/2)))}); }
+    else if(M.mode==='scale'){ this.updItem(M.id,{w:Math.max(2,Math.min(16,Math.round((M.ow+ux/(A.w/12))*10)/10))}); }
+    else if(M.mode==='rotate'){ const ccx=box.left+(A.cx+M.ox*(A.w/2))/320*box.width, ccy=box.top+(A.cy+M.oy*(A.h/2))/384*box.height;
+      let ang=Math.atan2(e.clientY-ccy,e.clientX-ccx)*180/Math.PI+90; this.updItem(M.id,{rot:Math.round(((ang%360)+360)%360)}); } }
+
+  // ---------- rotate drag ----------
+  startRotate(e){ this._drag={x:(e.clientX!==undefined?e.clientX:0), a:this.state.viewAngle}; }
+  rotateMove(e){ if(!this._drag)return; const x=(e.clientX!==undefined?e.clientX:0); this.setState({viewAngle:this._drag.a+(x-this._drag.x)}); }
+  _facePanel(a){ const f=(((Math.round(a/90))%4)+4)%4; return {0:'front',1:'rSleeve',2:'back',3:'lSleeve'}[f]; }
+  endRotate(e){ if(!this._drag)return; const snap=Math.round(this.state.viewAngle/90)*90; this.setState({viewAngle:snap, activePanel:this._facePanel(snap)}); this._drag=null; }
+
+  // ---------- studio helpers ----------
+  rotate(delta){ const a=this.state.viewAngle+delta; this.setState({viewAngle:a, activePanel:this._facePanel(a)}); }
+  selectPanel(k){ const map={front:0,rSleeve:90,back:180,lSleeve:270}; const va=map[k]!==undefined?map[k]:this.state.viewAngle; this.setState({activePanel:k, viewAngle:va}); }
+  onUpload(e){ const f=e&&e.target&&e.target.files&&e.target.files[0]; if(!f) return; const ap=this.state.activePanel;
+    const rd=new FileReader();
+    rd.onload=(ev)=>{ const url=ev.target.result; const img=new Image();
+      img.onload=()=>{ const pal=this._sampleColors(img); const soft=(img.naturalWidth&&img.naturalWidth<700); const ar=(img.naturalHeight? img.naturalWidth/img.naturalHeight : 1);
+        this.addItem(ap,{src:'upload',url,file:f.name,ar,note:soft?('raster · '+img.naturalWidth+'px — soft'):'looks sharp · '+(img.naturalWidth||'')+'px',w:(ap==='lSleeve'||ap==='rSleeve')?4:8,rot:0,resOk:!soft,colors:pal.count,palette:pal.colors}); };
+      img.onerror=()=>{ this.addItem(ap,{src:'upload',url,file:f.name,ar:1,w:8,rot:0,resOk:true,colors:2,palette:['#14142B','#2D5BFF']}); };
+      img.src=url; };
+    rd.readAsDataURL(f); }
+  _sampleColors(img){ try{ const c=document.createElement('canvas'); c.width=32; c.height=32; const g=c.getContext('2d'); g.drawImage(img,0,0,32,32); const d=g.getImageData(0,0,32,32).data; const map={};
+    for(let i=0;i<d.length;i+=4){ if(d[i+3]<128) continue; const r=Math.round(d[i]/48)*48, gg=Math.round(d[i+1]/48)*48, b=Math.round(d[i+2]/48)*48; const k=r+','+gg+','+b; map[k]=(map[k]||0)+1; }
+    const keys=Object.keys(map).sort((a,b)=>map[b]-map[a]); const top=keys.slice(0,6).map(k=>{const p=k.split(','); return 'rgb('+p[0]+','+p[1]+','+p[2]+')';});
+    return {count:Math.max(1,Math.min(keys.length,8)), colors:top.length?top:['#14142B']}; }catch(e){ return {count:2, colors:['#14142B','#2D5BFF']}; } }
+  autoFit(){ this.arrangePanel(this.state.activePanel); }
+
+  renderVals(){
+    const S=this.state, color=this.COLORS[S.colorIdx], blank=this.blank(), scr=S.screen;
+    const isSam=scr==='sam';
+    const method=this.chosenMethod(), nP=this.nPanels(), qt=this.qtyTotal();
+    const priceQ=qt>0?qt:1;
+    const unit=this.unit(method,priceQ,nP);
+    const lineTotal=Math.round(unit*qt*100)/100;
+
+    // cart totals
+    const cartTotal=S.cart.reduce((a,l)=>a+l.lineTotal,0);
+    const cartUnits=S.cart.reduce((a,l)=>a+l.qty,0);
+
+    // ---- picker ----
+    const bottleArt='<svg viewBox="0 0 120 150" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="8" width="36" height="12" rx="3" fill="#8B93A9"/><path d="M38 24 h44 a6 6 0 0 1 6 6 v104 a10 10 0 0 1 -10 10 h-42 a10 10 0 0 1 -10 -10 v-104 a6 6 0 0 1 6 -6 z" fill="#2D5BFF"/><rect x="40" y="60" width="40" height="34" rx="5" fill="#EAF0FE"/></svg>';
+    const pickerTiles=[
+      {name:'Drinkware', blurb:'Insulated tumblers and bottles. One decision, laser-sharp.', lead:'ships in 2 days', heroBg:'background:radial-gradient(120% 100% at 50% 20%,#FBFCFE,#E7EBF2);', art:{__html:bottleArt}, onClick:()=>{ if(typeof window!=='undefined'){ window.location.href='./PromoDash%20Prototype.dc.html?v=2'; } }},
+      {name:'T-shirts', blurb:'Custom tees and polos — order one, or sort a whole team.', lead:'ships in 3 days', heroBg:'background:radial-gradient(120% 100% at 50% 15%,#FCFCFE,#EEF0F5);', art:{__html:this.garment({face:'front',type:'crew',h:210})}, onClick:()=>this.go('list')}
+    ];
+    // ---- PDP gallery (live SVG design view + real-photo image-slots) ----
+    const galItems=[
+      {view:'live',   live:true,  label:'LIVE · your design in '+color.name, tag:'LIVE'},
+      {view:'pfront', photo:true, label:'PRODUCT · front', tag:'FRONT'},
+      {view:'pback',  photo:true, label:'PRODUCT · back',  tag:'BACK'},
+      {view:'pside',  photo:true, label:'PRODUCT · side',  tag:'SIDE'}
+    ];
+    const cur=galItems.find(x=>x.view===S.pdpView)||galItems[0];
+    const galThumbs=galItems.map(it=>({isArt:!!it.live,isTag:!it.live,tag:it.tag||'',
+      onClick:()=>this.set('pdpView',it.view),
+      art: it.live?{__html:this.garment({face:'front',box:false,h:78})}:null,
+      style:'position:relative;width:66px;height:78px;border-radius:12px;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;border:2px solid '+(it.view===S.pdpView?'#2D5BFF':'#E7E9F0')+';'+(it.live?'background:radial-gradient(120% 100% at 50% 20%,#FCFCFE,#EAEEF4);':'background:#F2F4F8;')}));
+    const galleryArt = {__html:this.garment({face:'front',box:true,h:460})};
+
+    // ---- blanks + colours ----
+    const blankCards=this.BLANKS.map((b,i)=>({name:b.name, fabric:b.fabric, from:this.fmt(this.unit('screen',1,1)),
+      photo:'./assets/'+b.slug+'-front.png',
+      onSelect:()=>this.setState({blankIdx:i,screen:'pdp'})}));
+    const swatch=(i)=>{ const c=this.COLORS[i]; const on=i===S.colorIdx;
+      return 'width:34px;height:34px;border-radius:10px;cursor:pointer;background:'+c.hex+';border:2px solid '+(on?'#2D5BFF':'transparent')+';box-shadow:0 0 0 1px rgba(0,0,0,.14)'+(on?', 0 0 0 4px rgba(45,91,255,.18)':'')+';'; };
+    const colorSwatches=this.COLORS.map((c,i)=>({name:c.name,onSelect:()=>this.set('colorIdx',i),style:swatch(i)}));
+
+    // ---- size / qty ----
+    const modes=[['single','One size','same size'],['mix','Mixed sizes','you know them'],['group','Ask the team','send a link']];
+    const modeBtns=modes.map(m=>{ const on=S.sizeMode===m[0];
+      return {label:m[1],sub:m[2],onClick:()=>this.setSizeMode(m[0]),
+        style:'flex:1;text-align:center;cursor:pointer;border-radius:10px;padding:9px 6px;font-size:12.5px;border:none;'+(on?'background:#14142B;color:#fff;box-shadow:0 2px 6px rgba(20,20,43,.2);':'background:#F2F4F8;color:#3C4152;')}; });
+    const sizeBtns=this.SIZES.map(sz=>{ const on=sz===S.oneSize;
+      return {label:sz,onSelect:()=>this.set('oneSize',sz),
+        style:'min-width:50px;height:44px;padding:0 6px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;border:1.5px solid '+(on?'#14142B':'#E7E9F0')+';background:'+(on?'#14142B':'#fff')+';color:'+(on?'#fff':'#14142B')+';'}; });
+    const om=this.MEAS[S.oneSize];
+    const splitRows=this.SIZES.map(k=>({label:k,count:S.split[k]||0,meas:this.MEAS[k].chest+' chest',onInc:()=>this.updSplit(k,1),onDec:()=>this.updSplit(k,-1)}));
+    // delegated sizing: reconciliation against a headcount
+    const mixSources=[['paste','Paste a sheet'],['type','Type them in']];
+    const mixSourceBtns=mixSources.map(s=>{ const on=S.mixSource===s[0];
+      return {label:s[1],onClick:()=>this.setMixSource(s[0]),
+        style:'flex:1;cursor:pointer;border-radius:9px;padding:9px 6px;font-size:12px;font-weight:600;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#fff')+';color:'+(on?'#0B2A8A':'#3C4152')+';'}; });
+    const mt=S.mixTarget, st=this.splitTotal(), balanced=st===mt;
+    const reconcileText=balanced?(mt+' of '+mt+' accounted for'):(st<mt?((mt-st)+' still to place · '+st+' of '+mt):((st-mt)+' over · '+st+' of '+mt));
+    const reconcileStyle=balanced?'background:#E7F6EF;border:1px solid #B9E4CE;':'background:#FFF8EC;border:1px solid #F0DCA8;';
+    const reconcileDot='width:8px;height:8px;border-radius:50%;flex:none;background:'+(balanced?'#1F9D6B':'#C77700')+';';
+    const reconcileTextColor=balanced?'#1F8A5B':'#7A5200';
+    const roster=[{name:'Maya Chen',size:'M'},{name:'Ravi Patel',size:'L'},{name:'Dana Ruiz',size:'S'}];
+    const outstanding=Math.max(0,S.targetQty-S.repliedCount);
+    const hasOutstanding=outstanding>0;
+    const shipD=this.shipInfo(method, qt>0?qt:1);
+
+    // ---- studio ----
+    const facing=(((Math.round(S.viewAngle/90))%4)+4)%4;
+    const facingLabel=['FRONT','RIGHT SLEEVE','BACK','LEFT SLEEVE'][facing];
+    // photo-mode compositing (uses ./assets/<slug>-<view>.png)
+    const pView=facing===2?'back':(facing===1||facing===3)?'side':'front';
+    const pPanel=facing===0?'front':facing===2?'back':facing===1?'rSleeve':'lSleeve';
+    // calibrate overlay to the photo's aspect: polo photos are square (1:1), tee cutouts are 5:6
+    const pTall=blank.type!=='polo'; const pVB=pTall?120:100;
+    const pArea=pView==='side'
+      ? (pTall?{cx:44,cy:42,w:13,h:18}:{cx:43,cy:40,w:12,h:16})
+      : (pTall?{cx:50,cy:52,w:34,h:36}:{cx:50,cy:46,w:28,h:30});
+    const pSrc='./assets/'+blank.slug+'-'+pView+'.png';
+    const pBox='<rect x="'+(pArea.cx-pArea.w/2)+'" y="'+(pArea.cy-pArea.h/2)+'" width="'+pArea.w+'" height="'+pArea.h+'" rx="1" fill="none" stroke="#2D5BFF" stroke-width="0.4" stroke-dasharray="2 2" opacity="0.55"/>';
+    const pArt='<svg viewBox="0 0 100 '+pVB+'" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">'+pBox+this.artOn(pPanel,1,pArea)+'</svg>';
+    const modePill=(on)=>'cursor:pointer;border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:600;border:1px solid '+(on?'#2D5BFF':'#2C2C3A')+';background:'+(on?'rgba(45,91,255,.16)':'#1E1E2A')+';color:'+(on?'#9DBBFF':'#8B93A9')+';';
+    // interactive artwork overlay (illustration mode, front/back at rest) — one draggable element per item
+    const chestKey=facing===2?'back':'front';
+    const canvasArtShow=(facing===0||facing===2)&&this.panelHasArt(chestKey)&&((((S.viewAngle%180)+180)%180)===0)&&S.studioMode==='illustration'&&!this._drag;
+    const rotStemStyle='position:absolute;left:50%;top:-18px;transform:translateX(-50%);width:1.5px;height:18px;background:#5B8CFF;';
+    const rotHandleStyle='position:absolute;left:50%;top:-28px;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:#2D5BFF;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.45);cursor:grab;touch-action:none;';
+    const scaleHandleStyle='position:absolute;right:-11px;bottom:-11px;width:20px;height:20px;border-radius:5px;background:#fff;border:2px solid #2D5BFF;box-shadow:0 2px 6px rgba(0,0,0,.4);cursor:nwse-resize;touch-action:none;';
+    const itemInner=(it)=>{ if(it.url) return ''; if(it.src==='text'){ const ft=this.FONTS.find(f=>f.id===(it.font||'grotesk'))||this.FONTS[0]; let t=(it.text||'Text').replace(/[<>&]/g,''); if(ft.upper)t=t.toUpperCase();
+        return '<svg viewBox="0 0 240 90" preserveAspectRatio="xMidYMid meet" width="100%" height="100%" style="overflow:visible;"><text x="120" y="60" text-anchor="middle" font-family="'+ft.family+'" font-weight="'+ft.weight+'" letter-spacing="'+ft.ls+'" font-size="56" fill="'+(it.color||'#14142B')+'">'+t+'</text></svg>'; }
+      const pal=(it.palette&&it.palette.length)?it.palette:['#2D5BFF','#14142B']; const c1=pal[0],c2=pal[1]||'#14142B',c3=pal[2]||'#EEF0F2';
+      return '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" width="100%" height="100%"><polygon points="50,14 82,66 18,66" fill="'+c1+'"/><polygon points="50,30 68,60 32,60" fill="'+c3+'"/><text x="50" y="88" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="18" fill="'+c2+'" letter-spacing="1">ACME</text></svg>'; };
+    const canvasItems=this.items(chestKey).map(it=>{ const m=this.itemMetrics(it,chestKey); const on=it.id===S.selectedId;
+      return {id:it.id, selected:on, isImg:!!it.url, isSvg:!it.url, url:it.url||'', inner:{__html:itemInner(it)},
+        onDown:(e)=>this.artDown(it.id,e),
+        wrap:'position:absolute;left:'+(m.cx/320*100).toFixed(2)+'%;top:'+(m.cy/384*100).toFixed(2)+'%;width:'+(m.awpx/320*100).toFixed(2)+'%;height:'+(m.awh/384*100).toFixed(2)+'%;transform:translate(-50%,-50%) rotate('+(it.rot||0)+'deg);cursor:grab;touch-action:none;'+(on?'outline:1.5px dashed #5B8CFF;outline-offset:4px;':'outline:1px dashed rgba(91,140,255,.4);outline-offset:3px;')}; });
+    const facings=[['front','Front'],['back','Back'],['lSleeve','L sleeve'],['rSleeve','R sleeve']];
+    const facingTabs=facings.map(f=>{ const on=S.activePanel===f[0]; const has=this.panelHasArt(f[0]);
+      return {label:f[1],onClick:()=>this.selectPanel(f[0]),
+        style:'display:flex;align-items:center;gap:6px;cursor:pointer;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;border:1px solid '+(on?'#2D5BFF':'#2C2C3A')+';background:'+(on?'rgba(45,91,255,.16)':'#1E1E2A')+';color:'+(on?'#9DBBFF':'#AEB4C6')+';',
+        dot:'width:7px;height:7px;border-radius:50%;background:'+(has?'#1F9D6B':'#4A4A5C')+';'}; });
+    const ap=S.activePanel, apName=(this.PANELS.find(p=>p.k===ap)||{}).name||'front';
+    const apItems=this.items(ap);
+    const sel=this.findItem(S.selectedId); const selO=(sel&&apItems.some(o=>o.id===sel.id))?sel:null;
+    const panelItemList=apItems.map(it=>({ label:(it.src==='text'?('“'+(it.text||'Text')+'”'):it.src==='ai'?'Generated artwork':(it.file||'Uploaded image')),
+      kind:(it.src==='text'?'text':it.src==='ai'?'ai':'image'), selected:it.id===S.selectedId,
+      onSelect:()=>this.selectItem(it.id), onDelete:()=>this.delItem(it.id),
+      style:'flex:1;min-width:0;text-align:left;cursor:pointer;border:none;background:none;font-size:12.5px;font-weight:600;color:'+(it.id===S.selectedId?'#0B2A8A':'#14142B')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;',
+      rowStyle:'display:flex;align-items:center;gap:8px;border-radius:10px;padding:8px 8px 8px 11px;border:1px solid '+(it.id===S.selectedId?'#2D5BFF':'#E7E9F0')+';background:'+(it.id===S.selectedId?'#EEF3FF':'#fff')+';' }));
+    const apObj=selO||{};
+    const placements=(ap==='front'||ap==='back')?[
+      {label:'Left chest',x:-0.42,y:-0.42,w:4},{label:'Right chest',x:0.42,y:-0.42,w:4},
+      {label:'Centre',x:0,y:0,w:8},{label:(ap==='back'?'Full back':'Full front'),x:0,y:0,w:12}
+    ]:[];
+    const placementBtns=placements.map(pl=>{ const on=selO&&Math.abs((selO.x||0)-pl.x)<0.05&&Math.abs((selO.y||0)-pl.y)<0.05&&Math.abs((selO.w||8)-pl.w)<0.6;
+      return {label:pl.label,onSelect:()=>{ if(S.selectedId!=null) this.updItem(S.selectedId,{x:pl.x,y:pl.y,w:pl.w}); },
+        style:'cursor:pointer;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#fff')+';color:'+(on?'#0B2A8A':'#3C4152')+';'}; });
+    const apPalette=(selO&&selO.palette&&selO.palette.length)?selO.palette:[];
+    const apSwatches=apPalette.map(h=>({style:'width:20px;height:20px;border-radius:50%;flex:none;background:'+h+';box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);'}));
+    const addModes=[['upload','Upload'],['text','Type text'],['ai','Describe it']];
+    const addModeBtns=addModes.map(m=>{ const on=S.addMode===m[0];
+      return {label:m[1],onClick:()=>this.set('addMode',m[0]),
+        style:'flex:1;cursor:pointer;border-radius:10px;padding:10px 6px;font-size:12.5px;font-weight:600;border:none;'+(on?'background:#14142B;color:#fff;':'background:#F2F4F8;color:#3C4152;')}; });
+    // print questions
+    const optBtn=(key,val,label)=>{ const on=S.answers[key]===val;
+      return {label,onSelect:()=>this.setState({answers:Object.assign({},S.answers,{[key]:val})}),
+        style:'cursor:pointer;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#fff')+';color:'+(on?'#0B2A8A':'#3C4152')+';'}; };
+    const printQuestions=[
+      {label:'How often will it be worn?',options:[['wear','week','Weekly'],['wear','sometimes','Now and then'],['wear','once','Once']].map(o=>optBtn(o[0],o[1],o[2]))},
+      {label:'How should it feel?',options:[['feel','soft','Soft on the fabric'],['feel','raised','Raised & thick']].map(o=>optBtn(o[0],o[1],o[2]))},
+      {label:'Anything fine in the artwork?',options:[['detail','fine','Fine lines'],['detail','bold','Bold shapes']].map(o=>optBtn(o[0],o[1],o[2]))}
+    ];
+    const avail=Object.keys(this.METHODS).filter(m=>!blank.poly || this.METHODS[m].poly);
+    const alts=avail.filter(m=>m!==method).map(m=>this.METHODS[m].plain+' '+this.fmt(this.unit(m,priceQ,Math.max(1,nP))));
+    const verdictAlts='or '+alts.join(' · ');
+    const recMethod=this.recommend();
+    const _allArt=this.allItems();
+    const _palSet={}; _allArt.forEach(o=>(o.palette||[]).forEach(h=>{_palSet[h]=1;}));
+    const detPalette=Object.keys(_palSet).slice(0,6);
+    const detColors=_allArt.length? Math.max(detPalette.length, this.maxColors()) : 0;
+    const detSwatches=detPalette.map(h=>({style:'width:22px;height:22px;border-radius:50%;flex:none;background:'+h+';box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);'}));
+    const colorEdu = detColors===0 ? 'Add artwork and we\'ll read its colours here — you never count them yourself.' : (detColors<=3 ? 'A few solid colours — screen print is cheapest and hardest wearing at this quantity.' : (detColors+' colours or gradients — full colour keeps every one, priced as one flat rate instead of per colour.'));
+    const methodChips=Object.keys(this.METHODS).map(m=>{ const disabled=blank.poly&&!this.METHODS[m].poly; const on=method===m; const isRec=recMethod===m;
+      return {label:this.METHODS[m].plain, note:({screen:'1–3 solid colours',dtg:'gradients & photos',dtf:'any fabric · no minimum',emb:'stitched · premium'})[m], price:this.fmt(this.unit(m,priceQ,Math.max(1,nP))), isRec:isRec?'Recommended':'', disabled,
+        onSelect:disabled?(()=>{}):(()=>this.set('methodOverride',m)),
+        style:'text-align:left;flex:1;min-width:calc(50% - 4px);cursor:'+(disabled?'not-allowed':'pointer')+';border-radius:11px;padding:9px 12px;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(disabled?'#F7F8FB':(on?'#EEF3FF':'#fff'))+';opacity:'+(disabled?'0.5':'1')+';'}; });
+
+    // ---- cart lines ----
+    const sizeSummaryOf=(l)=>{ if(l.sizeMode==='single') return l.oneSize+' × '+l.qty; if(l.sizeMode==='group') return l.qty+' shirts · sizes via link'; return this.SIZES.filter(k=>l.split[k]>0).map(k=>k+' '+l.split[k]).join(' · '); };
+    const sizeChipsOf=(l)=>{ if(l.sizeMode==='single') return [{t:l.oneSize+' × '+l.qty}]; if(l.sizeMode==='group') return [{t:l.qty+' via link'}]; return this.SIZES.filter(k=>l.split[k]>0).map(k=>({t:k+' '+l.split[k]})); };
+    const cartLines=S.cart.map(l=>({ name:l.name+' · '+l.colorName, design:l.designSummary,
+      art:{__html:this.garment({hex:l.hex,type:l.type,face:'front',art:true,h:80})},
+      sizeChips:sizeChipsOf(l), sizeSummary:sizeSummaryOf(l),
+      qty:l.qty, unit:this.fmt(l.unit), lineTotal:this.fmt(l.lineTotal),
+      onEdit:()=>this.editLine(l.id), onRemove:()=>this.removeLine(l.id) }));
+    const breakdown=[
+      {label:'Shirts — '+cartUnits+' total', val:this.fmt(cartTotal), valStyle:'font-weight:600;'},
+      {label:'Printing', val:'included', valStyle:'color:#1F9D6B;font-weight:600;'},
+      {label:'Shipping', val:'included', valStyle:'color:#1F9D6B;font-weight:600;'},
+      {label:'Tax', val:'included', valStyle:'color:#1F9D6B;font-weight:600;'}
+    ];
+
+    // ---- design summary ----
+    const designParts=this.PANELS.filter(p=>this.panelHasArt(p.k)).map(p=>p.name);
+    const designSummary=designParts.length?(designParts.length+' panel'+(designParts.length>1?'s':'')+' · '+this.METHODS[method].plain):'Blank';
+
+    // ---- sam ----
+    const samSizeBtns=this.SIZES.map(sz=>{ const on=S.samPicked===sz;
+      return {label:sz,onSelect:()=>this.set('samPicked',sz),
+        style:'height:48px;border-radius:11px;cursor:pointer;font-size:15px;font-weight:600;border:1.5px solid '+(on?'#2D5BFF':'#E7E9F0')+';background:'+(on?'#EEF3FF':'#fff')+';color:'+(on?'#0B2A8A':'#14142B')+';'}; });
+
+    // ---- add-to-cart label ----
+    const canAdd = qt>0;
+    const addLabel = qt>0 ? ('Add to cart · '+this.fmt(lineTotal)) : 'Choose sizes to continue';
+
+    return {
+      showHeader:!isSam, catTag:(scr==='picker'?'CUSTOM MERCH · US':'T-SHIRTS · US'),
+      cartCount:String(cartUnits),
+      goHome:()=>this.go('picker'), goList:()=>this.go('list'), goCart:()=>this.go('cart'),
+      goCheckout:()=>this.go('checkout'), goPdp:()=>this.go('pdp'),
+
+      isPicker:scr==='picker', isList:scr==='list', isPdp:scr==='pdp', blankCards,
+      isCart:scr==='cart', isCheckout:scr==='checkout', isConfirm:scr==='confirm', isSam,
+
+      pickerTiles,
+
+      // PDP
+      blankName:blank.name, blankShort:blank.short, colorName:color.name,
+      unitFmt:this.fmt(unit), qtyTotal:qt, shirtWord:qt===1?'shirt':'shirts',
+      bulkHint: qt>=12?' · volume price':(qt===1?' · '+this.fmt(this.unit('screen',40,1))+' each at 40+':''),
+      specs:blank.specs.map(v=>({v})),
+      colorSwatches,
+      galleryArt, galleryLabel:cur.label, galThumbs,
+      galIsLive:!!cur.live, galIsPhoto:!!cur.photo, selectedHex:color.hex,
+      photoSrc:'./assets/'+blank.slug+'-'+({pfront:'front',pback:'back',pside:'side'}[S.pdpView]||'front')+'.png',
+      noDesign:!this.hasDesign(), hasDesign:this.hasDesign(),
+      designSummary, chipArt:{__html:this.garment({face:'front',art:true,h:52})},
+      showLowResPdp:this.anyLowRes(),
+      openStudio:()=>this.setState({studioOpen:true, activePanel:'front', viewAngle:0}),
+      clearDesign:()=>this.setState({panels:{front:{items:[]},back:{items:[]},lSleeve:{items:[]},rSleeve:{items:[]}}, selectedId:null}),
+      modeBtns, modeSingle:S.sizeMode==='single', modeMix:S.sizeMode==='mix', modeGroup:S.sizeMode==='group',
+      sizeBtns, oneSize:S.oneSize, oneChest:om.chest, oneWidth:om.width,
+      qty:S.qty, qtyInc:()=>this.set('qty',S.qty+1), qtyDec:()=>this.set('qty',Math.max(1,S.qty-1)),
+      splitRows,
+      mixSourceBtns, mixTarget:S.mixTarget, mixTargetInc:()=>this.set('mixTarget',S.mixTarget+1), mixTargetDec:()=>this.set('mixTarget',Math.max(1,S.mixTarget-1)),
+      reconcileText, reconcileStyle, reconcileDot, reconcileTextColor,
+      normalizeShown:S.normalizeShown, dismissNormalize:()=>this.set('normalizeShown',false),
+      roster, hasOutstanding, outstandingNote:outstanding+' of '+S.targetQty+' haven’t replied yet.',
+      chaseAll:()=>this.set('repliedCount',S.targetQty), assignDefault:()=>this.set('repliedCount',S.targetQty),
+      targetQty:S.targetQty, tgtInc:()=>this.set('targetQty',S.targetQty+1), tgtDec:()=>this.set('targetQty',Math.max(1,S.targetQty-1)),
+      groupLink:'promodash.com/g/team-'+S.targetQty, copyLabel:S.copied?'Copied':'Copy', copyLink:()=>this.set('copied',true),
+      repliedCount:S.repliedCount, openSam:()=>this.go('sam'),
+      shipShort:shipD.short, addLabel, addToCart:()=>this.addToCart(),
+      addBtnStyle:'width:100%;background:#1F9D6B;color:#fff;border:none;border-radius:12px;padding:15px;font-size:15.5px;font-weight:600;box-shadow:0 8px 20px rgba(31,157,107,.26);'+(canAdd?'cursor:pointer;':'opacity:.45;cursor:not-allowed;'),
+      details:[
+        {tag:'NO JARGON', title:'We pick how it prints', body:'Answer three plain questions in the studio. We choose the method and say why — you never pick one by name.'},
+        {tag:'FITS EVERYONE', title:'Sizes without the guesswork', body:'Order one size, mix a spread, or send a link and let people answer. Free exchange if one is off.'},
+        {tag:'DATED, NOT VAGUE', title:'A ship-by, never a range', body:'Every choice updates the all-in price and a real arrival date — no quotes, no waiting on a rep.'}
+      ],
+
+      // studio
+      studioOpen:S.studioOpen, closeStudio:()=>this.setState({studioOpen:false, pdpView:this.hasDesign()?'live':S.pdpView}),
+      facingLabel, facingTabs, activePanelName:apName,
+      studioIllus:S.studioMode==='illustration', studioPhoto:S.studioMode==='photo',
+      setModeIllus:()=>this.set('studioMode','illustration'), setModePhoto:()=>this.set('studioMode','photo'),
+      modeIllusStyle:modePill(S.studioMode==='illustration'), modePhotoStyle:modePill(S.studioMode==='photo'),
+      studioPhotoSrc:pSrc, studioPhotoArt:{__html:pArt},
+      studioBaseArt:{__html:this.garment({angle:S.viewAngle,box:true,noArt:true,h:2000})},
+      canvasArtShow, canvasItems,
+      rotStemStyle, rotHandleStyle, scaleHandleStyle,
+      canvasDown:(e)=>this.canvasDown(e), canvasMove:(e)=>this.canvasMove(e), canvasUp:(e)=>this.canvasUp(e),
+      scaleDown:(e)=>this.scaleDown(e), rotHandleDown:(e)=>this.rotHandleDown(e),
+      startRotate:(e)=>this.startRotate(e), rotateMove:(e)=>this.rotateMove(e), endRotate:(e)=>this.endRotate(e),
+      rotateLeft:()=>this.rotate(-90), rotateRight:()=>this.rotate(90),
+      addModeBtns, modeUpload:S.addMode==='upload', modeText:S.addMode==='text', modeAi:S.addMode==='ai',
+      panelHasArt:this.panelHasArt(ap), panelItemList, panelItemCount:apItems.length, multiItems:apItems.length>1, hasSelected:!!selO, noSelected:!selO,
+      onUpload:(e)=>this.onUpload(e), delSelected:()=>{ if(S.selectedId!=null) this.delItem(S.selectedId); },
+      hasPlacement:placements.length>0, placementBtns, isSleevePanel:(ap==='lSleeve'||ap==='rSleeve'), isFacePanel:(ap==='front'||ap==='back'),
+      artRot:(selO&&selO.rot)||0, onArtRot:(e)=>this.updItem(S.selectedId,{rot:Number(e.target.value)}),
+      showAutofit:this.artOverflow(ap), autofit:()=>this.autoFit(),
+      apHasColors:apPalette.length>0, apSwatches, apColorsLabel:(selO&&selO.colors?(selO.colors===1?'1 colour':selO.colors+' colours'):''),
+      panelTextDraft:S.panelTextDraft, onPanelText:(e)=>this.set('panelTextDraft',e.target.value),
+      applyText:()=>{ const txt=S.panelTextDraft||'Text'; this.addItem(ap,{src:'text',text:txt,file:'“'+txt+'”',note:'text · prints crisp',w:(ap==='lSleeve'||ap==='rSleeve')?3:6,rot:0,ar:2.4,resOk:true,colors:1,font:S.textFont,color:S.textColor,palette:[S.textColor]}); this.set('panelTextDraft',''); },
+      textFontBtns:this.FONTS.map(f=>({label:f.name,onSelect:()=>this.set('textFont',f.id),style:'cursor:pointer;border-radius:9px;padding:8px 11px;font-size:12px;font-weight:600;border:1.5px solid '+(S.textFont===f.id?'#2D5BFF':'#E7E9F0')+';background:'+(S.textFont===f.id?'#EEF3FF':'#fff')+';color:'+(S.textFont===f.id?'#0B2A8A':'#3C4152')+';font-family:'+f.family+';'})),
+      textColorBtns:this.TEXT_COLORS.map(c=>({onSelect:()=>this.set('textColor',c.hex),title:c.name,style:'width:26px;height:26px;flex:none;border-radius:50%;cursor:pointer;border:none;background:'+c.hex+';box-shadow:'+(S.textColor===c.hex?'0 0 0 2px #fff,0 0 0 4px #2D5BFF':'inset 0 0 0 1px rgba(0,0,0,.18)')+';'})),
+      aiDraft:S.aiDraft, onAiDraft:(e)=>this.set('aiDraft',e.target.value),
+      genAi:()=>{ this.addItem(ap,{src:'ai',file:'generated artwork',note:'AI · full colour, sharp for print',w:(ap==='lSleeve'||ap==='rSleeve')?3.5:7,rot:0,ar:1,resOk:true,colors:5,palette:['#E8484D','#2D5BFF','#1F9D6B','#D9A441','#14142B']}); this.set('aiDraft',''); },
+      showLowRes:!!(selO&&selO.resOk===false), redraw:()=>this.updItem(S.selectedId,{resOk:true,note:'redrawn sharp · prints clean'}),
+      artW:(selO&&selO.w)||6, onArtW:(e)=>this.updItem(S.selectedId,{w:Number(e.target.value)}),
+      studioTab:S.studioTab, tabArt:S.studioTab==='art', tabPrint:S.studioTab==='print',
+      setTabArt:()=>this.set('studioTab','art'), setTabPrint:()=>this.set('studioTab','print'),
+      artTabStyle:'flex:1;cursor:pointer;border:none;border-bottom:2px solid '+(S.studioTab==='art'?'#14142B':'transparent')+';background:none;padding:12px;font-size:13px;font-weight:600;color:'+(S.studioTab==='art'?'#14142B':'#9AA3B2')+';',
+      printTabStyle:'flex:1;cursor:pointer;border:none;border-bottom:2px solid '+(S.studioTab==='print'?'#14142B':'transparent')+';background:none;padding:12px;font-size:13px;font-weight:600;color:'+(S.studioTab==='print'?'#14142B':'#9AA3B2')+';',
+      printQuestions, verdictVerb:this.METHODS[method].verb,
+      verdictWhy:(method==='emb'?'Stitched thread for a raised, premium finish that lasts.':method==='dtf'?'Works on any fabric with no minimum — the safe pick for this blend.':method==='dtg'?'Full colour with crisp gradients, no colour counting.':'A few solid colours — cheapest and hardest wearing at this quantity.'),
+      verdictAlts, showPolyNote:blank.poly,
+      hasArtwork:nP>0, detColors, detColorsLabel:(detColors===1?'1 colour read from your file':detColors+' colours read from your file'), detSwatches, colorEdu,
+      methodChips, overrideOn:S.methodOverride!=null, useRecommend:()=>this.set('methodOverride',null),
+      noArtwork:nP===0, showQuestions:S.showQuestions, toggleQuestions:()=>this.set('showQuestions',!S.showQuestions), qChevron:S.showQuestions?'▾':'▸',
+      panelCountLabel:(nP===0?'blank':nP+' panel'+(nP>1?'s':'')), studioUnitFmt:this.fmt(unit),
+      applyDesign:()=>this.setState({studioOpen:false, pdpView:this.hasDesign()?'live':S.pdpView}),
+      addFromStudio:()=>this.addToCart(),
+      quickUpload:()=>this.setState({studioOpen:true,studioTab:'art',activePanel:'front',addMode:'upload',viewAngle:0}),
+      quickText:()=>this.setState({studioOpen:true,studioTab:'art',activePanel:'front',addMode:'text',viewAngle:0}),
+      methodSummary:this.METHODS[method].plain, detColorsShort:(detColors===1?'1 colour':detColors+' colours'),
+      openStudioPrint:()=>this.setState({studioOpen:true,studioTab:'print',activePanel:'front',viewAngle:0}),
+
+      // cart / checkout
+      cartLines, cartEmpty:S.cart.length===0, cartHasItems:S.cart.length>0,
+      cartTotalFmt:this.fmt(cartTotal), breakdown,
+      shipLong:shipD.long, email:S.email, onEmail:(e)=>this.set('email',e.target.value),
+      pay:()=>this.go('confirm'), orderId:S.orderId, startNew:()=>{ this.setState({cart:[]}); this.go('picker'); },
+
+      // sam
+      samOpen:S.samPicked===null, samDoneView:S.samPicked!==null, samSizeBtns, samPicked:S.samPicked,
+      samCompare:S.samCompare, samToggleCompare:()=>this.set('samCompare',!S.samCompare)
+    };
+  }
+  setSizeMode(m){ const S=this.state; const patch={sizeMode:m};
+    if(m==='mix' && this.splitTotal()===0){ const sp=Object.assign({},S.split); sp[S.oneSize]=Math.max(1,S.qty); patch.split=sp; }
+    this.setState(patch); }
+  addToCart(){ const S=this.state; const qt=this.qtyTotal(); if(qt<=0) return;
+    const method=this.chosenMethod(), nP=this.nPanels(); const unit=this.unit(method,qt>0?qt:1,Math.max(1,nP));
+    const designParts=this.PANELS.filter(p=>this.panelHasArt(p.k)).map(p=>p.name);
+    const line={ id:S.seq, name:this.blank().name, type:this.blank().type, colorName:this.COLORS[S.colorIdx].name, hex:this.COLORS[S.colorIdx].hex,
+      panels:JSON.parse(JSON.stringify(S.panels)), method, answers:Object.assign({},S.answers), methodOverride:S.methodOverride,
+      textFont:S.textFont, textColor:S.textColor, targetQty:S.targetQty, repliedCount:S.repliedCount,
+      sizeMode:S.sizeMode, oneSize:S.oneSize, split:Object.assign({},S.split),
+      qty:qt, unit, lineTotal:Math.round(unit*qt*100)/100,
+      designSummary:designParts.length?(designParts.length+' panel'+(designParts.length>1?'s':'')+' · '+this.METHODS[method].plain):'Blank' };
+    let cart=S.cart.slice(); if(S.editId!=null){ cart=cart.map(l=>l.id===S.editId?Object.assign(line,{id:S.editId}):l); }
+    else { cart.push(line); }
+    this.setState({cart, editId:null, seq:S.seq+1, screen:'cart', studioOpen:false}); if(typeof window!=='undefined'&&window.scrollTo){try{window.scrollTo(0,0);}catch(e){}} }
+  editLine(id){ const l=this.state.cart.find(x=>x.id===id); if(!l)return; const bi=this.BLANKS.findIndex(b=>b.name===l.name); const ci=this.COLORS.findIndex(c=>c.name===l.colorName);
+    this.setState({editId:id, blankIdx:bi<0?0:bi, colorIdx:ci<0?0:ci, panels:JSON.parse(JSON.stringify(l.panels)),
+      answers:Object.assign({wear:'week',feel:'soft',detail:'fine'},l.answers||{}), methodOverride:l.methodOverride!==undefined?l.methodOverride:null,
+      textFont:l.textFont||'grotesk', textColor:l.textColor||'#FFFFFF', targetQty:l.targetQty||12,
+      sizeMode:l.sizeMode, oneSize:l.oneSize, split:Object.assign({},l.split), qty:l.qty, screen:'pdp'}); }
+  removeLine(id){ this.setState({cart:this.state.cart.filter(l=>l.id!==id)}); }
+}
+</script>
+</body>
+</html>
