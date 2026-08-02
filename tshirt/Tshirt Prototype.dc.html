@@ -1237,7 +1237,7 @@ class Component extends DCLogic {
       // PDP
       blankName:blank.name, blankShort:blank.short, colorName:color.name,
       unitFmt:this.fmt(unit), qtyTotal:qt, shirtWord:qt===1?'shirt':'shirts',
-      bulkHint: qt>=12?' · volume price':(qt===1?' · '+this.fmt(this.unit('screen',40,1))+' each at 40+':''),
+      bulkHint: qt>=40?' · volume price applied':(qt<40?' · '+this.fmt(this.unit(method,40,nP))+' each at 40+':''),
       specs:blank.specs.map(v=>({v})),
       colorSwatches,
       galleryArt, galleryLabel:cur.label, galThumbs,
