@@ -1182,14 +1182,14 @@ class Component extends DCLogic {
       onEdit:()=>this.editLine(l.id), onRemove:()=>this.removeLine(l.id) }));
     const breakdown=[
       {label:'Shirts — '+cartUnits+' total', val:this.fmt(cartTotal), valStyle:'font-weight:600;'},
-      {label:'Printing', val:'included', valStyle:'color:#1F9D6B;font-weight:600;'},
+      {label:(nP>0?('Printing · '+(detColors===1?'1 colour':detColors+' colours')):'Printing'), val:'included', valStyle:'color:#1F9D6B;font-weight:600;'},
       {label:'Shipping', val:'included', valStyle:'color:#1F9D6B;font-weight:600;'},
       {label:'Tax', val:'included', valStyle:'color:#1F9D6B;font-weight:600;'}
     ];
 
     // ---- design summary ----
-    const designParts=this.PANELS.filter(p=>this.panelHasArt(p.k)).map(p=>p.name);
-    const designSummary=designParts.length?(designParts.length+' panel'+(designParts.length>1?'s':'')+' · '+this.METHODS[method].plain):'Blank';
+    const itemCount=this.allItems().length;
+    const designSummary=itemCount?(itemCount+' print'+(itemCount>1?'s':'')+(nP>1?(' across '+nP+' panels'):'')+' · '+this.METHODS[method].plain):'Blank';
 
     // ---- sam ----
     const samSizeBtns=this.SIZES.map(sz=>{ const on=S.samPicked===sz;
@@ -1307,14 +1307,14 @@ class Component extends DCLogic {
     if(m==='mix' && this.splitTotal()===0){ const sp=Object.assign({},S.split); sp[S.oneSize]=Math.max(1,S.qty); patch.split=sp; }
     this.setState(patch); }
   addToCart(){ const S=this.state; const qt=this.qtyTotal(); if(qt<=0) return;
-    const method=this.chosenMethod(), nP=this.nPanels(); const unit=this.unit(method,qt>0?qt:1,Math.max(1,nP));
-    const designParts=this.PANELS.filter(p=>this.panelHasArt(p.k)).map(p=>p.name);
+    const method=this.chosenMethod(), nP=this.nPanels(); const unit=this.unit(method,qt>0?qt:1,nP);
+    const itemCount=this.allItems().length;
     const line={ id:S.seq, name:this.blank().name, type:this.blank().type, colorName:this.COLORS[S.colorIdx].name, hex:this.COLORS[S.colorIdx].hex,
       panels:JSON.parse(JSON.stringify(S.panels)), method, answers:Object.assign({},S.answers), methodOverride:S.methodOverride,
       textFont:S.textFont, textColor:S.textColor, targetQty:S.targetQty, repliedCount:S.repliedCount,
       sizeMode:S.sizeMode, oneSize:S.oneSize, split:Object.assign({},S.split),
       qty:qt, unit, lineTotal:Math.round(unit*qt*100)/100,
-      designSummary:designParts.length?(designParts.length+' panel'+(designParts.length>1?'s':'')+' · '+this.METHODS[method].plain):'Blank' };
+      designSummary:itemCount?(itemCount+' print'+(itemCount>1?'s':'')+(nP>1?(' across '+nP+' panels'):'')+' · '+this.METHODS[method].plain):'Blank' };
     let cart=S.cart.slice(); if(S.editId!=null){ cart=cart.map(l=>l.id===S.editId?Object.assign(line,{id:S.editId}):l); }
     else { cart.push(line); }
     this.setState({cart, editId:null, seq:S.seq+1, screen:'cart', studioOpen:false}); if(typeof window!=='undefined'&&window.scrollTo){try{window.scrollTo(0,0);}catch(e){}} }
