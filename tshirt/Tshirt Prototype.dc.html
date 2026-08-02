@@ -246,16 +246,6 @@
                 <button onClick="{{ dismissNormalize }}" style="flex:none;background:#fff;border:1px solid #F0DCA8;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;color:#7A5200;cursor:pointer;">Got it</button>
               </div>
             </sc-if>
-            <div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
-              <span style="font-size:11px;font-weight:700;color:#9AA3B2;letter-spacing:0.5px;">WHO’S GETTING ONE</span>
-              <span style="font-size:10px;font-weight:600;color:#9AA3B2;background:#F2F4F8;border-radius:999px;padding:2px 7px;">optional</span>
-            </div>
-            <div style="margin-top:8px;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:11px;padding:4px 4px;">
-              <sc-for list="{{ roster }}" as="r" hint-placeholder-count="3">
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 11px;font-size:12.5px;"><span>{{ r.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#6B7280;">{{ r.size }}</span></div>
-              </sc-for>
-              <div style="padding:6px 11px;font-size:11.5px;color:#9AA3B2;">Not required to check out.</div>
-            </div>
           </sc-if>
 
           <!-- ASK THE TEAM (group link) -->
@@ -1062,7 +1052,6 @@ class Component extends DCLogic {
     const reconcileStyle=balanced?'background:#E7F6EF;border:1px solid #B9E4CE;':'background:#FFF8EC;border:1px solid #F0DCA8;';
     const reconcileDot='width:8px;height:8px;border-radius:50%;flex:none;background:'+(balanced?'#1F9D6B':'#C77700')+';';
     const reconcileTextColor=balanced?'#1F8A5B':'#7A5200';
-    const roster=[{name:'Maya Chen',size:'M'},{name:'Ravi Patel',size:'L'},{name:'Dana Ruiz',size:'S'}];
     const outstanding=Math.max(0,S.targetQty-S.repliedCount);
     const hasOutstanding=outstanding>0;
     const shipD=this.shipInfo(method, qt>0?qt:1);
@@ -1206,7 +1195,7 @@ class Component extends DCLogic {
       mixSourceBtns, mixTarget:S.mixTarget, mixTargetInc:()=>this.set('mixTarget',S.mixTarget+1), mixTargetDec:()=>this.set('mixTarget',Math.max(1,S.mixTarget-1)),
       reconcileText, reconcileStyle, reconcileDot, reconcileTextColor,
       normalizeShown:S.normalizeShown, dismissNormalize:()=>this.set('normalizeShown',false),
-      roster, hasOutstanding, outstandingNote:outstanding+' of '+S.targetQty+' haven’t replied yet.',
+      hasOutstanding, outstandingNote:outstanding+' of '+S.targetQty+' haven’t replied yet.',
       chaseAll:()=>this.set('repliedCount',S.targetQty), assignDefault:()=>this.set('repliedCount',S.targetQty),
       targetQty:S.targetQty, tgtInc:()=>this.set('targetQty',S.targetQty+1), tgtDec:()=>this.set('targetQty',Math.max(1,S.targetQty-1)),
       groupLink:'promodash.com/g/team-'+S.targetQty, copyLabel:S.copied?'Copied':'Copy', copyLink:()=>this.set('copied',true),
