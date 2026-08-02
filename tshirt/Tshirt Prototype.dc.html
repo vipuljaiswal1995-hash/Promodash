@@ -127,11 +127,11 @@
           <span style="font-size:13.5px;color:#6B7280;padding-bottom:4px;">each · {{ qtyTotal }} {{ shirtWord }}{{ bulkHint }}</span>
         </div>
 
-        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;">
+        <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;">
           <sc-for list="{{ specs }}" as="s" hint-placeholder-count="4">
-            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#3C4152;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1F9D6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ s.v }}
-            </div>
+            <span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;font-weight:500;color:#3C4152;background:#F2F4F8;border:1px solid #E7E9F0;border-radius:999px;padding:6px 12px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1F9D6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ s.v }}
+            </span>
           </sc-for>
         </div>
 
