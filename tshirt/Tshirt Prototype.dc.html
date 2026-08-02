@@ -137,12 +137,6 @@
 
         <!-- Colour -->
         <div style="margin-top:22px;padding-top:22px;border-top:1px solid #E7E9F0;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Blank</div>
-          <div style="display:flex;gap:8px;margin-bottom:18px;">
-            <sc-for list="{{ blankBtns }}" as="b" hint-placeholder-count="2">
-              <button onClick="{{ b.onSelect }}" style="{{ b.style }}"><span style="font-weight:600;">{{ b.name }}</span><span style="display:block;font-size:11px;opacity:.7;margin-top:1px;">{{ b.meta }}</span></button>
-            </sc-for>
-          </div>
           <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Colour <span style="color:#9AA3B2;font-weight:500;">· {{ colorName }}</span></div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <sc-for list="{{ colorSwatches }}" as="c" hint-placeholder-count="8">
@@ -757,7 +751,7 @@ class Component extends DCLogic {
     this.SHIP_SHORT='Fri 7 Aug'; this.SHIP_LONG='Friday 7 August';
     this.state = {
       screen:'picker',
-      blankIdx:0, colorIdx:0,
+      blankIdx:1, colorIdx:0,
       // preview
       pdpView:'pfront', viewAngle:0,
       // design
@@ -842,8 +836,8 @@ class Component extends DCLogic {
   }
   // coordinate space of the interactive canvas — adapts to photo vs illustration base
   _editSpace(){ const S=this.state, f=this._facePanel(S.viewAngle), chest=(f==='back')?'back':'front', editable=(f==='front'||f==='back');
-    if(S.studioMode!=='illustration'){ const tall=this.blank().type!=='polo';
-      return {vw:100, vh:(tall?120:100), area:(tall?{cx:50,cy:52,w:34,h:36}:{cx:50,cy:46,w:28,h:30}), panel:chest, editable, aspect:(tall?'100 / 120':'1 / 1')}; }
+    if(S.studioMode!=='illustration'){
+      return {vw:100, vh:100, area:{cx:52,cy:36,w:26,h:30}, panel:chest, editable, aspect:'1 / 1'}; }
     return {vw:320, vh:384, area:this.printArea(chest), panel:chest, editable, aspect:'320 / 384'}; }
   itemMetrics(it,panelKey,areaOv){
     const A=areaOv||this.printArea(panelKey);
@@ -1038,15 +1032,12 @@ class Component extends DCLogic {
     // ---- PDP gallery: real photos, recoloured, with the design composited on ----
     const galViews=[{view:'pfront',v:'front',panel:'front',label:'FRONT'},{view:'pback',v:'back',panel:'back',label:'BACK'},{view:'pside',v:'side',panel:'rSleeve',label:'SIDE'}];
     const gcur=galViews.find(x=>x.view===S.pdpView)||galViews[0];
-    const gTall=blank.type!=='polo'; const gVB=gTall?120:100;
-    const gArea=gcur.v==='side'?(gTall?{cx:44,cy:42,w:13,h:18}:{cx:43,cy:40,w:12,h:16}):(gTall?{cx:50,cy:52,w:34,h:36}:{cx:50,cy:46,w:28,h:30});
-    const galleryComposite={__html:'<svg viewBox="0 0 100 '+gVB+'" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">'+this.artOn(gcur.panel,1,gArea)+'</svg>'};
+    const gArea=gcur.v==='side'?{cx:42,cy:33,w:12,h:16}:{cx:52,cy:36,w:26,h:30};
+    const galleryComposite={__html:'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">'+this.artOn(gcur.panel,1,gArea)+'</svg>'};
     const galleryLabel=gcur.label; const photoSrc='./assets/'+blank.slug+'-'+gcur.v+'.png';
     const galThumbs=galViews.map(it=>({ src:'./assets/'+blank.slug+'-'+it.v+'.png', onClick:()=>this.set('pdpView',it.view),
       style:'position:relative;width:72px;height:84px;border-radius:12px;overflow:hidden;cursor:pointer;background:#fff;padding:0;border:2px solid '+(it.view===S.pdpView?'#2D5BFF':'#E7E9F0')+';'}));
     // ---- blank selector + colours ----
-    const blankBtns=this.BLANKS.map((b,i)=>({name:b.short.replace(/^\w/,c=>c.toUpperCase()), meta:b.fabric, onSelect:()=>this.setState({blankIdx:i}),
-      style:'flex:1;text-align:left;cursor:pointer;border-radius:11px;padding:10px 13px;border:1.5px solid '+(i===S.blankIdx?'#2D5BFF':'#E7E9F0')+';background:'+(i===S.blankIdx?'#EEF3FF':'#fff')+';color:'+(i===S.blankIdx?'#0B2A8A':'#14142B')+';font-size:13px;'}));
     const swatch=(i)=>{ const c=this.COLORS[i]; const on=i===S.colorIdx;
       return 'width:34px;height:34px;border-radius:10px;cursor:pointer;background:'+c.hex+';border:2px solid '+(on?'#2D5BFF':'transparent')+';box-shadow:0 0 0 1px rgba(0,0,0,.14)'+(on?', 0 0 0 4px rgba(45,91,255,.18)':'')+';'; };
     const colorSwatches=this.COLORS.map((c,i)=>({name:c.name,onSelect:()=>this.set('colorIdx',i),style:swatch(i)}));
@@ -1082,11 +1073,9 @@ class Component extends DCLogic {
     // photo-mode compositing (uses ./assets/<slug>-<view>.png)
     const pView=facing===2?'back':(facing===1||facing===3)?'side':'front';
     const pPanel=facing===0?'front':facing===2?'back':facing===1?'rSleeve':'lSleeve';
-    // calibrate overlay to the photo's aspect: polo photos are square (1:1), tee cutouts are 5:6
-    const pTall=blank.type!=='polo'; const pVB=pTall?120:100;
-    const pArea=pView==='side'
-      ? (pTall?{cx:44,cy:42,w:13,h:18}:{cx:43,cy:40,w:12,h:16})
-      : (pTall?{cx:50,cy:52,w:34,h:36}:{cx:50,cy:46,w:28,h:30});
+    // photos are square 1024² cutouts; chest calibrated to their content
+    const pVB=100;
+    const pArea=pView==='side'?{cx:42,cy:33,w:12,h:16}:{cx:52,cy:36,w:26,h:30};
     const pSrc='./assets/'+blank.slug+'-'+pView+'.png';
     const pBox='<rect x="'+(pArea.cx-pArea.w/2)+'" y="'+(pArea.cy-pArea.h/2)+'" width="'+pArea.w+'" height="'+pArea.h+'" rx="1" fill="none" stroke="#2D5BFF" stroke-width="0.4" stroke-dasharray="2 2" opacity="0.55"/>';
     const pArt='<svg viewBox="0 0 100 '+pVB+'" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">'+pBox+this.artOn(pPanel,1,pArea)+'</svg>';
@@ -1199,7 +1188,7 @@ class Component extends DCLogic {
       pickerTiles,
 
       // PDP
-      blankName:blank.name, blankShort:blank.short, colorName:color.name, blankBtns,
+      blankName:blank.name, blankShort:blank.short, colorName:color.name,
       unitFmt:this.fmt(unit), qtyTotal:qt, shirtWord:qt===1?'shirt':'shirts',
       bulkHint: qt>=40?' · volume price applied':(qt<40?' · '+this.fmt(this.unit(method,40,nP))+' each at 40+':''),
       specs:blank.specs.map(v=>({v})),
