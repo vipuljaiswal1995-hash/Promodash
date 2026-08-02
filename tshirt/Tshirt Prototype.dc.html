@@ -1032,7 +1032,7 @@ class Component extends DCLogic {
     // ---- PDP gallery: real photos, recoloured, with the design composited on ----
     const galViews=[{view:'pfront',v:'front',panel:'front',label:'FRONT'},{view:'pback',v:'back',panel:'back',label:'BACK'},{view:'pside',v:'side',panel:'rSleeve',label:'SIDE'}];
     const gcur=galViews.find(x=>x.view===S.pdpView)||galViews[0];
-    const gArea=gcur.v==='side'?{cx:60,cy:31,w:9,h:11}:{cx:52,cy:36,w:26,h:30};
+    const gArea=gcur.v==='side'?{cx:54,cy:32,w:12,h:13}:{cx:52,cy:36,w:26,h:30};
     const galleryComposite={__html:'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">'+this.artOn(gcur.panel,1,gArea)+'</svg>'};
     const galleryLabel=gcur.label; const photoSrc='./assets/'+blank.slug+'-'+gcur.v+'.png';
     const galThumbs=galViews.map(it=>({ src:'./assets/'+blank.slug+'-'+it.v+'.png', onClick:()=>this.set('pdpView',it.view),
@@ -1073,10 +1073,9 @@ class Component extends DCLogic {
     // photo-mode compositing (uses ./assets/<slug>-<view>.png) — separate left/right side photos
     const pView=facing===2?'back':facing===1?'rside':facing===3?'lside':'front';
     const pPanel=facing===0?'front':facing===2?'back':facing===1?'rSleeve':'lSleeve';
-    const pSide=(pView==='rside'||pView==='lside');
-    // photos are square 1024² cutouts; chest & sleeve calibrated to their content
+    // print zones measured from the actual photos (sleeve differs per side — the side photos are mirrored)
     const pVB=100;
-    const pArea=pSide?{cx:60,cy:31,w:9,h:11}:{cx:52,cy:36,w:26,h:30};
+    const pArea=pView==='rside'?{cx:54,cy:32,w:12,h:13}:pView==='lside'?{cx:46,cy:32,w:12,h:13}:{cx:52,cy:36,w:26,h:30};
     const pSrc='./assets/'+blank.slug+'-'+pView+'.png';
     const pBox='<rect x="'+(pArea.cx-pArea.w/2)+'" y="'+(pArea.cy-pArea.h/2)+'" width="'+pArea.w+'" height="'+pArea.h+'" rx="1" fill="none" stroke="#2D5BFF" stroke-width="0.4" stroke-dasharray="2 2" opacity="0.55"/>';
     const pArt='<svg viewBox="0 0 100 '+pVB+'" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">'+pBox+this.artOn(pPanel,1,pArea)+'</svg>';
