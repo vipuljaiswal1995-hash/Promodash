@@ -532,13 +532,13 @@
               <div style="position:absolute;inset:0;pointer-events:none;" dangerouslySetInnerHTML="{{ studioBaseArt }}"></div>
               <sc-if value="{{ canvasArtShow }}" hint-placeholder-val="{{ false }}">
                 <sc-for list="{{ canvasItems }}" as="ci" hint-placeholder-count="1">
-                  <div style="{{ ci.wrap }}" onPointerDown="{{ ci.onDown }}">
+                  <div style="{{ ci.wrap }}">
                     <sc-if value="{{ ci.isImg }}" hint-placeholder-val="{{ false }}"><img src="{{ ci.url }}" alt="" style="width:100%;height:100%;object-fit:contain;pointer-events:none;display:block;"></sc-if>
                     <sc-if value="{{ ci.isSvg }}" hint-placeholder-val="{{ true }}"><div style="width:100%;height:100%;pointer-events:none;" dangerouslySetInnerHTML="{{ ci.inner }}"></div></sc-if>
                     <sc-if value="{{ ci.selected }}" hint-placeholder-val="{{ true }}">
                       <div style="{{ rotStemStyle }}"></div>
-                      <div style="{{ rotHandleStyle }}" onPointerDown="{{ rotHandleDown }}"></div>
-                      <div style="{{ scaleHandleStyle }}" onPointerDown="{{ scaleDown }}"></div>
+                      <div style="{{ rotHandleStyle }}"></div>
+                      <div style="{{ scaleHandleStyle }}"></div>
                     </sc-if>
                   </div>
                 </sc-for>
@@ -989,12 +989,29 @@ class Component extends DCLogic {
 
   // ---------- direct manipulation of artwork (drag / scale / rotate on canvas) ----------
   _cap(e){ try{ if(e&&e.currentTarget&&e.currentTarget.setPointerCapture&&e.pointerId!==undefined) e.currentTarget.setPointerCapture(e.pointerId); }catch(_){} }
-  canvasDown(e){ this._cap(e); this.startRotate(e); }
+  // All pointer work happens on the (stable) canvas element; we hit-test which item was grabbed.
+  canvasDown(e){
+    const box=e.currentTarget.getBoundingClientRect();
+    const facing=this._facePanel(this.state.viewAngle), editable=(facing==='front'||facing==='back');
+    if(box.width && editable){
+      const vx=(e.clientX-box.left)/box.width*320, vy=(e.clientY-box.top)/box.height*384, k=facing;
+      // handles on the currently-selected item take priority
+      const sid=this.state.selectedId, sit=this.findItem(sid);
+      if(sit && this.items(k).some(o=>o.id===sid)){
+        const m=this.itemMetrics(sit,k);
+        if(Math.hypot(vx-(m.cx+m.awpx/2), vy-(m.cy+m.awh/2))<13){ this._cap(e); this._startMan('scale',e,sid); return; }
+        if(Math.hypot(vx-m.cx, vy-(m.cy-m.awh/2-15))<14){ this._cap(e); this._startMan('rotate',e,sid); return; }
+      }
+      // topmost item under the pointer → select + move
+      const its=this.items(k);
+      for(let i=its.length-1;i>=0;i--){ const it=its[i], m=this.itemMetrics(it,k);
+        if(vx>=m.cx-m.awpx/2-2 && vx<=m.cx+m.awpx/2+2 && vy>=m.cy-m.awh/2-2 && vy<=m.cy+m.awh/2+2){
+          if(it.id!==sid) this.setState({selectedId:it.id}); this._cap(e); this._startMan('move',e,it.id); return; } }
+    }
+    this._cap(e); this.startRotate(e); // empty space → rotate the shirt
+  }
   canvasMove(e){ if(this._man) this._manMove(e); else if(this._drag) this.rotateMove(e); }
   canvasUp(e){ if(this._man) this._man=null; if(this._drag) this.endRotate(e); }
-  artDown(id,e){ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({selectedId:id}); this._cap(e); this._startMan('move',e,id); }
-  scaleDown(e){ if(e&&e.stopPropagation)e.stopPropagation(); this._cap(e); this._startMan('scale',e); }
-  rotHandleDown(e){ if(e&&e.stopPropagation)e.stopPropagation(); this._cap(e); this._startMan('rotate',e); }
   _startMan(mode,e,idOverride){ const id=idOverride!==undefined?idOverride:this.state.selectedId; const it=this.findItem(id); if(!it)return;
     this._man={mode,id,sx:e.clientX,sy:e.clientY,ox:it.x||0,oy:it.y||0,ow:it.w||6,orot:it.rot||0}; }
   _manMove(e){ const M=this._man; if(!M)return; const box=e.currentTarget.getBoundingClientRect(); if(!box.width)return; const A=this.printArea(this._facePanel(this.state.viewAngle));
@@ -1119,8 +1136,7 @@ class Component extends DCLogic {
       return '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" width="100%" height="100%"><polygon points="50,14 82,66 18,66" fill="'+c1+'"/><polygon points="50,30 68,60 32,60" fill="'+c3+'"/><text x="50" y="88" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="18" fill="'+c2+'" letter-spacing="1">ACME</text></svg>'; };
     const canvasItems=this.items(chestKey).map(it=>{ const m=this.itemMetrics(it,chestKey); const on=it.id===S.selectedId;
       return {id:it.id, selected:on, isImg:!!it.url, isSvg:!it.url, url:it.url||'', inner:{__html:itemInner(it)},
-        onDown:(e)=>this.artDown(it.id,e),
-        wrap:'position:absolute;left:'+(m.cx/320*100).toFixed(2)+'%;top:'+(m.cy/384*100).toFixed(2)+'%;width:'+(m.awpx/320*100).toFixed(2)+'%;height:'+(m.awh/384*100).toFixed(2)+'%;transform:translate(-50%,-50%) rotate('+(it.rot||0)+'deg);cursor:grab;touch-action:none;'+(on?'outline:1.5px dashed #5B8CFF;outline-offset:4px;':'outline:1px dashed rgba(91,140,255,.4);outline-offset:3px;')}; });
+        wrap:'position:absolute;pointer-events:none;left:'+(m.cx/320*100).toFixed(2)+'%;top:'+(m.cy/384*100).toFixed(2)+'%;width:'+(m.awpx/320*100).toFixed(2)+'%;height:'+(m.awh/384*100).toFixed(2)+'%;transform:translate(-50%,-50%) rotate('+(it.rot||0)+'deg);'+(on?'outline:1.5px dashed #5B8CFF;outline-offset:4px;':'outline:1px dashed rgba(91,140,255,.4);outline-offset:3px;')}; });
     const facings=[['front','Front'],['back','Back'],['lSleeve','L sleeve'],['rSleeve','R sleeve']];
     const facingTabs=facings.map(f=>{ const on=S.activePanel===f[0]; const has=this.panelHasArt(f[0]);
       return {label:f[1],onClick:()=>this.selectPanel(f[0]),
@@ -1256,7 +1272,6 @@ class Component extends DCLogic {
       canvasArtShow, canvasItems,
       rotStemStyle, rotHandleStyle, scaleHandleStyle,
       canvasDown:(e)=>this.canvasDown(e), canvasMove:(e)=>this.canvasMove(e), canvasUp:(e)=>this.canvasUp(e),
-      scaleDown:(e)=>this.scaleDown(e), rotHandleDown:(e)=>this.rotHandleDown(e),
       startRotate:(e)=>this.startRotate(e), rotateMove:(e)=>this.rotateMove(e), endRotate:(e)=>this.endRotate(e),
       rotateLeft:()=>this.rotate(-90), rotateRight:()=>this.rotate(90),
       addModeBtns, modeUpload:S.addMode==='upload', modeText:S.addMode==='text', modeAi:S.addMode==='ai',
